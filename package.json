@@ -1,0 +1,19 @@
+{
+  "name": "telollevo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaimytaco/telollevo.git"
+  },
+  "author": "Impar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaimytaco/telollevo/issues"
+  },
+  "homepage": "https://github.com/jaimytaco/telollevo#readme"
+}
