@@ -1,0 +1,29 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: IsidoraSans-Bold;
+    src: url(/fonts/isidora-sans/IsidoraSans-Bold.ttf) format('truetype'),
+         url(/fonts/isidora-sans/IsidoraSans-Bold.otf) format('opentype');
+    display: swap;
+}
+
+@font-face {
+    font-family: IsidoraSans-Regular;
+    src: url(/fonts/isidora-sans/IsidoraSans-Regular.ttf) format('truetype'),
+         url(/fonts/isidora-sans/IsidoraSans-Regular.otf) format('opentype');
+    display: swap;
+}
+
+body{
+    font: 12px/1.2 IsidoraSans-Regular, sans-serif;
+    color: #444344;
+}
+
+h1{
+    color: green;
+    font-size: 20px;
+}
