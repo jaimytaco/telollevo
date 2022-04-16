@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "telollevo-e311e"
+  },
+  "targets": {
+    "telollevo-e311e": {
+      "hosting": {
+        "qa": [
+          "qa-telollevo-e311e"
+        ]
+      }
+    }
+  }
+}

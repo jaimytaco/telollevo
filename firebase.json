@@ -1,0 +1,31 @@
+{
+  "hosting": [
+    {
+      "public": "dist",
+      "target": "prod",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "public": "dist",
+      "target": "dev",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "public": "dist",
+      "target": "qa",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    }
+  ]
+}

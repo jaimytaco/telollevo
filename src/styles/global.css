@@ -44,12 +44,12 @@ h3{
 }
 
 h4{
-    font: 1em/1.2 IsidoraSans-Bold, sans-serif;
+    font: 1.167em/1.2 IsidoraSans-Bold, sans-serif;
 }
 
 a,
 button{
-    font-family: IsidoraSans-SemiBold;
+    font: 1.167em/1.2 IsidoraSans-SemiBold, sans-serif;
     color: #444344;
     border: none;
     background: none;
@@ -60,9 +60,10 @@ li{
 }
 
 details{
+    font-size: 1.33em;
     background: #F0F1FA;
-    padding: 12px;
-    padding-left: 50px;
+    padding: 16px;
+    padding-left: 58px;
     border-radius: 8px;
 }
 
@@ -70,7 +71,7 @@ details summary{
     font-family: IsidoraSans-SemiBold;
     position: relative;
     min-height: 30px;
-    padding-right: 18px;
+    padding-right: 22px;
     display: flex;
     flex-flow: row wrap;
     align-items: center;
@@ -83,8 +84,9 @@ details[open] summary{
 details summary::before{
     content: '';
     position: absolute;
-    top: 0;
-    left: -38px;
+    top: 50%;
+    left: -42px;
+    transform: translateY(-50%);
     width: 30px;
     height: 30px;
     background-image: url(/img/icon/luggage.svg);
@@ -97,10 +99,14 @@ details summary::after{
     top: 50%;
     right: 0;
     transform: translateY(-50%);
-    width: 10px;
-    height: 10px;
+    width: 14px;
+    height: 14px;
     background-image: url(/img/icon/chevron-down.svg);
     background-size: contain;
+}
+
+details[open] summary::after{
+    transform: translateY(-50%) rotate(180deg);
 }
 
 details #text{
@@ -109,6 +115,7 @@ details #text{
 
 .btn{
     padding: 8px 12px;
+    padding-bottom: 6px !important;
     border-radius: 8px;
     text-decoration: none;
     min-height: 40px;
@@ -116,6 +123,11 @@ details #text{
     flex-flow: row wrap;
     align-items: center;
     gap: 12px;
+}
+
+.btn img,
+.btn svg{
+    margin-bottom: 2px;
 }
 
 .btn.btn-primary{
@@ -136,7 +148,7 @@ details #text{
 }
 
 .btn.btn-complain-book{
-    padding: 16px 12px;
+    padding: 16px 12px !important;
     width: fit-content;
 }
 
@@ -194,7 +206,7 @@ main{
 
 section{
     width: 100%;
-    padding: 48px 16px;
+    padding: 54px 16px;
 }
 
 section.s-hero{
@@ -217,7 +229,7 @@ footer{
     padding: 48px 16px 24px 16px;
     display: flex;
     flex-flow: column wrap;
-    gap: 20px;
+    gap: 24px;
 }
 
 footer ul{
@@ -267,9 +279,12 @@ footer ul.f-caption li:last-child{
 }
 
 .card.card-5{
-    padding: 24px 12px;
+    padding: 24px 32px;
     text-align: center;
     border-radius: 40px;
+    min-height: calc(70vh - 64px - 24px);
+    flex-flow: column wrap;
+    justify-content: center;
 }
 
 .card.card-5.c-5-bg-1{
@@ -284,6 +299,11 @@ footer ul.f-caption li:last-child{
     display: flex;
     flex-flow: column wrap;
     gap: 4px;
+    width: 100%;
+}
+
+.card.card-1 .c-info{
+    width: auto;
     flex: 1;
 }
 
@@ -298,7 +318,7 @@ footer ul.f-caption li:last-child{
 .card .c-multiple-thumbnail{
     position: relative;
     width: 100%;
-    padding: 16px 16px 4px 16px;
+    padding: 16px;
     display: grid;
     grid-template-rows: auto auto;
     grid-template-columns: auto auto;
@@ -323,7 +343,7 @@ footer ul.f-caption li:last-child{
     top: 16px;
     left: 50%;
     width: 50%;
-    height: 100%;
+    height: 95%;
     background-image: url(/img/icon/spark-2.svg);
     background-repeat: no-repeat;
     background-size: contain;
@@ -371,6 +391,14 @@ footer ul.f-caption li:last-child{
 
 .card.card-4 .c-thumbnail{
     display: none;
+}
+
+@media (min-width: 360px){
+    .card .c-thumbnail img,
+    .card .c-thumbnail svg{
+        width: 164px;
+        height: auto;
+    }
 }
 
 
