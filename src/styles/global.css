@@ -55,10 +55,63 @@ button{
     background: none;
 }
 
+li{
+    list-style: none;
+}
+
+details{
+    background: #F0F1FA;
+    padding: 12px;
+    padding-left: 50px;
+    border-radius: 8px;
+}
+
+details summary{
+    font-family: IsidoraSans-SemiBold;
+    position: relative;
+    min-height: 30px;
+    padding-right: 18px;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
+
+details[open] summary{
+    margin-bottom: 8px;
+}
+
+details summary::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -38px;
+    width: 30px;
+    height: 30px;
+    background-image: url(/img/icon/luggage.svg);
+    background-size: contain;
+}
+
+details summary::after{
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background-image: url(/img/icon/chevron-down.svg);
+    background-size: contain;
+}
+
+details #text{
+    color: red;
+}
+
 .btn{
     padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
     min-height: 40px;
-    border-radius: 50%;
     display: flex;
     flex-flow: row wrap;
     align-items: center;
@@ -66,13 +119,30 @@ button{
 }
 
 .btn.btn-primary{
+    background: #6E1EE6;
+    color: #fff;
+}
+
+.btn.btn-secondary{
     background: #F0F1FA;
+}
+
+.btn.btn-terciary{
+    background: transparent;
+}
+
+.btn.btn-bordered{
+    border: 1px solid #F0F1FA;
 }
 
 .btn.btn-complain-book{
     padding: 16px 12px;
-    border-radius: 8px;
     width: fit-content;
+}
+
+.btn.btn-round{
+    border-radius: 40px;
+    padding: 8px 16px;
 }
 
 img,
@@ -92,6 +162,7 @@ header{
     width: 100%;
     padding: 12px 16px;
     background: #fff;
+    z-index: 99;
     display: flex;
     flex-flow: row wrap;
     align-items: center;
@@ -126,13 +197,24 @@ section{
     padding: 48px 16px;
 }
 
-section .s-header{
+section.s-hero{
+    padding-top: 12px;
+    display: flex;
+    flex-flow: column wrap;
+    gap: 12px;
+}
+
+section .s-header-1{
     margin-bottom: 32px;
+}
+
+section .s-header-2{
+    margin-bottom: 24px;
 }
 
 footer{
     width: 100%;
-    padding: 24px 16px;
+    padding: 48px 16px 24px 16px;
     display: flex;
     flex-flow: column wrap;
     gap: 20px;
@@ -142,10 +224,6 @@ footer ul{
     display: flex;
     flex-flow: column;
     gap: 8px;
-}
-
-footer ul li{
-    list-style: none;
 }
 
 footer a{
@@ -165,22 +243,134 @@ footer ul.f-caption li:last-child{
     width: 100%;
 }
 
-.card-group-1{
+.card-group{
     display: flex;
     flex-flow: column wrap;
+}
+
+.card-group{
     gap: 32px;
 }
 
-.card-1{
-    padding: 0 24px;
+.card{
     display: flex;
     flex-flow: row wrap;
     gap: 16px;
 }
 
-.card-1 .c-1-info{
+.card.card-1{
+    padding: 0 24px;
+}
+
+.card.card-4{
+    text-align: center;
+}
+
+.card.card-5{
+    padding: 24px 12px;
+    text-align: center;
+    border-radius: 40px;
+}
+
+.card.card-5.c-5-bg-1{
+    background: #F5EFFD;
+}
+
+.card.card-5.c-5-bg-2{
+    background: #FEF9ED;
+}
+
+.card .c-info{
     display: flex;
     flex-flow: column wrap;
     gap: 4px;
     flex: 1;
 }
+
+.card.card-3 .c-info{
+    gap: 12px;
+}
+
+.card .c-info p{
+    font-size: 1.33em;
+}
+
+.card .c-multiple-thumbnail{
+    position: relative;
+    width: 100%;
+    padding: 16px 16px 4px 16px;
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: auto auto;
+    gap: 16px;
+}
+
+.card .c-multiple-thumbnail::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 85%;
+    background-image: url(/img/icon/spark-1.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.card .c-multiple-thumbnail::after{
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    background-image: url(/img/icon/spark-2.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.card .c-multiple-thumbnail picture img{
+    max-width: 100%;
+}
+
+.card .c-multiple-thumbnail picture:nth-child(1){
+    grid-column: 1 / span 1;
+    grid-row: 1 / span 2;
+    justify-self: end;
+}
+
+.card .c-multiple-thumbnail picture:nth-child(2){
+    margin-top: 16px;
+}
+
+.card .c-actions{
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    gap: 16px;
+}
+
+.card.card-4 .c-actions,
+.card.card-5 .c-actions{
+    justify-content: center;
+}
+
+.card .c-actions > *{
+    width: fit-content;
+}
+
+.card.card-5 .c-actions .btn-terciary{
+    color: #6E1EE6;
+}
+
+.card .c-thumbnail{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.card.card-4 .c-thumbnail{
+    display: none;
+}
+
+
