@@ -450,7 +450,7 @@ footer ul.f-caption li:last-child {
     }
 
     footer {
-        padding: 96px 48px 48px 48px;
+        padding: 96px 48px 24px 48px;
     }
 
     .btn {
@@ -557,7 +557,7 @@ footer ul.f-caption li:last-child {
     }
 
     footer {
-        padding: 96px 120px 48px 120px;
+        padding: 96px 120px 24px 120px;
         display: grid;
         grid-template-columns: 2fr repeat(3, 1fr);
         grid-template-rows: repeat(3, auto) 1px auto;
@@ -748,6 +748,11 @@ footer ul.f-caption li:last-child {
         width: 70% !important;
     }
 
+    .card.card-1 picture *{
+        width: 64px;
+        height: 64px;
+    }
+
     .card.card-2 .c-info{
         margin-top: auto;
         margin-bottom: 24px;
@@ -775,14 +780,14 @@ footer ul.f-caption li:last-child {
         grid-row: 1 / span 2;
     }
 
-    .card .c-thumbnail picture *{
+    .card.card-4 .c-thumbnail picture *{
         width: 100%;
         height: auto;
         padding-right: 48px;
     }
 
     .card.card-5 .c-thumbnail picture *{
-        min-width: 240px;
+        min-width: 200px;
     }
 
     .card.card-4 .c-info{
