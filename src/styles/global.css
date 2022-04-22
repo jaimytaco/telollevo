@@ -671,7 +671,12 @@ footer ul.f-caption li:last-child {
     }
 
     section.s-hero .card.card-5{
-        padding: 144px;
+        padding: 120px 0;
+        align-items: center;
+    }
+
+    section.s-hero .card.card-5 .c-info{
+        max-width: 400px;
     }
 
     section.s-faq{
@@ -787,7 +792,7 @@ footer ul.f-caption li:last-child {
     }
 
     .card.card-5 .c-thumbnail picture *{
-        min-width: 200px;
+        min-width: 240px;
     }
 
     .card.card-4 .c-info{
@@ -806,5 +811,44 @@ footer ul.f-caption li:last-child {
         justify-content: left;
         grid-column: 2 / span 1;
         grid-row: 2 / span 1;
+    }
+
+    section.s-hero .card.card-5{
+        transition: flex .5s ease,
+                    background-color .5s ease;
+    }
+
+    section.s-hero .card.card-5 .c-actions{
+        opacity: 0;
+        visibility: hidden;
+        transition: all .3s ease;
+    }
+
+    section.s-hero .card.card-5:hover .c-actions{
+        opacity: 1;
+        visibility: visible;
+    }
+
+    section.s-hero .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-primary{
+        background: #EDB730;
+        color: #000;
+    }
+
+    section.s-hero .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-terciary{
+        color: #fff;
+    }
+
+    section.s-hero .card.card-5:hover{
+        flex: 1.5;
+    }
+
+    section.s-hero .card.card-5.c-5-bg-1:hover{
+        background: #6E1EE6;
+        color: #fff;
+    }
+
+    section.s-hero .card.card-5.c-5-bg-2:hover{
+        background: #EDB730;
+        color: #000;
     }
 }
