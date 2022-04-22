@@ -538,7 +538,7 @@ footer ul.f-caption li:last-child {
         gap: 0;
     }
 
-    section.s-hero .card.card-5 {
+    .card.card-5 {
         padding: 96px;
         border-radius: 0;
         flex: 1;
@@ -670,12 +670,12 @@ footer ul.f-caption li:last-child {
         padding: 144px 120px;
     }
 
-    section.s-hero .card.card-5{
+    .card.card-5{
         padding: 120px 0;
         align-items: center;
     }
 
-    section.s-hero .card.card-5 .c-info{
+    .card.card-5 .c-info{
         max-width: 400px;
     }
 
@@ -813,42 +813,108 @@ footer ul.f-caption li:last-child {
         grid-row: 2 / span 1;
     }
 
-    section.s-hero .card.card-5{
-        transition: flex .5s ease,
+    .card.card-5{
+        transition: flex .3s ease,
                     background-color .5s ease;
     }
 
-    section.s-hero .card.card-5 .c-actions{
+    .card.card-5 .c-actions{
         opacity: 0;
         visibility: hidden;
         transition: all .3s ease;
     }
 
-    section.s-hero .card.card-5:hover .c-actions{
+    .card.card-5:hover .c-actions{
         opacity: 1;
         visibility: visible;
     }
 
-    section.s-hero .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-primary{
+    .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-primary{
         background: #EDB730;
         color: #000;
     }
 
-    section.s-hero .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-terciary{
+    .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-terciary{
         color: #fff;
     }
 
-    section.s-hero .card.card-5:hover{
+    .card.card-5:hover{
         flex: 1.5;
     }
 
-    section.s-hero .card.card-5.c-5-bg-1:hover{
-        background: #6E1EE6;
+    .card.card-5.c-5-bg-1:hover{
+        background: #8646E6;
         color: #fff;
     }
 
-    section.s-hero .card.card-5.c-5-bg-2:hover{
+    .card.card-5.c-5-bg-2:hover{
         background: #EDB730;
         color: #000;
+    }
+}
+
+@media (min-width: 1440px){
+    .card.card-5{
+        min-height: calc(100vh - 81px);
+        display: grid;
+        grid-template-columns: auto;
+        grid-template-rows: repeat(3, auto);
+    }
+
+    .card.card-5:hover{
+        grid-template-columns: repeat(2, auto);
+        grid-template-rows: repeat(2, auto);
+    }
+
+    .card.card-5 .c-thumbnail{
+        grid-column: 1 / span 1;
+        grid-row: 3 / span 1;
+    }
+
+    .card.card-5:hover .c-thumbnail picture *{
+        min-width: 280px;
+    }
+
+    .card.card-5.c-5-bg-1:hover .c-thumbnail{
+        grid-column: 1 / span 1;
+        grid-row: 1 / span 2;
+    }
+
+    .card.card-5.c-5-bg-2:hover .c-thumbnail{
+        grid-column: 2 / span 1;
+        grid-row: 1 / span 2;
+    }
+
+    .card.card-5:hover .c-info{
+        margin-top: auto;
+    }
+
+    .card.card-5.c-5-bg-1:hover .c-info{ 
+        grid-column: 2 / span 1;
+        grid-row: 1 / span 1;
+    }
+
+    .card.card-5.c-5-bg-2:hover .c-info{
+        grid-column: 1 / span 1;
+        grid-row: 1 / span 1;
+    }
+
+    .card.card-5 .c-actions{
+        display: none;
+    }
+
+    .card.card-5:hover .c-actions{
+        display: flex;
+        margin-bottom: auto;
+    }
+
+    .card.card-5.c-5-bg-1:hover .c-actions{
+        grid-column: 2 / span 1;
+        grid-row: 2 / span 1;
+    }
+
+    .card.card-5.c-5-bg-2:hover .c-actions{
+        grid-column: 1 / span 1;
+        grid-row: 2 / span 1;
     }
 }
