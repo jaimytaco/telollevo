@@ -1,33 +1,31 @@
 import '../styles/global.css'
+import { wf, registerWF } from './wf/lib'
 
-import { WebFluid } from '../scripts/web-fluid/webfluid'
+interface IMProduct {
+    id: string
+    code: string
+    slug: string
+}
 
-import { publicBlank, publicIndex } from '../scripts/renders'
-import { MProduct } from '../scripts/models'
-import { EDatabaseMode } from '../scripts/web-fluid/enums/database.enum'
-
+class MProduct implements IMProduct {
+    id: string
+    code: string
+    slug: string
+}
 
 const init = async () => {
-    const models = {
+    const OnlineDB = (await import('./wf/services/firebase.service')).default
+    const LocalDB = (await import('./wf/services/indexedDb.service')).default
+
+    await registerWF({
         products: MProduct
-    }
+    }, ['products'], OnlineDB, LocalDB)
 
-    const loaders = ['products']
-
-    const renders = {
-        '/': publicIndex,
-        '/blank': publicBlank
-    }
-    
-    await WebFluid.init(models, loaders, renders)
-
-    console.log(globalThis.webfluid.models['products'].getAll)
-    
-    const productsOnline = await globalThis.webfluid.models['products'].getAll('products', EDatabaseMode.Online)
+    const productsOnline = await wf.database.getAll('products', 'online')
     console.log('productsOnline =', productsOnline)
 
-    // const productsLocal = await globalThis.webfluid.models['products'].getAll(EDatabaseMode.Local)
-    // console.log('productsLocal =', productsLocal)
+    const productsLocal = await wf.database.getAll('products', 'local')
+    console.log('productsLocal =', productsLocal)
 }
 
 init()

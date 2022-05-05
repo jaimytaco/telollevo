@@ -1,4 +1,11 @@
-import { IIndexedDB, IIndexedDBDatabase } from '../interfaces/browser.interface'
+interface IIndexedDB extends IDBFactory{
+    databases: () => Promise<IDBDatabaseInfo[]>
+}
+
+interface IIndexedDBDatabase{
+    name: string
+    version: number
+}
 
 export const isNode = () => typeof process !== 'undefined'
 
@@ -11,7 +18,7 @@ export const isServiceWorker = () => typeof ServiceWorkerGlobalScope !== 'undefi
 // Taken from https://stackoverflow.com/questions/62954570/javascript-feature-detect-module-support-for-web-workers
 export const supportsWorkerType = () => {
     let supports = false;
-    const tester: any = {
+    const tester = {
         get type() { 
             supports = true
             return 
@@ -24,7 +31,7 @@ export const supportsWorkerType = () => {
         // which is perfect since
         // we don't need the worker to actually start,
         // checking for the type of the script is done before trying to load it.
-        const worker = new Worker('blob://', tester)
+        new Worker('blob://', tester)
     } finally {
         return supports
     }
