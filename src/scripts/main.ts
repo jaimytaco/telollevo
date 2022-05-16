@@ -1,25 +1,25 @@
 import '../styles/global.css'
 import { wf, registerWF } from './wf/lib'
-
-interface IMProduct {
-    id: string
-    code: string
-    slug: string
-}
-
-class MProduct implements IMProduct {
-    id: string
-    code: string
-    slug: string
-}
+// import { getConfig, publicHome } from './utils'
 
 const init = async () => {
-    const OnlineDB = (await import('./wf/services/firebase.service')).default
-    const LocalDB = (await import('./wf/services/indexedDb.service')).default
+    console.time('online-db')
+    console.time('local-db')
 
-    await registerWF({
-        products: MProduct
-    }, ['products'], OnlineDB, LocalDB)
+    const services = await Promise.all([
+        import('./wf/services/firebase.service'),
+        import('./wf/services/indexedDb.service')
+    ])
+
+    const OnlineDB = services[0].default
+    const LocalDB = services[1].default
+
+    const { APWA } = await import('./wf/actors/pwa.actor')
+    
+    const { getConfig, publicHome } = await import('./utils')
+
+    const config = await getConfig(OnlineDB, LocalDB, APWA)
+    await registerWF(config)
 
     const productsOnline = await wf.database.getAll('products', 'online')
     console.log('productsOnline =', productsOnline)

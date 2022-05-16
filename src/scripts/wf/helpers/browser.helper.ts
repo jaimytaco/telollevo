@@ -45,6 +45,6 @@ export const getServiceWorkerContainer = () => navigator.serviceWorker
 
 export const getWorkerPath = (fn: string) => {
     const { DEV } = import.meta.env
-    const WORKER_PREFIX = DEV ? '/src/scripts/workers/' : './'
+    const WORKER_PREFIX = DEV ? '/src/scripts/workers/' : '/'
     return fn.split(WORKER_PREFIX)[1]?.split('",')?.[0]
 }

@@ -16,6 +16,14 @@ const init = (onlineDB: T, localDB: T) => {
     LocalDB = localDB
 }
 
+const initOnline = (onlineDB: T) => {
+    OnlineDB = onlineDB
+}
+
+const initLocal = (localDB: T) => {
+    LocalDB = localDB
+}
+
 const register = async (mode: string): Promise<void> | Promise<ILocalDbInit> => {
     // if (mode === EDatabaseMode.Online) return OnlineDB.register()
     if (mode === EDatabaseMode.Local) return LocalDB.register()
@@ -70,5 +78,10 @@ export const ADatabase = {
     loadLocalDatabase,
     ...ADatabaseMethods,
     methods: Object.keys(ADatabaseMethods),
-    init
+    init,
+    
+    initOnline,
+    initLocal,
+    OnlineDB,
+    LocalDB
 }
