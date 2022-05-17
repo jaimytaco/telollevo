@@ -1,4 +1,4 @@
 export enum EDatabaseMode {
-    Online = 'online',
-    Local = 'local',
+    Network = 'online',
+    Offline = 'local',
 }

@@ -1,5 +1,3 @@
-
-
 const getUIBuilder = (builders: T, viewId: string) => builders[viewId]?.builder
 
 const getViewContent = async (lib: T, builders: T, viewId: string) => {
@@ -14,14 +12,8 @@ const getViewContent = async (lib: T, builders: T, viewId: string) => {
 
 const getViewIdByPathname = (builders: T, pathname: string) => {
     const keys = Object.keys(builders)
-    for (const key of keys){
-        if (builders[key].pathname === pathname) return key
-    }
-
+    for (const key of keys) if (builders[key].pathname === pathname) return key
     return null
-    
-    // return Object.values(builders)
-    //     .find(value => value.pathname === pathname)?.id
 }
 
 const getDynamicContent = ({ lib, builders, pathname, viewId }) => {

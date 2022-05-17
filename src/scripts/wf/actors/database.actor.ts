@@ -1,49 +1,40 @@
 import { EDatabaseMode } from '../enums/database.enum'
 import { isNode } from '../helpers/browser.helper'
 
-interface ILocalDbInit {
+interface IOfflineDbInit {
     isOfflineFirst: boolean
     isFirstLoad: boolean,
 }
 
 const dataLoaders = {}
 
-let OnlineDB
-let LocalDB
+let NetworkDB
+let OfflineDB
 
-const init = (onlineDB: T, localDB: T) => {
-    OnlineDB = onlineDB
-    LocalDB = localDB
-}
+const initNetwork = (db: T) => NetworkDB = db
 
-const initOnline = (onlineDB: T) => {
-    OnlineDB = onlineDB
-}
+const initOffline = (db: T) => OfflineDB = db
 
-const initLocal = (localDB: T) => {
-    LocalDB = localDB
-}
-
-const register = async (mode: string): Promise<void> | Promise<ILocalDbInit> => {
-    // if (mode === EDatabaseMode.Online) return OnlineDB.register()
-    if (mode === EDatabaseMode.Local) return LocalDB.register()
+const register = async (mode: string): Promise<void> | Promise<IOfflineDbInit> => {
+    // if (mode === EDatabaseMode.Network) return NetworkDB.register()
+    if (mode === EDatabaseMode.Offline) return OfflineDB.register()
 }
 
 const getAll = (collectionName: string, mode: string) => {
-    if (isNode()) mode = EDatabaseMode.Online
-    if (mode === EDatabaseMode.Online) return OnlineDB.getAll(collectionName)
-    if (mode === EDatabaseMode.Local) return LocalDB.getInitialData(collectionName, 'all')
+    if (isNode()) mode = EDatabaseMode.Network
+    if (mode === EDatabaseMode.Network) return NetworkDB.getAll(collectionName)
+    if (mode === EDatabaseMode.Offline) return OfflineDB.getInitialData(collectionName, 'all')
 }
 
 const add = (collectionName: string, doc: T, mode: string): Promise<T> => {
-    // if (mode === EDatabaseMode.Online) return OnlineDB.add(collectionName, doc);
-    if (mode === EDatabaseMode.Local) return LocalDB.add(collectionName, doc);
+    // if (mode === EDatabaseMode.Network) return NetworkDB.add(collectionName, doc);
+    if (mode === EDatabaseMode.Offline) return OfflineDB.add(collectionName, doc);
 }
 
 const registerLoaders = async (loaders) => {
     const datas = await Promise.all(
         loaders
-            .map(loader => getAll(loader, EDatabaseMode.Online))
+            .map(loader => getAll(loader, EDatabaseMode.Network))
     )
 
     datas
@@ -52,7 +43,7 @@ const registerLoaders = async (loaders) => {
         })
 }
 
-const loadLocalDatabase = async (modelKeys, loaders) => {
+const loadOfflineDatabase = async (modelKeys, loaders) => {
     await registerLoaders(loaders)
 
     await Promise.all(
@@ -62,7 +53,7 @@ const loadLocalDatabase = async (modelKeys, loaders) => {
                 if (!docs) return []
                 console.info(`Loaded ${docs.length} docs in '${collectionName}'`)
                 return docs
-                    .map(doc => add(collectionName, doc, EDatabaseMode.Local))
+                    .map(doc => add(collectionName, doc, EDatabaseMode.Offline))
             })
     )
 }
@@ -75,13 +66,12 @@ const ADatabaseMethods = {
 export const ADatabase = {
     register,
     registerLoaders,
-    loadLocalDatabase,
+    loadOfflineDatabase,
     ...ADatabaseMethods,
     methods: Object.keys(ADatabaseMethods),
-    init,
     
-    initOnline,
-    initLocal,
-    OnlineDB,
-    LocalDB
+    initNetwork,
+    initOffline,
+    NetworkDB,
+    OfflineDB
 }

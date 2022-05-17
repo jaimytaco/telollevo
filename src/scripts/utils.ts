@@ -10,53 +10,8 @@ class MProduct implements IMProduct {
     slug: string
 }
 
-export const getConfig = (OnlineDB, LocalDB, pwaActor) => ({
-    models: {
-        products: MProduct
-    },
-    loaders: ['products'],
-    services: {
-        OnlineDB,
-        LocalDB
-    },
-    sw: {
-        cache: {
-            prefix: 'sw-telollevo',
-            version: 2,
-        },
-        static: [
-            '/',
-            '/blank'
-        ],
-        dynamic: [
-            '/about'
-        ],
-        actor: pwaActor
-    },
-    ui: {
-        'public-about': {
-            pathname: '/about',
-            builder: publicAbout,
-            pattern: '/about{/}?'
-        }
-    }
-})
-
-export const isDynamicPathname = async () => {
-    const { sw } = await getConfig()
-    const keys = Object.keys(sw.ui)
-
-    for (const key of keys){
-        const { pathname, pattern } = sw.ui[key]
-        const urlPattern = new URLPattern({ pathname })
-        return location.pathname === pathname || urlPattern.test(location.pathname)
-    } 
-
-    return false
-}
-
 const publicAbout = async (lib) => {
-    const products = await lib.database.getAll('products', 'local')
+    const products = await lib.database.getAll('products', 'online')
     return {
         head: {
             title: 'Te lo llevo | Inicio',
@@ -64,6 +19,7 @@ const publicAbout = async (lib) => {
         },
         body: `
             <main>
+                <h1>About</h1>
                 <header>
                     <div>
                         <img width="60" height="80" src="/img/logo.svg" alt="Astro logo">
@@ -77,3 +33,38 @@ const publicAbout = async (lib) => {
         `
     }
 }
+
+export const models =   {
+    products: MProduct
+}
+
+export const loaders = ['products']
+
+export const ui = {
+    'public-about': {
+        pathname: '/about',
+        builder: publicAbout,
+        pattern: '/about{/}?'
+    },
+    // 'assets-js': {
+    //     pattern: '/about{/}?',
+    //     builder: () => fetch()
+    // }
+}
+
+export const sw = {
+    cache: {
+        prefix: 'sw-telollevo',
+        version: 2,
+    },
+    static: [
+        '/',
+        '/blank'
+    ],
+    dynamic: [
+        '/about'
+    ]
+}
+
+
+

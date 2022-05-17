@@ -1,25 +1,44 @@
 import '../styles/global.css'
-import { wf, registerWF } from './wf/lib'
-// import { getConfig, publicHome } from './utils'
 
 const init = async () => {
-    console.time('online-db')
-    console.time('local-db')
+    const {
+        models,
+        loaders
+    } = await import('./utils')
 
-    const services = await Promise.all([
-        import('./wf/services/firebase.service'),
-        import('./wf/services/indexedDb.service')
-    ])
+    const {
+        registerSW
+    } = await import('./wf/actors/pwa.actor')
 
-    const OnlineDB = services[0].default
-    const LocalDB = services[1].default
+    const {
+        wf,
+        registerNetworkDB,
+        registerOfflineDB,
+        updateOfflineDB,
+        registerModels,
+        getHTML,
+        isDynamicPathname,
+        isViewUpdatable // TODO
+    } = await import('./wf/lib.ts')
 
-    const { APWA } = await import('./wf/actors/pwa.actor')
-    
-    const { getConfig, publicHome } = await import('./utils')
+    const networkDB = (await import('./wf/services/firebase.service')).default
+    const offlineDB = (await import('./wf/services/indexedDb.service')).default
 
-    const config = await getConfig(OnlineDB, LocalDB, APWA)
-    await registerWF(config)
+    await registerNetworkDB(networkDB)    
+    await registerOfflineDB(networkDB, offlineDB)
+
+    await updateOfflineDB(models, loaders)
+
+    registerSW()
+    registerModels(models)
+
+    const { pathname } = location
+
+    // // TODO: rewrite body only
+    // if (isDynamicPathname(pathname)) {
+    //     const { html, lastUpdate, err } = await getHTML({ pathname })
+    //     if (!err) isViewUpdatable(lastUpdate) ? document.body.innerHTML = html : null
+    // }
 
     const productsOnline = await wf.database.getAll('products', 'online')
     console.log('productsOnline =', productsOnline)

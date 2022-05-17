@@ -1,4 +1,3 @@
-import { IError } from '../lib'
 import { initializeApp } from 'firebase/app'
 import {
     getFirestore,
@@ -7,6 +6,10 @@ import {
     doc,
     runTransaction
 } from 'firebase/firestore'
+
+interface IError{
+    err: T
+}
 
 const FIREBASE_CONFIG = {
     apiKey: "AIzaSyCTuRFw8EAuWbtzzx00flegmKU73wqyzdc",

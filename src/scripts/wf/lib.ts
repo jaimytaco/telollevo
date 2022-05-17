@@ -1,5 +1,9 @@
 import { EDatabaseMode } from './enums/database.enum'
-import { isNode, supportsWorkerType, supportsIndexedDB } from './helpers/browser.helper'
+import {
+    isNode,
+    supportsWorkerType,
+    supportsIndexedDB,
+} from './helpers/browser.helper'
 
 interface IWebFluid {
     models?: T[],
@@ -8,30 +12,15 @@ interface IWebFluid {
     isFirstLoad?: boolean
 }
 
-export interface IError {
-    err: T
-}
+export const wf: IWebFluid = {}
 
-export const wf: IWebFluid = {
-    database: {}
-}
-
-export const addModel = (key, value) => {
-    wf.models ? null : wf.models = {}
-    wf.models[key] = {
-        _collection: key,
-        ...value
-    }
-}
-
-const registerDB = async (onlineDB: T, localDB: T) => {
+export const registerNetworkDB = async (networkDB: T) => {
     const { ADatabase } = await import('./actors/database.actor')
-    
+
     if (isNode()) {
         wf.database = ADatabase
-        // wf.database.init(onlineDB, localDB)
-        wf.database.initOnline(onlineDB)
-        await wf.database.register(EDatabaseMode.Online)
+        wf.database.initNetwork(networkDB)
+        await wf.database.register(EDatabaseMode.Network)
     } else {
         if (supportsWorkerType()) {
             const { wrap } = await import('comlink')
@@ -40,124 +29,86 @@ const registerDB = async (onlineDB: T, localDB: T) => {
         } else wf.database = ADatabase
 
         const { proxy } = await import('comlink')
+        wf.database.initNetwork(proxy(networkDB))
+    }
+}
 
-        // wf.database.init(proxy(onlineDB), proxy(localDB))
-       
-        wf.database.initOnline(proxy(onlineDB))
-        wf.database.initLocal(proxy(localDB))
+export const registerOfflineDB = async (networkDB: T, offlineDB: T) => {
+    if (!isNode()) {
+        if (wf.database.NetworkDB) wf.database.initNetwork(networkDB)
 
-        await wf.database.register(EDatabaseMode.Online)
+        const { proxy } = await import('comlink')
+
+        wf.database.initOffline(proxy(offlineDB))
+
+        await wf.database.register(EDatabaseMode.Network)
 
         if (supportsIndexedDB()) {
-            const { isOfflineFirst, isFirstLoad } = await wf.database.register(EDatabaseMode.Local)
+            const { isOfflineFirst, isFirstLoad } = await wf.database.register(EDatabaseMode.Offline)
             wf.isOfflineFirst = isOfflineFirst
             wf.isFirstLoad = isFirstLoad
         }
     }
 }
 
-const registerOnlineDB = async (onlineDB: T) => {
-    const { ADatabase } = await import('./actors/database.actor')
-    
-    if (isNode()) {
-        wf.database = ADatabase
-        wf.database.initOnline(onlineDB)
-        await wf.database.register(EDatabaseMode.Online)
-    } else {
-        if (supportsWorkerType()) {
-            const { wrap } = await import('comlink')
-            const WDatabase = (await import('./workers/database.worker?worker')).default
-            wf.database = await wrap(new WDatabase())
-        } else wf.database = ADatabase
-
-        const { proxy } = await import('comlink')       
-        wf.database.initOnline(proxy(onlineDB))
+export const updateOfflineDB = async (models, loaders) => {
+    if (wf?.isOfflineFirst && wf?.isFirstLoad) {
+        await wf?.database?.loadOfflineDatabase(Object.keys(models), loaders)
     }
 }
 
-const registerLocalDB = async (onlineDB: T, localDB: T) => {
-    if (!isNode()){
-        if (wf.database.OnlineDB) wf.database.initOnline(onlineDB)
-        
-        const { proxy } = await import('comlink')  
-
-        wf.database.initLocal(proxy(localDB))
-
-        await wf.database.register(EDatabaseMode.Online)
-
-        if (supportsIndexedDB()) {
-            const { isOfflineFirst, isFirstLoad } = await wf.database.register(EDatabaseMode.Local)
-            wf.isOfflineFirst = isOfflineFirst
-            wf.isFirstLoad = isFirstLoad
-        }
+const addModel = (key, value) => {
+    wf.models ? null : wf.models = {}
+    wf.models[key] = {
+        _collection: key,
+        ...value
     }
 }
 
-const registerModels = (models: T) => Object.keys(models)
+export const registerModels = (models: T) => Object.keys(models)
     .forEach(key => addModel(key, models[key]))
 
-export const registerWF = async ({ models, loaders, services, sw, ui }) => {
-    const { OnlineDB, LocalDB } = services
+// export const registerSW = async () => {
+//     const { APWA } = await import('./actors/pwa.actor')
+//     return APWA.registerSW
+// }
 
-    // await registerDB(OnlineDB, LocalDB)
-    await registerOnlineDB(OnlineDB)
-    console.timeEnd('online-db')
-    await registerLocalDB(OnlineDB, LocalDB)
-    console.timeEnd('local-db')
-    
-    registerModels(models)
+export const getHTML = async ({ pathname, viewId }) => {
+    const { AUI } = await import('./actors/ui.actor')
+    const { ui } = await import('../utils')
 
-    if (wf.isOfflineFirst && wf.isFirstLoad)
-        await wf.database.loadLocalDatabase(Object.keys(models), loaders)
+    const { content, err } = await AUI.getDynamicContent({ lib: wf, builders: ui, pathname, viewId })
+    if (err) return { err }
 
-    // await registerUI(ui)
+    const blankResponse = await fetch(getBlankPathname())
+    const blankText = await blankResponse.text()
 
-    if (sw.actor) {
-        await sw.actor.registerSW()
+    const html = blankText
+        .replace(getTitleTag(), content.head.title)
+        .replace(getMetaTag(), content.head.meta)
+        .replace(getBodyTag(), content.body)
 
-        if (sw.dynamic?.length) {
-            const { getCacheName } = await import('./workers/sw.worker')
-            const { AUI } = await import('./actors/ui.actor')
-
-            for (const pathname of sw.dynamic) {
-                const { content, err } = await AUI.getDynamicContent({ lib: wf, builders: ui, pathname })
-                if (err) continue
-                const blankResponse = await fetch('/blank')
-                const blankText = await blankResponse.text()
-                const html = blankText
-                    .replace('<!-- [TITLE] -->', content.head.title)
-                    .replace('<!-- [META] -->', content.head.meta)
-                    .replace('<!-- [BODY] -->', content.body)
-
-                const cacheName = getCacheName(sw.cache.prefix)
-                const cache = await caches.open(cacheName)
-                await cache.put(new Request(pathname), new Response(html, { headers: { 'content-type': 'text/html' } }))
-            }
-
-            // const { isDynamicPathname } = await import('../utils')
-            // if (isDynamicPathname()) location.reload()
-        }
-    }
+    return { html }
 }
 
-// export const registerUI = async (ui) => {
-//     // const paths = Object.keys(ui)
+export const get404Pathname = () => '/404'
 
-//     // for (const path of paths) {
-//     //     console.log('path =', path)
-//     //     const content = await ui[path].builder(wf)
-//     //     console.log('content =', content)
+const getBlankPathname = () => '/blank'
 
-//     //     // const response = await serveFromCache(new Request('/blank'))
-//     //     // const blank = await response.text()
-//     //     // const html = blank
-//     //     //     .replace('<!-- [TITLE] -->', content.head.title)
-//     //     //     .replace('<!-- [META] -->', content.head.meta)
-//     //     //     .replace('<!-- [BODY] -->', content.body)
+const getTitleTag = () => '<!-- [TITLE] -->'
+const getMetaTag = () => '<!-- [META] -->'
+const getBodyTag = () => '<!-- [BODY] -->'
 
-//     //     // console.log('html =', html)
-//     // }
+// TODO
+export const isStaticPathname = (pathname: string) => true
 
-//     const { AUI } = await import('./actors/ui.actor')
-//     wf.ui = AUI
-// }
+export const isDynamicPathname = ({ url, pattern }) => {
+    return Object.keys(ui)
+        .find(key => {
+            const urlPattern = new URLPattern({ pathname: ui[key].pattern })
+            return urlPattern.test(url.href) || ui[key].pathname === url.pathname
+        })
+}
+
+// TODO
+export const isViewUpdatable = () => true

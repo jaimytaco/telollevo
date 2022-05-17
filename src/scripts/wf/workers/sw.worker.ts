@@ -1,147 +1,116 @@
-// import { default as OnlineDB } from '../services/firebase.service'
-// import { default as LocalDB } from '../services/indexedDb.service'
-import { getConfig } from '../../utils'
-// import { wf, registerWF } from '../lib'
+import {
+    models,
+    sw,
+    ui
+} from '../../utils'
 
-export const SW_VERSION = 16
+import {
+    isStaticPathname,
+    get404Pathname,
+} from '../lib'
 
-const cacheStaticAssets = async (cacheName: string, sw: T) => {
+import {
+    registerNetworkDB,
+    getHTML,
+    cacheFromNetwork,
+} from '../lib.worker'
+
+import { default as networkDB } from '../services/firebase.service'
+
+const registerNetworkDBPromise = registerNetworkDB(networkDB)
+
+const cacheStatic = async (e) => {
     try {
-        const cache = await caches.open(cacheName)
+        const cache = await caches.open(getCacheName())
         cache.addAll(sw.static)
 
-        // await initAppForSW()
+        await registerNetworkDBPromise
+        for (const key of Object.keys(ui)) cacheFromNetwork({ cacheName: getCacheName(), url: new URL(`${location.origin}${ui[key].pathname}`), pattern: ui[key].pattern })
     } catch (err) {
         console.error(err)
     }
 }
 
-const removePreviousCaches = async (prefix: string, allCaches: string[]) => {
+const getCacheName = () => `${sw.cache.prefix}-static-${SW_VERSION}`
+
+const removePreviousCaches = async (allCaches: string[]) => {
     const cacheNames = await caches.keys()
     return Promise.all(
         cacheNames
-            .filter(cacheName => cacheName.startsWith(prefix) && !allCaches.includes(cacheName))
+            .filter(cacheName => cacheName.startsWith(sw.cache.prefix) && !allCaches.includes(cacheName))
             .map(cacheName => caches.delete(cacheName))
     )
 }
 
-// TODO: regex matching
-const pathMatches = (path: string, p: string) => {
-    return path === p
-}
+const getURLFromRequest = (request) => new URL(request.url)
+const getPathnameFromRequest = (request) => getURLFromRequest(request).pathname
 
-// const handleFetch = (e: Event, cacheName: string, { static, dynamic }: T) => {
-//     const isDynamic = dynamic.find(s => pathMatches(e.request.pathname, s))
+const serveFromCache = async (request) => {
+    try {
+        const cache = await caches.open(getCacheName())
+        const response = await cache.match(request, { ignoreSearch: true })
 
-//     e.respondWith(
-//         caches.open(cacheName)
-//             .then((cache) => {
-//                 if (isDynamic) return serveDynamically(e)
-
-//                 return cache.match(e.request, { ignoreSearch: true })
-//                     .then((response) => {
-//                         return (
-//                             response ||
-//                             fetch(e.request)
-//                                 .then((response) => {
-//                                     if (e.request.method !== 'POST') cache.put(e.request, response.clone())
-//                                     return response
-//                                 })
-//                                 .catch((err) => console.error(err))
-//                         )
-//                     })
-//             }),
-//     )
-// }
-
-// const serveFromCache = async (request: Request) => {
-//     const response = await caches.match(request, { ignoreSearch: true })
-//     if (!response || request.url.origin === location.origin) console.info(`${request.url} served without cache`)
-//     return response || fetch(request)
-// }
-  
-const serveFromCache = async (request: Request, cacheName: string, cacheOnFetch: boolean = false) => {
-    const cache = await caches.open(cacheName)
-    const cacheResponse = await cache.match(request, { ignoreSearch: true })
-    if (cacheResponse) return cacheResponse
-
-    if (cacheOnFetch) {
-        try {
-            const networkResponse = await fetch(request)
-            const url = new URL(request.url)
-            const bypassCache = request.method === 'POST' || request.url.includes('/sw.worker.') || location.origin !== url.origin
-            // console.log('request =', request)
-            if (!bypassCache) cache.put(request, networkResponse.clone())
-            return networkResponse
-        } catch (err) {
-            console.error(err)
-        }
+        if (response) console.info('served with cache: ', getPathnameFromRequest(request))
+        return response || fetch(request)
+    } catch (err) {
+        console.error(err)
     }
 }
 
-const fullfillBlank = async (content: T) => {
-    const response = await serveFromCache(new Request('/blank'))
-    const blank = await response.text()
-    return blank
-        .replace('<!-- [TITLE] -->', content.head.title)
-        .replace('<!-- [META] -->', content.head.meta)
-        .replace('<!-- [BODY] -->', content.body)
-}
-
-const serveWithStream = async (e: Event, content: T) => {
-    const response = await serveFromCache(new Request('/blank'))
-    const blank = await response.text()
-
-    return streamHTML(e, [
-        blank
-            .replace('<!-- [TITLE] -->', content.head.title)
-            .replace('<!-- [META] -->', content.head.meta)
-            .replace('<!-- [BODY] -->', content.body)
-    ])
-}
-
-const serveDynamically = async (e: Event) => {
+const serveWithStreams = async (e) => {
     const { pathname } = e.request
-    const { content, err } = await wf.ui.getDynamicContent({ pathname })
-    return err ?
-        serveFromCache(new Request('/404')) :
-        serveWithStream(e, content)
+    await registerOfflineDB(offlineDB)
+    registerModels(models)
+
+    const { html, err } = await getHTML({ pathname })
+    const response = err ?
+        serveFromCache(new Request(get404Pathname())) :
+        streamHTML(e, [html])
+
+    if (response) console.info('served with streams: ', getPathnameFromRequest(e.request))
+    return response || fetch(e.request)
 }
 
-export const getCacheName = (prefix) => `${prefix}-static-${SW_VERSION}`
+const streamHTML = (e, htmls) => {
+    const responsePromises = htmls
+        .map(html => new Response(html, {
+            headers: { 'Content-Type': 'text/html; charset=utf-8' }
+        }))
 
-const registerSW = async () => {
-    // const OnlineDB = (await import('../services/firebase.service')).default
-    // const LocalDB = (await import('..f/services/indexedDb.service')).default
+    const { readable, writable } = new TransformStream()
 
-    const config = await getConfig(OnlineDB, LocalDB)
-    const { sw } = config
-    const cacheName = getCacheName(sw.cache.prefix)
+    e.waitUntil(async function () {
+        for (const responsePromise of responsePromises) {
+            const response = await responsePromise
+            await response.body.pipeTo(writable, { preventClose: true })
+        }
+        writable.getWriter().close()
+    }())
 
-    // await registerWF(config)
-
-    addEventListener('install', (e: Event) => {
-        skipWaiting()
-        e.waitUntil(cacheStaticAssets(cacheName, sw))
-        // e.waitUntil(cacheStaticAssets(cacheName, sw))
-        // skipWaiting()
-    })
-
-    addEventListener('activate', (e: Event) => {
-        e.waitUntil(removePreviousCaches(sw.cache.prefix, [cacheName]))
-    })
-
-    addEventListener('fetch', (e: Event) => {
-        // const isDynamic = sw.dynamic.find(s => pathMatches(e.request.pathname, s))
-        // e.respondWith(isDynamic ?
-        //     serveDynamically(e) :
-        //     serveFromCache(e.request, cacheName, true)
-        // )
-
-        e.respondWith(
-            serveFromCache(e.request, cacheName, true)
-        )
+    return new Response(readable, {
+        headers: {
+            'Content-Type': 'text/html; charset=utf-8'
+        }
     })
 }
 
-registerSW()
+addEventListener('install', (e) => {
+    e.waitUntil(cacheStatic(e))
+    skipWaiting()
+})
+
+addEventListener('activate', (e) => {
+    e.waitUntil(removePreviousCaches([getCacheName()]))
+})
+
+const updateFromNetwork = async (e) => {
+    await registerNetworkDBPromise
+    await cacheFromNetwork({ cacheName: getCacheName(), url: new URL(e.request.url) })
+}
+
+addEventListener('fetch', (e) => {
+    e.waitUntil(updateFromNetwork(e))
+    e.respondWith(serveFromCache(e.request))
+})
+
+const SW_VERSION = 25

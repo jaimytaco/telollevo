@@ -1,6 +1,5 @@
 import { openDB, deleteDB, IDBPTransaction } from 'idb'
 import { getIndexedDBDatabases } from '../helpers/browser.helper'
-import { ILocalDbInit } from '../interfaces/localDb.model.interface'
 
 const dbPrefix = 'telollevo-idb'
 const dbVersion = 'v1'
@@ -76,7 +75,7 @@ const add = async (collectionName: string, doc: T) => {
     return tx.oncomplete
 }
 
-const register = async (): Promise<ILocalDbInit> => {
+const register = async (): Promise<T> => {
     await clearPreviousDB()
     const isFirstLoad = !(await existDB(getDBName()))
     localDbPromise = openDatabase()
