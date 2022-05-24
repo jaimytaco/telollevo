@@ -1,4 +1,6 @@
-import { isBrowser, getWorkerPath } from '../helpers/browser.helper'
+import { 
+    isBrowser, 
+} from '../helpers/browser.helper'
 
 // Taken from https://stackoverflow.com/questions/37573482/to-check-if-serviceworker-is-in-waiting-state
 export const registerSW = async () => {
@@ -8,11 +10,12 @@ export const registerSW = async () => {
     if (!isBrowser()) return
     if (!navigator.serviceWorker) return
 
-    const WSW = (await import('../workers/sw.worker?worker')).default
+    // const WSW = (await import('../workers/sw.worker?worker')).default
 
     try {
         const registration = await navigator.serviceWorker.register(
-            getWorkerPath(WSW.toString()),
+            // getWorkerPath(WSW.toString()),
+            '/sw.worker.js',
             {
                 scope: '/',
                 type: 'module',
@@ -40,8 +43,8 @@ export const registerSW = async () => {
                             // just show the initial "content is cached" message.
                             console.info('Content is cached for the first time!')
 
-                            // Force control of SW in initial state
-                            location.reload()
+                            // // Force control of SW in initial state
+                            // location.reload()
                         }
                     }
                 })

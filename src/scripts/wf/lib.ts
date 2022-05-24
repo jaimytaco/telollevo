@@ -5,21 +5,14 @@ import {
     supportsIndexedDB,
 } from './helpers/browser.helper'
 
-interface IWebFluid {
-    models?: T[],
-    database?: T,
-    isOfflineFirst?: boolean,
-    isFirstLoad?: boolean
-}
-
-export const wf: IWebFluid = {}
+export const wf = {}
 
 export const registerNetworkDB = async (networkDB: T) => {
     const { ADatabase } = await import('./actors/database.actor')
 
     if (isNode()) {
         wf.database = ADatabase
-        wf.database.initNetwork(networkDB)
+        wf.database.setNetworkDB(networkDB)
         await wf.database.register(EDatabaseMode.Network)
     } else {
         if (supportsWorkerType()) {
@@ -29,17 +22,17 @@ export const registerNetworkDB = async (networkDB: T) => {
         } else wf.database = ADatabase
 
         const { proxy } = await import('comlink')
-        wf.database.initNetwork(proxy(networkDB))
+        wf.database.setNetworkDB(proxy(networkDB))
     }
 }
 
 export const registerOfflineDB = async (networkDB: T, offlineDB: T) => {
     if (!isNode()) {
-        if (wf.database.NetworkDB) wf.database.initNetwork(networkDB)
+        if (wf.database.NetworkDB) wf.database.setNetworkDB(networkDB)
 
         const { proxy } = await import('comlink')
 
-        wf.database.initOffline(proxy(offlineDB))
+        wf.database.setOfflineDB(proxy(offlineDB))
 
         await wf.database.register(EDatabaseMode.Network)
 
@@ -68,16 +61,15 @@ const addModel = (key, value) => {
 export const registerModels = (models: T) => Object.keys(models)
     .forEach(key => addModel(key, models[key]))
 
-// export const registerSW = async () => {
-//     const { APWA } = await import('./actors/pwa.actor')
-//     return APWA.registerSW
-// }
+export const getContent = async ({ pathname, viewId }) => {
+    const { AUI } = await import('./actors/ui.actor')
+    const { ui } = await import('../config')
+
+    return AUI.getDynamicContent({ lib: wf, builders: ui, pathname, viewId })
+}
 
 export const getHTML = async ({ pathname, viewId }) => {
-    const { AUI } = await import('./actors/ui.actor')
-    const { ui } = await import('../utils')
-
-    const { content, err } = await AUI.getDynamicContent({ lib: wf, builders: ui, pathname, viewId })
+    const { content, err } = await getContent({ pathname, viewId })
     if (err) return { err }
 
     const blankResponse = await fetch(getBlankPathname())
@@ -91,6 +83,24 @@ export const getHTML = async ({ pathname, viewId }) => {
     return { html }
 }
 
+export const cacheDynamically = async ({ ui, cacheName, url, pattern }) => {
+    const { pathname } = url
+
+    if (!isDynamicPathname({ ui, url, pattern })) return
+    const { html, err } = await getHTML({ pathname })
+
+    if (err) return { err }
+    const cache = await caches.open(cacheName)
+    return cache.put(new Request(pathname), new Response(html, {
+        headers: { 'Content-Type': 'text/html; charset=utf-8' }
+    }))
+}
+
+export const cacheFromUI = async (ui, cacheName) => Promise.all([
+    Object.keys(ui)
+        .map((key) => cacheDynamically({ ui, cacheName, url: new URL(`${location.origin}${ui[key].pathname}`), pattern: ui[key].pattern }))
+])
+
 export const get404Pathname = () => '/404'
 
 const getBlankPathname = () => '/blank'
@@ -100,14 +110,22 @@ const getMetaTag = () => '<!-- [META] -->'
 const getBodyTag = () => '<!-- [BODY] -->'
 
 // TODO
-export const isStaticPathname = (pathname: string) => true
+export const isStaticPathname = () => true
 
-export const isDynamicPathname = ({ url, pattern }) => {
+const testPattern = (url, pattern) => (new URLPattern({ pathname: pattern })).test(url.href)
+
+export const isDynamicPathname = ({ ui, url, pattern }) => {
+    if (pattern) return testPattern(url, pattern)
     return Object.keys(ui)
-        .find(key => {
-            const urlPattern = new URLPattern({ pathname: ui[key].pattern })
-            return urlPattern.test(url.href) || ui[key].pathname === url.pathname
-        })
+        .find(key => testPattern(url, ui[key].pattern))
+}
+
+export const updateView = async (mainTag, pathname) => {
+    const { content, err, lastUpdate } = await getContent({ pathname })
+    if (!err && isViewUpdatable(lastUpdate)) {
+        document.title = content.head.title
+        document.querySelector(mainTag).innerHTML = content.body
+    }
 }
 
 // TODO

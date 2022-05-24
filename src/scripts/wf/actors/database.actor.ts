@@ -11,30 +11,37 @@ const dataLoaders = {}
 let NetworkDB
 let OfflineDB
 
-const initNetwork = (db: T) => NetworkDB = db
+const setNetworkDB = (db: T) => NetworkDB = db
 
-const initOffline = (db: T) => OfflineDB = db
+const setOfflineDB = (db: T) => OfflineDB = db
 
-const register = async (mode: string): Promise<void> | Promise<IOfflineDbInit> => {
-    // if (mode === EDatabaseMode.Network) return NetworkDB.register()
+const register = async (mode: string, prefix, models): Promise<void> | Promise<IOfflineDbInit> => {
     if (mode === EDatabaseMode.Offline) return OfflineDB.register()
 }
 
-const getAll = (collectionName: string, mode: string) => {
+const getAll = (mode, collectionName, filters) => {
     if (isNode()) mode = EDatabaseMode.Network
-    if (mode === EDatabaseMode.Network) return NetworkDB.getAll(collectionName)
-    if (mode === EDatabaseMode.Offline) return OfflineDB.getInitialData(collectionName, 'all')
+    if (mode === EDatabaseMode.Network) return NetworkDB.getAll(collectionName, filters)
+    if (mode === EDatabaseMode.Offline) return OfflineDB.getAll(collectionName, filters)
 }
 
-const add = (collectionName: string, doc: T, mode: string): Promise<T> => {
-    // if (mode === EDatabaseMode.Network) return NetworkDB.add(collectionName, doc);
+const add = (mode, collectionName: string, doc: T): Promise<T> => {
+    if (mode === EDatabaseMode.Network) return NetworkDB.add(collectionName, doc);
     if (mode === EDatabaseMode.Offline) return OfflineDB.add(collectionName, doc);
+}
+
+const update = (mode, collectionName: string, doc: T): Promise<T> => {
+    if (mode === EDatabaseMode.Network) return NetworkDB.update(collectionName, doc);
+}
+
+const get = (mode, collectionName, id) => {
+    if (mode === EDatabaseMode.Network) return NetworkDB.get(collectionName, id)
 }
 
 const registerLoaders = async (loaders) => {
     const datas = await Promise.all(
         loaders
-            .map(loader => getAll(loader, EDatabaseMode.Network))
+            .map(loader => getAll(EDatabaseMode.Network, loader))
     )
 
     datas
@@ -60,8 +67,12 @@ const loadOfflineDatabase = async (modelKeys, loaders) => {
 
 const ADatabaseMethods = {
     getAll,
-    add
+    add,
+    update,
+    get
 }
+
+const isNetworkDBRegistered = () => !!NetworkDB
 
 export const ADatabase = {
     register,
@@ -70,8 +81,9 @@ export const ADatabase = {
     ...ADatabaseMethods,
     methods: Object.keys(ADatabaseMethods),
     
-    initNetwork,
-    initOffline,
-    NetworkDB,
-    OfflineDB
+    setNetworkDB,
+    setOfflineDB,
+    // NetworkDB,
+    // OfflineDB,
+    isNetworkDBRegistered
 }

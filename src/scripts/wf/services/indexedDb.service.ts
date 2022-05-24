@@ -1,21 +1,19 @@
-import { openDB, deleteDB, IDBPTransaction } from 'idb'
-import { getIndexedDBDatabases } from '../helpers/browser.helper'
+import { 
+    openDB, 
+    deleteDB, 
+    IDBPTransaction 
+} from 'idb'
 
-const dbPrefix = 'telollevo-idb'
-const dbVersion = 'v1'
+import { 
+    getIndexedDBDatabases 
+} from '../helpers/browser.helper'
 
-const storeNames = [
-    'products'
-]
+import {
+    EOperator
+} from '../enums/database.enum'
 
-const indexes = {
-    'products': ['name']
-}
-
-const stores = {}
 
 const localDatabases = getIndexedDBDatabases()
-let localDbPromise = null
 
 const getDBName = (): string => `${dbPrefix}-${dbVersion}`
 
@@ -43,53 +41,89 @@ const openDatabase = () => {
 
             switch (oldVersion) {
                 case 0:
-                    stores['products'] = upgradeDb.createObjectStore('products', {
-                        keyPath: 'id'
-                    })
+                    for (const storeName of storeNames)
+                        stores[storeName] = upgradeDb.createObjectStore(storeName, {
+                            keyPath: 'id'
+                        })
 
-                    indexes['products']
-                        .forEach(index => stores['products'].createIndex(`by-${index}`, `${index}`))
+
+                    // stores['products'] = upgradeDb.createObjectStore('products', {
+                    //     keyPath: 'id'
+                    // })
+
+                    // indexes['products']
+                    //     .forEach(index => stores['products'].createIndex(`by-${index}`, `${index}`))
             }
         }
     })
 }
 
-const getInitialData = async (collectionName: string, /*filters: IDatabaseFilter[],*/ mode: 'single' | 'all') => {
-    const ldb = await localDbPromise
-    if (!ldb) return
-    // if (!filters.length) return
+const formatOperation = (a, b, op) => {
+    if (op === EOperator.LessThan) return a < b
+    if (op === EOperator.LessThanOrEqualTo) return a <= b
+    if (op === EOperator.EqualTo) return a === b
+    if (op === EOperator.GreaterThan) return a > b
+    if (op === EOperator.GreaterThanOrEqualTo) return a >= b
+    if (op === EOperator.NotEqualTo) return a !== b
+}
 
-    const query = ldb.transaction(collectionName).objectStore(collectionName)
-    // if (filters[0].method.includes('-by')) query = query.index(`by-${filters[0].key}`)
+const getAll = async (collectionName, filters) => {
+    if (!localDbPromise) throw 'offline DB not opened'
+    const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
+    const docs = await query.getAll()
+    const filterFns = !filters ? 
+        null : 
+        filters
+            .map((filter) => {
+                return (doc) => formatOperation(doc[filter.field], filter.value, filter.operator)
+            })
 
-    // if (mode === 'single') return [await query.get(filters[0].value)]
-    if (mode === 'all') return query.getAll()
+    return !filterFns ? 
+        docs : 
+        filterFns
+            .reduce((acc, filterFn) => {
+                acc = acc.filter((doc) => filterFn(doc))
+                return acc
+            }, docs)
+}
+
+const get = async (collectionName, id) => {
+    if (!localDbPromise) throw 'offline DB not opened'
+    const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
+    return query.get('by-id', id)
 }
 
 const add = async (collectionName: string, doc: T) => {
-    const ldb = await localDbPromise
-    if (!ldb) return
-    const tx = ldb.transaction(collectionName, 'readwrite')
+    if (!localDbPromise) throw 'offline DB not opened'
+    const tx = (await localDbPromise).transaction(collectionName, 'readwrite')
     const store = tx.objectStore(collectionName)
     store.put(doc)
     return tx.oncomplete
 }
 
-const register = async (): Promise<T> => {
+const register = async (prefix, models): Promise<T> => {
+    dbPrefix = 'telollevo-idb'
+    storeNames = Object.keys(models)
+
     await clearPreviousDB()
     const isFirstLoad = !(await existDB(getDBName()))
     localDbPromise = openDatabase()
     const isOfflineFirst = typeof (await localDbPromise) !== 'undefined'
-
     return {
         isOfflineFirst,
         isFirstLoad
     }
 }
 
+let dbPrefix
+let dbVersion = 'v1'
+let storeNames
+let localDbPromise
+
+const stores = {}
 
 export default {
     register,
     add,
-    getInitialData
+    getAll
 }

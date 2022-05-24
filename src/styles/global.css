@@ -856,20 +856,18 @@ footer ul.f-caption li:last-child {
 @media (min-width: 1440px){
     header,
     section{
-        padding-left: calc(50vw - 1334px / 2);
-        padding-right: calc(50vw - 1334px / 2);
+        padding-left: calc(50vw - 1200px / 2);
+        padding-right: calc(50vw - 1200px / 2);
     }
 
     section.s-hero{
-        /* padding-left: calc(50vw - 1334px / 2) !important;
-        padding-right: calc(50vw - 1334px / 2) !important;  */
         padding-left: calc(50vw - 1440px / 2) !important;
         padding-right: calc(50vw - 1440px / 2) !important; 
     }
 
     footer{
-        padding-left: calc(50vw - 1200px / 2);
-        padding-right: calc(50vw - 1200px / 2);
+        padding-left: calc(50vw - 1100px / 2);
+        padding-right: calc(50vw - 1100px / 2);
     }
 
     .card.card-5{
