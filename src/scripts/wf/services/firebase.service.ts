@@ -61,7 +61,7 @@ const get = async (collectionName, id) => {
     }
 }
 
-const update = async (collectionName, docData, updateFn) => {
+const update = async (collectionName, docData) => {
     const { id, ...data } = docData
     const docRef = doc(firestore, collectionName, id)
     try {

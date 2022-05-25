@@ -136,24 +136,24 @@ const getMultipleHTML = async ({ viewId, generator }) => {
     return { htmls }
 }
 
-export const cacheFromGenerator = async ({ cacheName, viewId, generator }) => {
-    const { htmls, err } = await getMultipleHTML({ viewId, generator })
-    console.log('htmls =', htmls)
-    console.log('err =', err)
-    if (err) return { err }
+// export const cacheFromGenerator = async ({ cacheName, viewId, generator }) => {
+//     const { htmls, err } = await getMultipleHTML({ viewId, generator })
+//     console.log('htmls =', htmls)
+//     console.log('err =', err)
+//     if (err) return { err }
 
-    console.log('htmls =', htmls)
+//     console.log('htmls =', htmls)
 
-    // const cache = await caches.open(cacheName)
-    // return Promise.all(
-    //     htmls
-    //         .map((html) => {
-    //             return cache.put(new Request(pathname), new Response(html, {
-    //                 headers: { 'Content-Type': 'text/html; charset=utf-8' }
-    //             }))
-    //         })
-    // )
-}
+//     // const cache = await caches.open(cacheName)
+//     // return Promise.all(
+//     //     htmls
+//     //         .map((html) => {
+//     //             return cache.put(new Request(pathname), new Response(html, {
+//     //                 headers: { 'Content-Type': 'text/html; charset=utf-8' }
+//     //             }))
+//     //         })
+//     // )
+// }
 
 const getBlankPathname = () => '/blank'
 

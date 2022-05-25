@@ -116,7 +116,7 @@ const register = async (prefix, models): Promise<T> => {
 }
 
 let dbPrefix
-let dbVersion = 'v1'
+const dbVersion = 'v1'
 let storeNames
 let localDbPromise
 
