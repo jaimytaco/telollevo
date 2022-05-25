@@ -20,6 +20,7 @@ export default defineConfig({
                 main: new URL('./index.html', import.meta.url).pathname,
                 blank: new URL('./blank.html', import.meta.url).pathname,
                 traveler: new URL('./traveler.html', import.meta.url).pathname,
+                shopper: new URL('./shopper.html', import.meta.url).pathname,
             },
             output: {
                 entryFileNames: `[name].js`,
