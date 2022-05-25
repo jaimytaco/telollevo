@@ -1,0 +1,11 @@
+main {
+    width: 100%;
+    padding-top: 64px;
+    min-height: 200px;
+}
+
+@media (min-width: 1024px) {
+    main {
+        padding-top: 81px;
+    }
+}

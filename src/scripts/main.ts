@@ -1,4 +1,12 @@
 import '../styles/global.css'
+import '../styles/button.css'
+import '../styles/header.css'
+import '../styles/main.css'
+import '../styles/section.css'
+import '../styles/footer.css'
+import '../styles/card.css'
+
+
 
 // const init = async () => {
 //     console.log('-------------------------------\n\ninit()')
