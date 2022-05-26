@@ -3,6 +3,17 @@ import eslint from '@rollup/plugin-eslint'
 
 const assetsDir = '.'
 
+const publicPaths = {
+    main: new URL('./index.html', import.meta.url).pathname,
+    blank: new URL('./blank.html', import.meta.url).pathname,
+    traveler: new URL('./traveler.html', import.meta.url).pathname,
+    shopper: new URL('./shopper.html', import.meta.url).pathname,
+}
+
+const adminPaths = {
+    orders: new URL('./admin-orders.html', import.meta.url).pathname,
+}
+
 export default defineConfig({
     plugins: [
         {
@@ -17,10 +28,8 @@ export default defineConfig({
         minify: false,
         rollupOptions: {
             input: {
-                main: new URL('./index.html', import.meta.url).pathname,
-                blank: new URL('./blank.html', import.meta.url).pathname,
-                traveler: new URL('./traveler.html', import.meta.url).pathname,
-                shopper: new URL('./shopper.html', import.meta.url).pathname,
+                ...publicPaths,
+                ...adminPaths
             },
             output: {
                 entryFileNames: `[name].js`,

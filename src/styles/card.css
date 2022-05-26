@@ -37,12 +37,12 @@
 
 .card.card-5.c-5-bg-1,
 .card.card-6.c-6-bg-1 {
-    background: #F5EFFD;
+    background: var(--primary-c-1);
 }
 
 .card.card-5.c-5-bg-2,
 .card.card-6.c-6-bg-2 {
-    background: #FEF9ED;
+    background: var(--secondary-c-1);
 }
 
 .card.card-7{
@@ -150,7 +150,7 @@
 }
 
 .card.card-5 .c-actions .btn-terciary {
-    color: #6E1EE6;
+    color: var(--primary-c);
 }
 
 .card .c-thumbnail {
@@ -172,14 +172,15 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #F2C34B;
+    background: var(--secondary-c);
     transition: all .3s ease;
 }
 
 .c-decorator.active{
     transform: scale(1.5);
     transform-origin: center;
-    box-shadow: 0 0 20px 10px rgb(242 195 75 / 60%);
+    box-shadow: 0 0 20px 10px var(--secondary-c-2);
+
 }
 
 .card.card-7 .c-thumbnail .c-decorator.c-d-1{
@@ -215,8 +216,8 @@
 
 .card.card-7 .c-extra{
     padding: 40px;
-    background: #0E1C1F;
-    color: #fff;
+    background: var(--black-c);
+    color: var(--white-c);
     margin-top: -32px;
 }
 
@@ -533,12 +534,12 @@
     }
 
     .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-primary{
-        background: #EDB730;
-        color: #000;
+        background: var(--secondary-c);
+        color: var(--black-c);
     }
 
     .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-terciary{
-        color: #fff;
+        color: var(--white-c);
     }
 
     .card.card-5:hover{
@@ -546,13 +547,13 @@
     }
 
     .card.card-5.c-5-bg-1:hover{
-        background: #8646E6;
-        color: #fff;
+        background: var(--primary-c-3);
+        color: var(--white-c);
     }
 
     .card.card-5.c-5-bg-2:hover{
-        background: #EDB730;
-        color: #000;
+        background: var(--secondary-c);
+        color: var(--black-c);
     }
 
     .card.card-6 .c-thumbnail picture *{
@@ -585,7 +586,7 @@
         left: calc(-50vw + 1440px / 2);
         width: calc(50vw - 1440px / 2);
         height: 100%;
-        background: #F5EFFD;
+        background: var(--primary-c-1);
         transition: background-color .5s ease;
     }
 
@@ -596,16 +597,16 @@
         right: calc(-50vw + 1440px / 2);
         width: calc(50vw - 1440px / 2);
         height: 100%;
-        background: #FEF9ED;
+        background: var(--secondary-c-1);
         transition: background-color .5s ease;
     }
 
     .card.card-5.c-5-bg-1:hover::before{
-        background: #8646E6;
+        background: var(--primary-c-3);
     }
 
     .card.card-5.c-5-bg-2:hover::before{
-        background: #EDB730;
+        background: var(--secondary-c);
     }
 
     .card.card-5:hover{

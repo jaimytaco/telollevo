@@ -4,6 +4,7 @@
     border-radius: 8px;
     text-decoration: none;
     min-height: 40px;
+    width: fit-content;
     display: flex;
     flex-flow: row wrap;
     align-items: center;
@@ -15,12 +16,12 @@
 }
 
 .btn.btn-primary {
-    background: #6E1EE6;
-    color: #fff;
+    background: var(--primary-c);
+    color: var(--white-c);
 }
 
 .btn.btn-secondary {
-    background: #F0F1FA;
+    background: var(--primary-c-2);
 }
 
 .btn.btn-terciary {
@@ -28,12 +29,11 @@
 }
 
 .btn.btn-bordered {
-    border: 1px solid #F0F1FA;
+    border: 1px solid var(--primary-c-2);
 }
 
 .btn.btn-complain-book {
     padding: 16px 12px !important;
-    width: fit-content;
 }
 
 .btn.btn-round {

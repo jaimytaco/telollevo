@@ -1,3 +1,4 @@
+import '../styles/root.css'
 import '../styles/global.css'
 import '../styles/button.css'
 import '../styles/header.css'
@@ -5,6 +6,20 @@ import '../styles/main.css'
 import '../styles/section.css'
 import '../styles/footer.css'
 import '../styles/card.css'
+
+const init = async () => {
+    const {
+        registerSW
+    } = await import('./wf/actors/pwa.actor')
+
+    const {
+        SW_VERSION
+    } = await import('./wf/workers/sw.worker')
+
+    registerSW()
+}
+
+init()
 
 
 

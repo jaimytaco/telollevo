@@ -1,7 +1,18 @@
 export const cacheStatic = async (e, cacheName, staticPaths) => {
     try {
         const cache = await caches.open(cacheName)
-        cache.addAll(staticPaths)    
+        
+        for(const path of staticPaths){
+            console.log('installing path =', path)
+            cache.addAll([path])
+                .then((r) => {
+                    console.log(r)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })   
+        }
+        // cache.addAll(staticPaths)   
     } catch (err) {
         console.error(err)
     }
@@ -16,11 +27,22 @@ export const serveFromCache = async (request, cacheName) => {
         const cache = await caches.open(cacheName)
         const response = await cache.match(request, { ignoreSearch: true })
 
-        if (response) console.info('served with cache: ', getPathnameFromRequest(request))
+        if (response) {
+            sendMessage({msg: `from cache: ${getPathnameFromRequest(request)}`})
+            console.info('served with cache: ', getPathnameFromRequest(request))
+        }
         return response || fetch(request)
     } catch (err) {
         console.error(err)
     }
+}
+
+export const sendMessage = async message => {
+    const clients = await self.clients.matchAll({
+        includeUncontrolled: true,
+    })
+
+    clients.forEach((client) => client.postMessage(message))
 }
 
 // const streamHTML = (e, htmls) => {

@@ -60,19 +60,19 @@ section .s-header-3 {
     }
 
     section.s-hero.s-h-bg-2{
-        background: #FEF9ED;
+        background: var(--secondary-c-1);
     }
 
     section.s-what-can-you-bring {
-        background: #FEF9ED;
+        background: var(--secondary-c-1);
     }
 
     section.s-contact-us {
-        background: #F5EFFD;
+        background: var(--primary-c-1);
     }
 
     section.s-contact-us.s-cu-bg-2{
-        background: #FEF9ED;
+        background: var(--secondary-c-1);
     }
 }
 

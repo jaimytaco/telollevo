@@ -28,8 +28,16 @@
       ],
       "rewrites": [
         {
-          "source": "/viajero",
+          "source": "/blank",
+          "destination": "/blank.html"
+        },
+        {
+          "source": "/traveler",
           "destination": "/traveler.html"
+        },
+        {
+          "source": "/shopper",
+          "destination": "/shopper.html"
         }
       ]
     }

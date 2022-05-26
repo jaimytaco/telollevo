@@ -22,6 +22,11 @@ export const registerSW = async () => {
             }
         )
 
+        navigator.serviceWorker.addEventListener('message', ({ data }) => {
+            const message = data.msg
+            console.log(`FROM SW:`, message)
+        })
+
         if (registration.waiting && registration.active) {
             // The page has been loaded when there's already a waiting and active SW.
             // This would happen if skipWaiting() isn't being called, and there are

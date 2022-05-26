@@ -17,9 +17,9 @@ const publicAbout = async (wf) => {
                     <div>
                         <img width="60" height="80" src="/img/logo.svg" alt="Astro logo">
                         ${products
-                            .map(product => `<h1>Welcome to <a href="/category/${product.name}">${product.name}</a></h1>`)
-                            .join('')
-                        }
+                .map(product => `<h1>Welcome to <a href="/category/${product.name}">${product.name}</a></h1>`)
+                .join('')
+            }
                     </div>
                 </header>
             </main>
@@ -72,21 +72,62 @@ export const generator = {
     }
 }
 
+const fonts = [
+    '/fonts/isidora-sans/IsidoraSans-Bold.ttf',
+    '/fonts/isidora-sans/IsidoraSans-Regular.ttf',
+    '/fonts/isidora-sans/IsidoraSans-SemiBold.ttf',
+]
+
+const images = [
+    '/img/icon/avatar.svg',
+    '/img/icon/chevron-down.svg',
+    '/img/icon/clock.svg',
+    '/img/icon/lock.svg',
+    '/img/icon/luggage.svg',
+    '/img/icon/money.svg',
+    '/img/icon/pig.svg',
+    '/img/icon/spark-1.svg',
+    '/img/icon/spark-2.svg',
+    '/img/icon/city.jpg',
+    '/img/thumbnail/what-can-you-bring-1.jpg',
+    '/img/thumbnail/what-can-you-bring-2.jpg',
+    '/img/thumbnail/what-can-you-bring-3.jpg',
+]
+
+const scripts = [
+    '/browser.helper.js',
+    '/main2.js',
+    '/modulepreload-polyfill.js',
+    '/pwa.actor.js',
+    '/database.worker.66931918.js',
+]
+
+const styles = [
+    '/main.css',
+]
+
+const routes = [
+    '/',
+    '/blank',
+    '/traveler',
+    '/shopper',
+]
+
 export const sw = {
     cache: {
         prefix: `sw-${app.name}`,
         version: 2,
     },
     static: [
-        '/',
-        '/blank'
+        ...fonts,
+        ...images,
+        ...scripts,
+        ...styles,
+        ...routes,
     ],
     dynamic: [
-        '/about'
+        // '/about'
     ]
 }
 
 export const getMainTag = () => 'main'
-
-
-

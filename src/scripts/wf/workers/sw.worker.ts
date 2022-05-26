@@ -19,7 +19,8 @@ import {
     cacheStatic,
     serveFromCache,
     removePreviousCaches,
-    getCacheName
+    getCacheName,
+    sendMessage
 } from '../helpers/sw.helper'
 
 import { default as networkDB } from '../services/firebase.service'
@@ -30,17 +31,17 @@ let registerNetworkDBPromise
 let registerOfflineDBPromise
 
 const onInstall = async (e) => {
-    registerNetworkDBPromise = registerNetworkDB(networkDB)
-    registerOfflineDBPromise = registerOfflineDB(offlineDB)
+    // registerNetworkDBPromise = registerNetworkDB(networkDB)
+    // registerOfflineDBPromise = registerOfflineDB(offlineDB)
 
     cacheStatic(e, getCacheName(sw.cache.prefix, SW_VERSION), sw.static)
 
-    await registerNetworkDBPromise
-    await registerOfflineDBPromise
+    // await registerNetworkDBPromise
+    // await registerOfflineDBPromise
 
-    await updateDB()
+    // await updateDB()
 
-    await cacheFromUI(ui, getCacheName(sw.cache.prefix, SW_VERSION))
+    // await cacheFromUI(ui, getCacheName(sw.cache.prefix, SW_VERSION))
 
     console.log('onInstall wf =', wf)
 }
@@ -61,20 +62,25 @@ const onFetch = (e) => {
     //     await cacheDynamically({ ui, cacheName: getCacheName(sw.cache.prefix, SW_VERSION), url: new URL(e.request.url) })
     // })())
 
-    // return serveFromCache(e.request, getCacheName(sw.cache.prefix, SW_VERSION))
+    return serveFromCache(e.request, getCacheName(sw.cache.prefix, SW_VERSION))
 }
 
 addEventListener('install', (e) => {
-    e.waitUntil(onInstall(e))
+    sendMessage({msg: 'install'})
+
     skipWaiting()
+    e.waitUntil(onInstall(e))
 })
 
 addEventListener('activate', (e) => {
+    sendMessage({msg: 'activate'})
+
     e.waitUntil(removePreviousCaches(sw.cache.prefix, [getCacheName(sw.cache.prefix, SW_VERSION)]))
+    return self.clients.claim()
 })
 
 addEventListener('fetch', (e) => {
     e.respondWith(onFetch(e))
 })
 
-export const SW_VERSION = 26
+export const SW_VERSION = 30

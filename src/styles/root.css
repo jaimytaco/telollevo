@@ -1,0 +1,17 @@
+:root{
+    --primary-c: #6E1EE6;
+    --primary-c-1: #F5EFFD;
+    --primary-c-2: #F0F1FA;
+    --primary-c-3: #8646E6;
+
+    --secondary-c: #EDB730;
+    --secondary-c-1: #FEF9ED;
+    --secondary-c-2: rgb(242 195 75 / 60%);
+
+    --white-c: #fff;
+    --black-c: #0E1C1F;
+
+    --font-c: #444344;
+
+    --separator-c: #cdcdcd;
+}
