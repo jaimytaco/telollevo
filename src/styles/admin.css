@@ -81,6 +81,12 @@ button {
     color: var(--font-color);
 }
 
+p a,
+p button{
+    font-size: inherit;
+    display: inline !important;
+}
+
 li {
     list-style: none;
 }
@@ -101,6 +107,11 @@ svg {
     flex-flow: row wrap;
     align-items: center;
     gap: 6px;
+}
+
+p .btn{
+    padding: 0;
+    min-height: 0;
 }
 
 .btn.btn-minimal{
@@ -194,6 +205,12 @@ section.s-sum-up{
     gap: 12px;
 }
 
+section.s-sum-up.is-closed{
+    padding-top: 8px;
+    padding-bottom: 0;
+    background: transparent;
+}
+
 .a-card-group-1{
     width: 100%;
     overflow-x: auto;
@@ -231,4 +248,18 @@ section.s-sum-up{
 
 .a-card-1 .a-card-2{
     margin-top: 2px;
+}
+
+section.s-sum-up #close-sum-up{
+    display: none;
+}
+
+section.s-sum-up.is-closed #close-sum-up{
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+section.s-sum-up.is-closed > *:not(#close-sum-up){
+    display: none;
 }
