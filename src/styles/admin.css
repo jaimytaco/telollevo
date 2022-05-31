@@ -96,6 +96,38 @@ svg {
     vertical-align: bottom;
 }
 
+input{
+    font: 1.1em/1.2 var(--font-family-semibold);
+    border: none;
+    min-height: 40px;
+}
+
+fieldset{
+    all: unset;
+}
+
+fieldset.t-search{
+    width: 100%;
+    border: 1px solid var(--separator-color);
+    border-radius: 40px;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+fieldset.t-search input{
+    font-size: 1.3em;
+    max-width: fit-content;
+    flex: 1;
+}
+
+fieldset.t-search input:placeholder-shown{
+    max-width: 88px;
+    flex: unset;
+}
+
 .btn {
     padding: 8px 12px;
     /* padding-bottom: 6px !important; */
@@ -209,6 +241,11 @@ section.s-sum-up.is-closed{
     padding-top: 8px;
     padding-bottom: 0;
     background: transparent;
+}
+
+section.s-table-search{
+    padding-left: 32px;
+    padding-right: 32px;
 }
 
 .a-card-group-1{
