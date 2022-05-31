@@ -216,8 +216,8 @@
 
 .card.card-7 .c-extra{
     padding: 40px;
-    background: var(--black-c);
-    color: var(--white-c);
+    background: var(--black-color);
+    color: var(--white-color);
     margin-top: -32px;
 }
 
@@ -535,11 +535,11 @@
 
     .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-primary{
         background: var(--secondary-c);
-        color: var(--black-c);
+        color: var(--black-color);
     }
 
     .card.card-5.card-5.c-5-bg-1:hover .c-actions .btn.btn-terciary{
-        color: var(--white-c);
+        color: var(--white-color);
     }
 
     .card.card-5:hover{
@@ -548,12 +548,12 @@
 
     .card.card-5.c-5-bg-1:hover{
         background: var(--primary-c-3);
-        color: var(--white-c);
+        color: var(--white-color);
     }
 
     .card.card-5.c-5-bg-2:hover{
         background: var(--secondary-c);
-        color: var(--black-c);
+        color: var(--black-color);
     }
 
     .card.card-6 .c-thumbnail picture *{

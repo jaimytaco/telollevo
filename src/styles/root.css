@@ -8,10 +8,10 @@
     --secondary-c-1: #FEF9ED;
     --secondary-c-2: rgb(242 195 75 / 60%);
 
-    --white-c: #fff;
-    --black-c: #0E1C1F;
+    --white-color: #fff;
+    --black-color: #0E1C1F;
 
-    --font-c: #444344;
+    --font-color: #444344;
 
-    --separator-c: #cdcdcd;
+    --separator-color: #cdcdcd;
 }

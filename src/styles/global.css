@@ -27,8 +27,8 @@
 
 body {
     font: 12px/1.2 IsidoraSans-Regular, sans-serif;
-    color: var(--font-c);
-    background: var(--white-c);
+    color: var(--font-color);
+    background: var(--white-color);
 }
 
 h1 {
@@ -54,7 +54,7 @@ p {
 a,
 button {
     font: 1.167em/1.2 IsidoraSans-SemiBold, sans-serif;
-    color: var(--font-c);
+    color: var(--font-color);
     border: none;
     background: none;
 }
@@ -119,8 +119,8 @@ svg {
 }
 
 hr {
-    background: var(--separator-c);
-    border: 0.5px solid var(--separator-c);
+    background: var(--separator-color);
+    border: 0.5px solid var(--separator-color);
 }
 
 @media (min-width: 768px) {

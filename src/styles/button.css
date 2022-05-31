@@ -17,7 +17,7 @@
 
 .btn.btn-primary {
     background: var(--primary-c);
-    color: var(--white-c);
+    color: var(--white-color);
 }
 
 .btn.btn-secondary {
