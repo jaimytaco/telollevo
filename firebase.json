@@ -38,6 +38,10 @@
         {
           "source": "/shopper",
           "destination": "/shopper.html"
+        },
+        {
+          "source": "/pedidos",
+          "destination": "/admin-orders.html"
         }
       ]
     }

@@ -11,7 +11,7 @@
     --font-family-bold: GoogleSans-Bold, sans-serif;
     --font-family-semibold: GoogleSans-Medium, sans-serif;
     --font-family-regular: GoogleSans-Regular, sans-serif;
-    --font-size-min: 10px;
+    --font-size-min: 12px;
 
     --separator-color: #cdcdcd;
 }
@@ -19,7 +19,7 @@
 * {
     padding: 0;
     margin: 0;
-    box-sizing: border-box !important;
+    box-sizing: border-box;
 }
 
 @font-face {
@@ -47,7 +47,7 @@ body {
     font: var(--font-size-min)/1.2 var(--font-family-regular);
     color: var(--font-color);
     background: var(--white-color);
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 /* h1 {
@@ -78,9 +78,10 @@ p {
 
 a,
 button {
-    all: unset;
     font: 1.1em/1.2 var(--font-family-semibold);
     color: var(--font-color);
+    background: transparent;
+    border: none;
 }
 
 p a,
@@ -105,7 +106,7 @@ input{
 }
 
 fieldset{
-    all: unset;
+    border: none;
 }
 
 fieldset.t-search{
@@ -126,7 +127,8 @@ fieldset.t-search input{
 }
 
 fieldset.t-search input:placeholder-shown{
-    max-width: 88px;
+    max-width: 10.5ch;
+    min-height: 48px;
     flex: unset;
 }
 
@@ -243,8 +245,7 @@ section.s-sum-up{
 }
 
 section.s-sum-up.is-closed{
-    padding-top: 8px;
-    padding-bottom: 0;
+    padding-bottom: 4px;
     background: transparent;
 }
 
@@ -329,6 +330,7 @@ section.s-table-head .t-h-actions{
 
 section.s-table-head .t-h-title{
     padding: 12px;
+    padding-bottom: 8px;
     padding-left: 0;
     flex: 1;
 }
@@ -336,6 +338,7 @@ section.s-table-head .t-h-title{
 section.s-table-head .t-h-filter{
     padding: 12px;
     padding-right: 0;
+    padding-bottom: 8px;
     display: flex;
     justify-content: end;
 }
@@ -381,4 +384,31 @@ section.s-table-head .t-h-filter{
     padding: 4px 8px;
     border: 1px solid var(--separator-color);
     border-radius: 12px;
+}
+
+.t-pag{
+    width: 100%;
+    padding: 16px 0;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.t-pag .btn{
+    min-height: 48px;
+    aspect-ratio: 1 / 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.t-pag .btn.active{
+    border: 1px solid var(--separator-color);
+}
+
+@media (min-width: 375px){
+    body{
+        --font-size-min: 13px;
+    }
 }
