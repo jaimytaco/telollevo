@@ -57,11 +57,13 @@ body {
 h2 {
     font: 2em/1.2 var(--font-family-bold);
 }
+*/
 
 h3 {
-    font: 1.33em/1.2 var(--font-family-bold);
+    font: 1.4em/1.2 var(--font-family-semibold);
 }
 
+/*
 h4 {
     font: 1.167em/1.2 var(--font-family-bold);
 } */
@@ -244,8 +246,15 @@ section.s-sum-up.is-closed{
 }
 
 section.s-table-search{
-    padding-left: 32px;
-    padding-right: 32px;
+    padding: 8px 32px 4px 32px;
+}
+
+section.s-table-head{
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom: 1px solid var(--separator-color);
+    display: flex;
+    flex-flow: row wrap;
 }
 
 .a-card-group-1{
@@ -299,4 +308,25 @@ section.s-sum-up.is-closed #close-sum-up{
 
 section.s-sum-up.is-closed > *:not(#close-sum-up){
     display: none;
+}
+
+section.s-table-head .t-head-actions{
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+section.s-table-head .t-head-title{
+    padding: 12px;
+    padding-left: 0;
+    flex: 1;
+}
+
+section.s-table-head .t-head-filter{
+    padding: 12px;
+    padding-right: 0;
+    display: flex;
+    justify-content: end;
 }
