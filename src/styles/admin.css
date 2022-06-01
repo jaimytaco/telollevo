@@ -222,6 +222,9 @@ main {
     width: 100%;
     height: 100vh;
     padding-top: 101px;
+    overflow: hidden;
+    display: flex;
+    flex-flow: column nowrap;
 }
 
 section {
@@ -246,7 +249,7 @@ section.s-sum-up.is-closed{
 }
 
 section.s-table-search{
-    padding: 8px 32px 4px 32px;
+    padding: 10px 32px 4px 32px;
 }
 
 section.s-table-head{
@@ -255,6 +258,12 @@ section.s-table-head{
     border-bottom: 1px solid var(--separator-color);
     display: flex;
     flex-flow: row wrap;
+}
+
+section.s-table-content{
+    padding: 0;
+    overflow-y: auto;
+    flex: 1;
 }
 
 .a-card-group-1{
@@ -310,7 +319,7 @@ section.s-sum-up.is-closed > *:not(#close-sum-up){
     display: none;
 }
 
-section.s-table-head .t-head-actions{
+section.s-table-head .t-h-actions{
     width: 100%;
     display: flex;
     flex-flow: row wrap;
@@ -318,15 +327,58 @@ section.s-table-head .t-head-actions{
     gap: 8px;
 }
 
-section.s-table-head .t-head-title{
+section.s-table-head .t-h-title{
     padding: 12px;
     padding-left: 0;
     flex: 1;
 }
 
-section.s-table-head .t-head-filter{
+section.s-table-head .t-h-filter{
     padding: 12px;
     padding-right: 0;
     display: flex;
     justify-content: end;
+}
+
+.t-row{
+    width: 100%;
+    border-bottom: 1px solid var(--separator-color);
+    padding: 12px 16px;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+}
+
+.t-row .t-r-info{
+    padding-right: 16px;
+    flex: 1;
+    display: flex;
+    flex-flow: column wrap;
+    gap: 2px;
+}
+
+.t-row .t-r-more{
+    display: none;
+}
+
+.a-card-group-3{
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    gap: 12px;
+}
+
+.t-row .t-r-info .a-card-group-3{
+    margin-bottom: 4px;
+}
+
+.t-row .t-r-info p{
+    font-size: 1.15em;
+}
+
+.a-card-3{
+    font-size: 1.1em;
+    padding: 4px 8px;
+    border: 1px solid var(--separator-color);
+    border-radius: 12px;
 }
