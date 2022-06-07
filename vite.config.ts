@@ -12,6 +12,7 @@ const publicPaths = {
 
 const adminPaths = {
     orders: new URL('./admin-orders.html', import.meta.url).pathname,
+    newOrders: new URL('./new-admin-orders.html', import.meta.url).pathname
 }
 
 export default defineConfig({
@@ -31,11 +32,11 @@ export default defineConfig({
                 ...publicPaths,
                 ...adminPaths
             },
-            output: {
-                entryFileNames: `[name].js`,
-                chunkFileNames: `[name].js`,
-                assetFileNames: `[name].[ext]`
-            }
+            // output: {
+            //     entryFileNames: `[name].js`,
+            //     chunkFileNames: `[name].js`,
+            //     assetFileNames: `[name].[ext]`
+            // }
         },
     },
 })

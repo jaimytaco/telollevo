@@ -1,0 +1,302 @@
+/* ROOT ******************************************************************/
+:root{
+    --white-color: #fff;
+    --black-color: #222;
+
+    --font-color: #222;
+    --font-family-bold: GoogleSans-Bold, sans-serif;
+    --font-family-semibold: GoogleSans-Medium, sans-serif;
+    --font-family-regular: GoogleSans-Regular, sans-serif;
+    --font-size-min: 12px;
+
+    --separator-color: #EEEEEE;
+
+    --bg-color-1: #F5F5F5;
+    --bg-color-2: #EEEEEE;
+
+    --primary-color-1: red;
+    --primary-color-2: #222;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* FONT ******************************************************************/
+@font-face {
+    font-family: GoogleSans-Bold;
+    src: url(/fonts/google-sans/GoogleSans-Bold.ttf) format('truetype'),
+        url(/fonts/google-sans/GoogleSans-Bold.otf) format('opentype');
+    display: swap;
+}
+
+@font-face {
+    font-family: GoogleSans-Medium;
+    src: url(/fonts/google-sans/GoogleSans-Medium.ttf) format('truetype'),
+        url(/fonts/google-sans/GoogleSans-Medium.otf) format('opentype');
+    display: swap;
+}
+
+@font-face {
+    font-family: GoogleSans-Regular;
+    src: url(/fonts/google-sans/GoogleSans-Regular.ttf) format('truetype'),
+        url(/fonts/google-sans/GoogleSans-Regular.otf) format('opentype');
+    display: swap;
+}
+
+/* GLOBAL ******************************************************************/
+body {
+    font: var(--font-size-min)/1.2 var(--font-family-regular);
+    color: var(--font-color);
+    background: var(--bg-color-1);
+}
+
+h3 {
+    font: 1.5em/1.2 var(--font-family-semibold);
+}
+
+h6{
+    font: 1.25em/1.2 var(--font-family-semibold);
+}
+
+p {
+    font: 1.25em/1.2 var(--font-family-regular);
+}
+
+img,
+svg {
+    vertical-align: bottom;
+}
+
+nav{
+    width: 100%;
+    padding-inline: 16px;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav.n-top-1{
+    padding-block: 14px 8px;
+}
+
+nav.n-top-2{
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+}
+
+menu.m-nav{
+    overflow-x: auto;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 16px;
+}
+
+menu.m-nav::-webkit-scrollbar{
+    display: none;
+}
+
+nav.n-top-2 menu.m-nav{
+    padding-inline-end: 24px;
+    flex: 1;
+}
+
+nav.n-top-2 .n-t-actions-2{
+    position: relative;
+    padding-inline-start: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+nav.n-top-2 .n-t-actions-2::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    right: calc(100% - 1px);
+    width: 48px;
+    height: 100%;
+    background: linear-gradient(to left,var(--bg-color-1),rgb(255 255 255 / 0));
+}
+
+main{
+    width: 100%;
+    padding-block-start: 32px;
+}
+
+/* BUTTON ******************************************************************/
+a,
+button {
+    font: 1.167em/1.2 var(--font-family-semibold);
+    color: var(--font-color);
+    background: transparent;
+    border: none;
+}
+
+.btn{
+    padding-block: 8px;
+    padding-inline: 12px;
+    /* padding-block-end: 6px !important; */
+    border-radius: 6px;
+    text-decoration: none;
+    min-height: 40px;
+    width: fit-content;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:not(:is(.btn-logo, .btn-auth, .btn-nav)) picture *{
+    margin-block-end: .225em;
+}
+
+.btn.btn-logo{
+    display: none;
+}
+
+.btn.btn-auth{
+    padding-block: 0;
+    padding-inline: 0;
+}
+
+.btn.btn-auth span{
+    display: none;
+}
+
+.btn.btn-primary-2{
+    background: var(--primary-color-2);
+    color: var(--white-color);
+}
+
+.btn.btn-sm{
+    padding-inline: 10px;
+    min-height: 36px;
+}
+
+.btn.btn-nav{
+    font-size: 1em;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    padding-inline: 0;
+    padding-block: 12px;
+    justify-content: center;
+}
+
+.btn.btn-nav.active{
+    border-bottom: 2px solid var(--black-color);
+}
+
+.btn.btn-underline{
+    text-decoration: underline;
+}
+
+section.s-table header .s-t-h-actions .btn span{
+    display: none;
+}
+
+/* FORM ******************************************************************/
+nav.n-top-1 form{
+    flex: 1;
+    padding-inline-end: 16px;
+}
+
+fieldset{
+    border: none;
+}
+
+fieldset.f-search{
+    width: 100%;
+    background: var(--bg-color-2);
+    border-radius: 32px;
+    padding-inline: 24px;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 14px;
+}
+
+input{
+    font: 1.33em/1.2 var(--font-family-semibold);
+    min-height: 40px;
+    border: none;
+}
+
+fieldset.f-search input{
+    min-width: 11ch;
+    background: transparent;
+    max-width: 20ch;
+    width: calc(100% - 30px);
+    min-height: 48px;
+}
+
+/* TABLE ******************************************************************/
+section.s-table{
+    background: var(--white-color);
+    border-radius: 16px 16px 0 0;
+}
+
+section.s-table header{
+    padding-block: 12px 6px;
+    padding-inline: 16px;
+    border-bottom: 1px solid var(--separator-color);
+    display: flex;
+    flex-flow: row wrap;
+    gap: 24px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+section.s-table header .s-t-h-actions{
+    display: flex;
+    flex-flow: row wrap;
+    gap: 8px;
+}
+
+section.s-table .s-t-body{
+    width: 100%;
+    background: var(--separator-color);
+    display: flex;
+    flex-flow: column wrap;
+    gap: 1px;
+}
+
+.t-row{
+    width: 100%;
+    background: var(--white-color);
+    padding-block: 12px;
+    padding-inline: 16px;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+/* CARDS ******************************************************************/
+.card-1 .c-1-icon{
+    display: none;
+}
+
+.card-1 .c-1-detail > h6{
+    margin-block: 6px 2px;
+}
+
+.card-group-2{
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    gap: 8px;
+}
+
+.card-2{
+    font-size: 1.167em;
+    border: 1px solid var(--separator-color);
+    border-radius: 12px;
+    padding-block: 4px;
+    padding-inline: 8px;
+}
