@@ -166,11 +166,26 @@ body.on-dialog > main{
 /* BUTTON ******************************************************************/
 a,
 button {
-    font: var(--font-size-p)/1.2 var(--font-family-semibold);
+    font: var(--font-size-label)/1.2 var(--font-family-semibold);
     color: var(--font-color);
     background: transparent;
     border: none;
+    cursor: pointer;
+    white-space: nowrap;
+
+    outline-color: red;
+    outline-offset: -5px;
 }
+
+/* a:is(:hover, :focus-visible),
+button:is(:hover, :focus-visible){
+    background: blue;
+}
+
+a:active,
+button:active{
+    background: green;
+} */
 
 .btn{
     padding-block: 8px;
@@ -534,6 +549,82 @@ fieldset.fs-search input{
     border: none;
     min-height: 52px;
     padding-inline: 0;
+}
+
+/* SPLIT BUTTON ******************************************************************/
+.split-btn{
+    display: inline-flex;
+    /* background: yellow; */
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.sp-popup-trigger{
+    /* inline-size: 4ch; */
+    cursor: pointer;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* border-inline-start: ?; */
+    border-start-end-radius: 6px;
+    border-end-end-radius: 6px;
+}
+
+/* .split-btn .sp-popup-trigger:is(:hover, :focus-within){
+    background: red;
+} */
+
+.split-btn .sp-popup-trigger:focus{
+    outline: none;
+}
+
+/* .split-btn .sp-popup-trigger:active{
+    background: brown;
+} */
+
+.split-btn .sp-popup-trigger > picture{
+    transition: transform .3s ease;
+}
+
+.split-btn .sp-popup-trigger:focus-within > picture{
+    transition-duration: .3s;
+    transform: rotateZ(.5turn);
+}
+
+.sp-popup {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 80%;
+    right: 0;
+    list-style-type: none;
+    background: var(--white-color);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 8%), 0 4px 12px rgb(0 0 0 / 5%);
+    padding-inline: 0;
+    padding-block: .5ch;
+    border-radius: 6px;
+    display: flex;
+    flex-flow: column wrap;
+    transition: opacity .3s ease;
+}
+
+.sp-popup .btn{
+    inline-size: 100%;
+    flex-flow: row nowrap;
+}
+
+.split-btn .sp-popup-trigger > .sp-popup {
+    transform: translateY(5px);
+    transition: opacity .3s ease,
+                transform .3s ease;
+}
+
+.split-btn .sp-popup-trigger:focus-within > .sp-popup {
+    transition-duration: .3s;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 @media (min-width: 425px){
