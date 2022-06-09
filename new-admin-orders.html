@@ -13,11 +13,11 @@
         <nav class="n-top-1">
             <button class="btn btn-logo">
                 <picture>
-                    <img src="/img/icon/isotype.svg" width="32" height="32">
+                    <img src="/img/icon/logotype.svg" height="36">
                 </picture>
             </button>
             <form>
-                <fieldset class="f-search">
+                <fieldset class="fs-search">
                     <picture>
                         <img src="/img/icon/search.svg" width="16" height="16">
                     </picture>
@@ -26,12 +26,12 @@
             </form>
             <button class="btn btn-auth">
                 <picture>
-                    <img src="/img/icon/user.svg" width="32" height="32">
+                    <img src="/img/icon/user.svg" width="40" height="40">
                 </picture>
                 <span>
-                    <strong>Fabián Delgado</strong>
+                    Fabián Delgado
                     <br>
-                    Técnico
+                    <small>Técnico</small>
                 </span>
             </button>
         </nav>
@@ -63,9 +63,9 @@
                 </a>
             </menu>
             <div class="n-t-actions-2">
-                <button class="btn btn-primary-2 btn-sm">
+                <button id="register-order_btn" class="btn btn-primary-2 btn-sm">
                     <picture>
-                        <img src="/img/icon/plus-light.svg" width="12" height="12">
+                        <img src="/img/icon/plus-light.svg" width="14" height="14">
                     </picture>
                     <span>Crear pedido</span>
                 </button>
@@ -280,6 +280,138 @@
             </div>
         </section>
     </main>
+
+    <nav id="register-order_dialog" class="n-dialog n-d-multistep">
+        <form id="register-order-step-1_form">
+            <header>
+                <button data-close-dialog="register-order_dialog" class="btn btn-xs" type="button">
+                    <picture>
+                        <img src="/img/icon/close-light.svg" width="20" height="20">
+                    </picture>
+                </button>
+                <h3>¿Quieres crear una orden?</h3>
+                <p>Ahora indícanos los datos del equipo</p>
+            </header>
+            <main>
+                <fieldset>
+                    <label for="product-link">Link del producto</label>
+                    <input type="text" placeholder="Ingresa el link del producto" id="product-link">
+                </fieldset>
+                <fieldset>
+                    <label for="">Categoría</label>
+                    <input list="product-category" placeholder="Selecciona una categoría">
+                    <datalist id="product-category">
+                        <option value="Categoría #1"></option>
+                        <option value="Categoría #2"></option>
+                        <option value="Categoría #3"></option>
+                    </datalist>
+                </fieldset>
+                <fieldset>
+                    <label for="product-pu">Valor unitario</label>
+                    <input type="number" placeholder="Ingresa el valor unitario del producto" id="product-pu">
+                </fieldset>
+                <fieldset>
+                    <label for="product-qty">Cantidad</label>
+                    <input type="number" placeholder="Ingresa la cantidad de productos" id="product-qty">
+                </fieldset>
+                <fieldset>
+                    <legend>¿Necesitas la caja del producto?</legend>
+                    <input type="radio" name="product-need-box" value="yes" id="product-need-box_yes">
+                    <label for="product-need-box_yes" class="btn">Sí</label>
+    
+                    <input type="radio" name="product-need-box" value="no" id="product-need-box_no" checked>
+                    <label for="product-need-box_no" class="btn">No</label>
+                </fieldset>
+            </main>
+            <footer>
+                <button class="btn btn-primary-1 btn-submit" type="submit">Listo</button>
+            </footer>
+        </form>
+
+        <form id="register-order-step-2_form">
+            <header>
+                <button data-current-step="register-order-step-2_form" data-previous-step="register-order-step-1_form" class="btn btn-xs" type="button">
+                    <picture>
+                        <img src="/img/icon/arrow-left-light.svg" width="20" height="20">
+                    </picture>
+                </button>
+                <h3>Ahora que ya sabemos que deseas traer</h3>
+                <p>Indícanos las características de tu artículo.</p>
+            </header>
+            <main>
+                <fieldset>
+                    <legend>¿Tu artículo pesa más de 5 kilos?</legend>
+                    <input type="radio" name="product-weight-more-5kg" value="yes" id="product-weight-more-5kg_yes">
+                    <label for="product-weight-more-5kg_yes" class="btn">Sí</label>
+    
+                    <input type="radio" name="product-weight-more-5kg" value="no" id="product-weight-more-5kg_no" checked>
+                    <label for="product-weight-more-5kg_no" class="btn">No</label>
+                </fieldset>
+                <fieldset>
+                    <legend>
+                        ¿Tu artículo mide más de 50 cm?
+                        <br>
+                        <small>(de alguno de sus lados)</small>
+                    </legend>
+                    <input type="radio" name="product-is-taller-50cm" value="yes" id="product-is-taller-50cm_yes">
+                    <label for="product-is-taller-50cm_yes" class="btn">Sí</label>
+    
+                    <input type="radio" name="product-is-taller-50cm" value="no" id="product-is-taller-50cm_no" checked>
+                    <label for="product-is-taller-50cm_no" class="btn">No</label>
+                </fieldset>
+                <fieldset>
+                    <legend>
+                        ¿Alguno de los links contiene más de una unidad?                         <br>
+                        <small>Por ejemplo packs, cajas o bolsas con varias unidades adentro.</small>
+                    </legend>
+                    <input type="radio" name="product-has-more-units" value="yes" id="product-has-more-units_yes">
+                    <label for="product-has-more-units_yes" class="btn">Sí</label>
+    
+                    <input type="radio" name="product-has-more-units" value="no" id="product-has-more-units_no" checked>
+                    <label for="product-has-more-units_no" class="btn">No</label>
+                </fieldset>
+                <fieldset>
+                    <legend>¿Quién enviará tus compras al alojamiento del viajero?</legend>
+                    <input type="radio" name="order-shipper" value="relative" id="order-shipper_yes">
+                    <label for="order-shipper_yes" class="btn">Un amigo, familiar u otro</label>
+    
+                    <input type="radio" name="order-shipper" value="store" id="order-shipper_no" checked>
+                    <label for="order-shipper_no" class="btn">Una tienda</label>
+                </fieldset>
+                <fieldset>
+                    <label for="order-extra-comment">Si deseas, puedes dejarle un comentario al viajero</label>
+                    <textarea id="order-extra-comment"></textarea>
+                </fieldset>
+            </main>
+            <footer>
+                <button class="btn btn-primary-1 btn-submit" type="submit">Listo</button>
+            </footer>
+        </form>
+
+        <form id="register-order-step-3_form">
+            <header>
+                <button data-current-step="register-order-step-3_form" data-previous-step="register-order-step-2_form" class="btn btn-xs" type="button">
+                    <picture>
+                        <img src="/img/icon/arrow-left-light.svg" width="20" height="20">
+                    </picture>
+                </button>
+                <h3>¿Quién deseas que compre tu artículo?</h3>
+                <p>Escoge a una de las opciones.</p>
+            </header>
+            <main>
+                <fieldset>
+                    <input type="radio" name="order-buyer" value="relative" id="order-buyer_me">
+                    <label for="order-buyer_me" class="btn btn-f-width">Yo deseo comprarlo</label>
+    
+                    <input type="radio" name="order-buyer" value="store" id="order-buyer_us" checked>
+                    <label for="order-buyer_us" class="btn btn-f-width">Deseo que Te lo llevo lo compre por una comisión adicional</label>
+                </fieldset>
+            </main>
+            <footer>
+                <button class="btn btn-primary-1 btn-submit" type="submit">Listo</button>
+            </footer>
+        </form>
+    </nav>
 
     <script defer type="module" src="/src/scripts/admin.ts"></script>
 </body>
