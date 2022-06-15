@@ -1,4 +1,14 @@
-import '../styles/admin.css'
+import '../styles/admin/root-admin.css'
+import '../styles/admin/font.css'
+import '../styles/admin/global-admin.css'
+import '../styles/admin/button.css'
+import '../styles/admin/table.css'
+import '../styles/admin/cards.css'
+import '../styles/admin/dialog.css'
+import '../styles/admin/form.css'
+import '../styles/admin/split-button.css'
+
+import '../styles/admin/admin.css'
 
 const handleDialog = (id, action) => {
     const body = document.body

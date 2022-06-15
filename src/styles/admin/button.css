@@ -1,0 +1,126 @@
+a,
+button {
+    font: var(--font-size-label)/1.2 var(--font-family-semibold);
+    color: var(--font-color);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+
+    /* outline-color: red; */
+    /* outline-offset: -5px; */
+}
+
+/* a:is(:hover, :focus-visible),
+button:is(:hover, :focus-visible){
+    background: blue;
+}
+
+a:active,
+button:active{
+    background: green;
+} */
+
+.btn{
+    padding-block: 8px;
+    padding-inline: 12px;
+    /* padding-block-end: 6px !important; */
+    border-radius: 6px;
+    text-decoration: none;
+    min-block-size: 40px;
+    inline-size: fit-content;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:not(:is(.btn-logo, .btn-auth, .btn-nav, .btn-round)) picture *{
+    margin-block: 0 2px;
+}
+
+.btn.btn-logo{
+    padding-inline: 0;
+    padding-block: 0;
+    display: none;
+}
+
+.btn.btn-auth{
+    font-size: var(--font-size-label);
+    padding-block: 0;
+    padding-inline: 0;
+}
+
+.btn.btn-auth > span{
+    display: none;
+}
+
+.btn.btn-primary{
+    background: var(--btn-color-primary);
+    color: var(--white-color);
+}
+
+.btn.btn-secondary{
+    background: var(--btn-color-secondary);
+    color: var(--white-color);
+}
+
+.btn.btn-tertiary{
+    background: var(--btn-color-tertiary);
+    color: var(--white-color);
+}
+
+.btn.btn-xs{
+    padding-block: 0;
+    padding-inline: 0;
+    min-block-size: 0;
+}
+
+.btn.btn-sm{
+    padding-inline: 10px;
+    min-block-size: 36px;
+}
+
+.btn.btn-nav{
+    font-size: var(--font-size-p);
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    padding-inline: 0;
+    padding-block: 12px;
+    flex-flow: column wrap;
+    justify-content: center;
+}
+
+.btn.btn-nav.active{
+    border-bottom: 2px solid var(--black-color);
+}
+
+.btn.btn-underline{
+    text-decoration: underline;
+}
+
+.btn.btn-submit{
+    font-size: var(--font-size-h3);
+    inline-size: 100%;
+    min-block-size: 52px;
+    justify-content: center;
+}
+
+.btn.btn-f-width{
+    inline-size: 100%;
+}
+
+.btn.btn-round{
+    border-radius: 50%;
+    background: var(--color-7);
+    aspect-ratio: 1 / 1;
+    justify-content: center;
+}
+
+.btn.btn-bordered{
+    border: 1px solid var(--btn-color-tertiary);
+}
+
+section.s-table header .s-t-h-actions .btn span{
+    display: none;
+}

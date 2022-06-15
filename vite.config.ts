@@ -12,7 +12,7 @@ const publicPaths = {
 
 const adminPaths = {
     orders: new URL('./admin-orders.html', import.meta.url).pathname,
-    newOrders: new URL('./new-admin-orders.html', import.meta.url).pathname
+    newOrders: new URL('./admin-orders.html', import.meta.url).pathname
 }
 
 export default defineConfig({

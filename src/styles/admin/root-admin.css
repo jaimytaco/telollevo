@@ -1,0 +1,75 @@
+:root{
+    /* --hsl-1: 349 100% 61%;
+    --hsl-2: 349 100% 66%;
+    --hsl-3: 0 0% 13%;
+    --hsl-4: 0 0% 30%;
+    --hsl-5: 0 0% 44%;
+    --hsl-6: 0 0% 87%;
+    --hsl-7: 0 0% 93%;
+    --hsl-8: 0 0% 96%;
+    --hsl-9: 0 0% 100%;
+
+    --color-1: hsl(var(--hsl-1));
+    --color-2: hsl(var(--hsl-2));
+    --color-3: hsl(var(--hsl-3));
+    --color-4: hsl(var(--hsl-4));
+    --color-5: hsl(var(--hsl-5));
+    --color-6: hsl(var(--hsl-6));
+    --color-7: hsl(var(--hsl-7));
+    --color-8: hsl(var(--hsl-8));
+    --color-9: hsl(var(--hsl-9)); */
+
+    --hsl-1: 264 80% 51%;
+    --hsl-2: 266 78% 96%;
+    /* --hsl-3: 300 1% 26%; */
+    --hsl-3: 0 0% 13%;
+    --hsl-4: 300 20% 83%;
+    --hsl-7: 234 50% 96%;
+    --hsl-8: 0 0% 100%;
+    --hsl-9: 0 0% 100%;
+
+    --color-1: hsl(var(--hsl-1));
+    --color-2: hsl(var(--hsl-2));
+    --color-3: hsl(var(--hsl-3));
+    --color-4: hsl(var(--hsl-4));
+    --color-7: hsl(var(--hsl-7));
+    --color-8: hsl(var(--hsl-8));
+    --color-9: hsl(var(--hsl-9));
+
+    --white-color: var(--color-9);
+    --black-color: var(--color-3);
+
+    --bg-color-body: var(--color-7);
+    --bg-color-search: var(--color-8);
+    --bg-color-dialog: var(--color-8);
+    --bg-color-dialog-overlay: hsl(var(--hsl-7) / 80%);
+    --bg-color-table: var(--white-color);
+    --bg-color-input-checked: var(--color-7);
+
+    --color-dialog-form: var(--black-color);
+    --color-input: var(--black-color);
+    --color-input-border: hsl(var(--hsl-3) / 30%);
+    --color-input-checked: var(--color-7);
+
+    /* --shadow-table: 0 1px 2px hsl(var(--hsl-3) / 8%), 0 4px 12px hsl(var(--hsl-3) / 5%); */
+    --shadow-table: unset;
+
+    --separator-color: hsl(var(--hsl-3) / 10%);
+
+    --font-color: var(--black-color);
+    --font-family-bold: GoogleSans-Bold, sans-serif;
+    --font-family-semibold: GoogleSans-Medium, sans-serif;
+    --font-family-regular: GoogleSans-Regular, sans-serif;
+    --font-size-min: 12px;
+
+    --font-size-h1: 1.5em;
+    --font-size-h3: 1.33em;
+    --font-size-p: 1.167em;
+    --font-size-label: 1.1em;
+
+    --space-dialog: 32px;
+
+    --btn-color-primary: var(--color-1);
+    --btn-color-secondary: var(--black-color);
+    --btn-color-tertiary: var(--black-color);
+}

@@ -42,10 +42,6 @@
         {
           "source": "/pedidos",
           "destination": "/admin-orders.html"
-        },
-        {
-          "source": "/nuevo-pedido",
-          "destination": "/new-admin-orders.html"
         }
       ]
     }
