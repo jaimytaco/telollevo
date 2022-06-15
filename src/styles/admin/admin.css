@@ -147,6 +147,10 @@
         left: 70%;
         max-inline-size: calc(30% - var(--space-dialog));
     }
+
+    .btn.btn-submit{
+        font-size: var(--font-size-p);
+    }
 }
 
 @media (min-width: 1280px){
