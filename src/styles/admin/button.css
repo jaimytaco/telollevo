@@ -122,6 +122,14 @@ button:active{
     border: 1px solid var(--btn-color-tertiary);
 }
 
+.btn.btn-spin{
+    transition: all .3s ease;
+}
+
+.btn.btn-spin.active{
+    transform: rotateZ(.5turn);
+}
+
 section.s-table header .s-t-h-actions .btn span{
     display: none;
 }

@@ -76,6 +76,26 @@ body > main section.s-table .s-t-body{
 }
 
 .t-r-extra{
+    position: absolute;
+    bottom: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow-y: auto;
+    max-block-size: 0;
     inline-size: 100%;
+    padding-block: 0;
+    transition: opacity .3s ease,
+                visibility .3s ease;
+}
+
+.t-r-extra.active{
+    position: relative;
+    bottom: unset;
+    opacity: 1;
+    visibility: visible;
+    overflow-y: hidden;
+    max-block-size: 100%;
     padding-block: 0 4px;
+    transition: opacity .3s ease .3s,
+                visibility .3s ease .3s;
 }

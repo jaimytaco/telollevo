@@ -99,8 +99,34 @@ const registerOrder = () => {
     }
 }
 
+const initTableExtra = () => {
+    const showTableBtns = [...document.querySelectorAll('[data-show-table-extra]')]
+    showTableBtns.forEach((btn) => {
+        btn.onclick = () => {
+            const id = btn.getAttribute('data-show-table-extra')
+            if (!id) throw 'table-extra id not found'
+            const extra = document.getElementById(id)
+            if (!extra) throw 'table-extra not found'
+
+            const btns = [...document.querySelectorAll(`[data-show-table-extra="${id}"]`)]
+            btns.forEach((b) => {
+                const content = b.getAttribute(`data-show-table-extra-${extra.matches('.active') ? 'open' : 'close'}`)
+                if (content) b.textContent = content
+                b.classList.toggle('active')
+            })
+
+            extra.classList.toggle('active')
+        }
+    })
+}
+
+const initTable = () => {
+    initTableExtra()
+}
+
 const render = () => {
     initDialog()
+    initTable()
 
     registerOrder()
 }
