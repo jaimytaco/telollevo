@@ -15,7 +15,7 @@ const publicAbout = async (wf) => {
                 <h1>About</h1>
                 <header>
                     <div>
-                        <img width="60" height="80" src="/img/logo.svg" alt="Astro logo">
+                        <img width="60" height="80" src="/img/telollevo/logo.svg" alt="Astro logo">
                         ${products
                 .map(product => `<h1>Welcome to <a href="/category/${product.name}">${product.name}</a></h1>`)
                 .join('')
@@ -79,19 +79,19 @@ const fonts = [
 ]
 
 const images = [
-    '/img/icon/avatar.svg',
-    '/img/icon/chevron-down.svg',
-    '/img/icon/clock.svg',
-    '/img/icon/lock.svg',
-    '/img/icon/luggage.svg',
-    '/img/icon/money.svg',
-    '/img/icon/pig.svg',
-    '/img/icon/spark-1.svg',
-    '/img/icon/spark-2.svg',
-    '/img/icon/city.jpg',
-    '/img/thumbnail/what-can-you-bring-1.jpg',
-    '/img/thumbnail/what-can-you-bring-2.jpg',
-    '/img/thumbnail/what-can-you-bring-3.jpg',
+    '/img/telollevo/icon/avatar.svg',
+    '/img/telollevo/icon/chevron-down.svg',
+    '/img/telollevo/icon/clock.svg',
+    '/img/telollevo/icon/lock.svg',
+    '/img/telollevo/icon/luggage.svg',
+    '/img/telollevo/icon/money.svg',
+    '/img/telollevo/icon/pig.svg',
+    '/img/telollevo/icon/spark-1.svg',
+    '/img/telollevo/icon/spark-2.svg',
+    '/img/telollevo/icon/city.jpg',
+    '/img/telollevo/thumbnail/what-can-you-bring-1.jpg',
+    '/img/telollevo/thumbnail/what-can-you-bring-2.jpg',
+    '/img/telollevo/thumbnail/what-can-you-bring-3.jpg',
 ]
 
 const scripts = [

@@ -1,5 +1,4 @@
-// import '../styles/admin.css'
-import '../styles/new-admin.css'
+import '../styles/admin.css'
 
 const handleDialog = (id, action) => {
     const body = document.body

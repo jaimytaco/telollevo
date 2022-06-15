@@ -93,7 +93,7 @@ details summary::before {
     transform: translateY(-50%);
     width: 30px;
     height: 30px;
-    background-image: url(/img/icon/luggage.svg);
+    background-image: url(/img/telollevo/icon/luggage.svg);
     background-size: contain;
 }
 
@@ -105,7 +105,7 @@ details summary::after {
     transform: translateY(-50%);
     width: 14px;
     height: 14px;
-    background-image: url(/img/icon/chevron-down.svg);
+    background-image: url(/img/telollevo/icon/chevron-down.svg);
     background-size: contain;
 }
 
