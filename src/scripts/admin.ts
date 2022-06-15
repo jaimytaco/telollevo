@@ -52,6 +52,10 @@ const registerOrder = () => {
     if (!formStep2) throw 'register-order-step-2_form not found'
     const formStep3 = document.getElementById('register-order-step-3_form')
     if (!formStep3) throw 'register-order-step-3_form not found'
+    const formStep4 = document.getElementById('register-order-step-4_form')
+    if (!formStep4) throw 'register-order-step-4_form not found'
+    const formStep5 = document.getElementById('register-order-step-5_form')
+    if (!formStep5) throw 'register-order-step-5_form not found'
 
     btn.onclick = () => {
         handleDialog('register-order_dialog', 'add')
@@ -74,6 +78,24 @@ const registerOrder = () => {
 
         formStep2.classList.remove('active')
         formStep3.classList.add('active')
+    }
+
+    formStep3.onsubmit = (e) => {
+        e.preventDefault()
+
+        // TODO: form-step-3 submit logic
+
+        formStep3.classList.remove('active')
+        formStep4.classList.add('active')
+    }
+
+    formStep4.onsubmit = (e) => {
+        e.preventDefault()
+
+        // TODO: form-step-4 submit logic
+
+        formStep4.classList.remove('active')
+        formStep5.classList.add('active')
     }
 }
 

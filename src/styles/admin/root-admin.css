@@ -68,6 +68,7 @@
     --font-size-label: 1.1em;
 
     --space-dialog: 32px;
+    --space-nav-top-end: 82.3px;
 
     --btn-color-primary: var(--color-1);
     --btn-color-secondary: var(--black-color);

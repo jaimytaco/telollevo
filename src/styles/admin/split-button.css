@@ -1,12 +1,36 @@
 .split-btn{
-    display: inline-flex;
-    /* background: yellow; */
     touch-action: manipulation;
     user-select: none;
+    display: inline-flex;    
+    gap: 1px;
+}
+
+.split-btn.sp-primary{
+    background: var(--white-color);
+    color: var(--white-color);
+}
+
+.split-btn.sp-bordered{
+    background: var(--btn-color-tertiary);
+    border-radius: 6px;
+}
+
+.split-btn > .sp-label{
+    border-radius: 6px 0 0 6px;
+}
+
+.split-btn.sp-primary > .sp-label{
+    background: var(--btn-color-primary);
+}
+
+.split-btn.sp-bordered > .sp-label{
+    background: var(--white-color);
+    border-radius: 6px 0 0 6px;
+    border: 1px solid var(--btn-color-tertiary);
+    border-inline-end: 0;
 }
 
 .sp-popup-trigger{
-    /* inline-size: 4ch; */
     cursor: pointer;
     position: relative;
     display: inline-flex;
@@ -15,6 +39,21 @@
     /* border-inline-start: ?; */
     border-start-end-radius: 6px;
     border-end-end-radius: 6px;
+}
+
+.split-btn > .sp-popup-trigger{
+    border-radius: 0 6px 6px 0;
+}
+
+.split-btn.sp-primary > .sp-popup-trigger{
+    background: var(--btn-color-primary);
+}
+
+.split-btn.sp-bordered > .sp-popup-trigger{
+    background: var(--white-color);
+    border-radius: 0 6px 6px 0;
+    border: 1px solid var(--btn-color-tertiary);
+    border-inline-start: 0;
 }
 
 /* .split-btn .sp-popup-trigger:is(:hover, :focus-within){
@@ -61,6 +100,7 @@
     border-radius: 0;
     transition: all .3s ease;
     inline-size: 100%;
+    font-size: inherit;
     flex-flow: row nowrap;
 }
 
@@ -76,6 +116,10 @@
 
 .split-btn .sp-popup-trigger:focus-within{
     background: var(--color-8);
+}
+
+.split-btn.sp-primary .sp-popup-trigger:focus-within{
+    background: var(--btn-color-primary)
 }
 
 .split-btn .sp-popup-trigger:focus-within > .sp-popup {

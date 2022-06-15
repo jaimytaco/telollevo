@@ -20,3 +20,11 @@
     padding-block: 4px;
     padding-inline: 8px;
 }
+
+.card-3{
+    inline-size: 100%;
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    gap: 12px;
+}

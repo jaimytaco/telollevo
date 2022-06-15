@@ -77,18 +77,57 @@
             <header>
                 <h1>Pedidos</h1>
                 <div class="s-t-h-actions">
-                    <button class="btn btn-underline">
-                        <picture>
-                            <img src="/img/telollevo/icon/filter.svg" width="16" height="16">
-                        </picture>
-                        <span>Filtrar por</span>
-                    </button>
-                    <button class="btn btn-underline">
-                        <picture>
-                            <img src="/img/telollevo/icon/minimize.svg" width="16" height="16">
-                        </picture>
-                        <span>Ordenar por</span>
-                    </button>
+                    <div class="split-btn">
+                        <span class="sp-popup-trigger btn btn-underline" tabindex="-1">
+                            <picture>
+                                <img src="/img/telollevo/icon/filter.svg" width="16" height="16">
+                            </picture>
+                            <span>Filtrar por</span>
+                            <ul class="sp-popup">
+                                <li>
+                                    <button class="btn">Registrado</button>
+                                </li>
+                                <li>
+                                    <button class="btn">Cotizado</button>
+                                </li>
+                                <li>
+                                    <button class="btn">Pagado</button>
+                                </li>
+                                <li>
+                                    <button class="btn">Con orden de compra</button>
+                                </li>
+                                <li>
+                                    <button class="btn">Con código de seguimiento</button>
+                                </li>
+                                <li>
+                                    <button class="btn">Listo para entrega</button>
+                                </li>
+                                <li>
+                                    <button class="btn">Entregado</button>
+                                </li>
+                            </ul>
+                        </span>
+                    </div>
+
+                    <div class="split-btn">
+                        <span class="sp-popup-trigger btn btn-underline" tabindex="-1">
+                            <picture>
+                                <img src="/img/telollevo/icon/minimize.svg" width="16" height="16">
+                            </picture>
+                            <span>Ordenar por</span>
+                            <ul class="sp-popup">
+                                <li>
+                                    <button class="btn">Fecha de registro</button>
+                                </li>
+                                <li>
+                                    <button class="btn">Producto</button>
+                                </li>
+                                <li>
+                                    <button class="btn">Categoría</button>
+                                </li>
+                            </ul>
+                        </span>
+                    </div>
                 </div>
             </header>
             <div class="s-t-body">
@@ -100,7 +139,7 @@
                             </picture>
                             <div class="c-1-detail">
                                 <div class="card-group-2">
-                                    <h6 class="card-2">Estado de la orden</h6>
+                                    <h6 class="card-2">Registrado</h6>
                                 </div>
                                 <h6>Producto</h6>
                                 <p>Categoría de producto</p>
@@ -108,7 +147,22 @@
                         </div>
                     </div>
                     <div class="t-r-actions t-r-actions-desktop">
-                        <button class="btn btn-bordered">CTA principal</button>
+                        <div class="split-btn sp-bordered">
+                            <span class="sp-label btn">Administrar</span>
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
                         <button class="btn btn-round">
                             <picture>
                                 <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
@@ -123,7 +177,69 @@
                                 </picture>
                                 <ul class="sp-popup">
                                     <li>
-                                        <button class="btn">CTA principal</button>
+                                        <button class="btn">Ver pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="t-row">
+                    <div class="t-r-info">
+                        <div class="card-1">
+                            <picture class="c-1-icon">
+                                <img src="/img/telollevo/icon/order.svg" width="40" height="40">
+                            </picture>
+                            <div class="c-1-detail">
+                                <div class="card-group-2">
+                                    <h6 class="card-2">Cotizado</h6>
+                                </div>
+                                <h6>Producto</h6>
+                                <p>Categoría de producto</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="t-r-actions t-r-actions-desktop">
+                        <button class="btn btn-primary">
+                            <span>Elegir viajero</span>
+                        </button>
+                        <div class="split-btn sp-bordered">
+                            <span class="sp-label btn">Administrar</span>
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
+                        <button class="btn btn-round">
+                            <picture>
+                                <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
+                            </picture>
+                        </button>
+                    </div>
+                    <div class="t-r-actions t-r-actions-mobile">
+                        <div class="split-btn">
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/telollevo/icon/more-vertical.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">Elegir viajero</button>
                                     </li>
                                     <li>
                                         <button class="btn">Ver pedido</button>
@@ -147,7 +263,7 @@
                             </picture>
                             <div class="c-1-detail">
                                 <div class="card-group-2">
-                                    <h6 class="card-2">Estado de la orden</h6>
+                                    <h6 class="card-2">Pagado</h6>
                                 </div>
                                 <h6>Producto</h6>
                                 <p>Categoría de producto</p>
@@ -155,7 +271,9 @@
                         </div>
                     </div>
                     <div class="t-r-actions t-r-actions-desktop">
-                        <button class="btn btn-bordered">CTA principal</button>
+                        <button class="btn btn-primary">
+                            <span>Registrar orden de compra</span>
+                        </button>
                         <button class="btn btn-round">
                             <picture>
                                 <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
@@ -170,16 +288,10 @@
                                 </picture>
                                 <ul class="sp-popup">
                                     <li>
-                                        <button class="btn">CTA principal</button>
+                                        <button class="btn">Registrar orden de compra</button>
                                     </li>
                                     <li>
                                         <button class="btn">Ver pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Editar pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Eliminar pedido</button>
                                     </li>
                                 </ul>
                             </span>
@@ -194,7 +306,7 @@
                             </picture>
                             <div class="c-1-detail">
                                 <div class="card-group-2">
-                                    <h6 class="card-2">Estado de la orden</h6>
+                                    <h6 class="card-2">Con orden de compra</h6>
                                 </div>
                                 <h6>Producto</h6>
                                 <p>Categoría de producto</p>
@@ -202,7 +314,9 @@
                         </div>
                     </div>
                     <div class="t-r-actions t-r-actions-desktop">
-                        <button class="btn btn-bordered">CTA principal</button>
+                        <button class="btn btn-primary">
+                            <span>Registrar código de seguimiento</span>
+                        </button>
                         <button class="btn btn-round">
                             <picture>
                                 <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
@@ -217,16 +331,10 @@
                                 </picture>
                                 <ul class="sp-popup">
                                     <li>
-                                        <button class="btn">CTA principal</button>
+                                        <button class="btn">Registrar código de seguimiento</button>
                                     </li>
                                     <li>
                                         <button class="btn">Ver pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Editar pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Eliminar pedido</button>
                                     </li>
                                 </ul>
                             </span>
@@ -241,7 +349,7 @@
                             </picture>
                             <div class="c-1-detail">
                                 <div class="card-group-2">
-                                    <h6 class="card-2">Estado de la orden</h6>
+                                    <h6 class="card-2">Con código de seguimiento</h6>
                                 </div>
                                 <h6>Producto</h6>
                                 <p>Categoría de producto</p>
@@ -249,7 +357,6 @@
                         </div>
                     </div>
                     <div class="t-r-actions t-r-actions-desktop">
-                        <button class="btn btn-bordered">CTA principal</button>
                         <button class="btn btn-round">
                             <picture>
                                 <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
@@ -264,16 +371,7 @@
                                 </picture>
                                 <ul class="sp-popup">
                                     <li>
-                                        <button class="btn">CTA principal</button>
-                                    </li>
-                                    <li>
                                         <button class="btn">Ver pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Editar pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Eliminar pedido</button>
                                     </li>
                                 </ul>
                             </span>
@@ -288,7 +386,7 @@
                             </picture>
                             <div class="c-1-detail">
                                 <div class="card-group-2">
-                                    <h6 class="card-2">Estado de la orden</h6>
+                                    <h6 class="card-2">Listo para entregar</h6>
                                 </div>
                                 <h6>Producto</h6>
                                 <p>Categoría de producto</p>
@@ -296,7 +394,6 @@
                         </div>
                     </div>
                     <div class="t-r-actions t-r-actions-desktop">
-                        <button class="btn btn-bordered">CTA principal</button>
                         <button class="btn btn-round">
                             <picture>
                                 <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
@@ -311,16 +408,7 @@
                                 </picture>
                                 <ul class="sp-popup">
                                     <li>
-                                        <button class="btn">CTA principal</button>
-                                    </li>
-                                    <li>
                                         <button class="btn">Ver pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Editar pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Eliminar pedido</button>
                                     </li>
                                 </ul>
                             </span>
@@ -335,7 +423,7 @@
                             </picture>
                             <div class="c-1-detail">
                                 <div class="card-group-2">
-                                    <h6 class="card-2">Estado de la orden</h6>
+                                    <h6 class="card-2">Entregado</h6>
                                 </div>
                                 <h6>Producto</h6>
                                 <p>Categoría de producto</p>
@@ -343,7 +431,6 @@
                         </div>
                     </div>
                     <div class="t-r-actions t-r-actions-desktop">
-                        <button class="btn btn-bordered">CTA principal</button>
                         <button class="btn btn-round">
                             <picture>
                                 <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
@@ -358,110 +445,7 @@
                                 </picture>
                                 <ul class="sp-popup">
                                     <li>
-                                        <button class="btn">CTA principal</button>
-                                    </li>
-                                    <li>
                                         <button class="btn">Ver pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Editar pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Eliminar pedido</button>
-                                    </li>
-                                </ul>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="t-row">
-                    <div class="t-r-info">
-                        <div class="card-1">
-                            <picture class="c-1-icon">
-                                <img src="/img/telollevo/icon/order.svg" width="40" height="40">
-                            </picture>
-                            <div class="c-1-detail">
-                                <div class="card-group-2">
-                                    <h6 class="card-2">Estado de la orden</h6>
-                                </div>
-                                <h6>Producto</h6>
-                                <p>Categoría de producto</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="t-r-actions t-r-actions-desktop">
-                        <button class="btn btn-bordered">CTA principal</button>
-                        <button class="btn btn-round">
-                            <picture>
-                                <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
-                            </picture>
-                        </button>
-                    </div>
-                    <div class="t-r-actions t-r-actions-mobile">
-                        <div class="split-btn">
-                            <span class="sp-popup-trigger btn" tabindex="-1">
-                                <picture>
-                                    <img src="/img/telollevo/icon/more-vertical.svg" width="14" height="14">
-                                </picture>
-                                <ul class="sp-popup">
-                                    <li>
-                                        <button class="btn">CTA principal</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Ver pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Editar pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Eliminar pedido</button>
-                                    </li>
-                                </ul>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="t-row">
-                    <div class="t-r-info">
-                        <div class="card-1">
-                            <picture class="c-1-icon">
-                                <img src="/img/telollevo/icon/order.svg" width="40" height="40">
-                            </picture>
-                            <div class="c-1-detail">
-                                <div class="card-group-2">
-                                    <h6 class="card-2">Estado de la orden</h6>
-                                </div>
-                                <h6>Producto</h6>
-                                <p>Categoría de producto</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="t-r-actions t-r-actions-desktop">
-                        <button class="btn btn-bordered">CTA principal</button>
-                        <button class="btn btn-round">
-                            <picture>
-                                <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
-                            </picture>
-                        </button>
-                    </div>
-                    <div class="t-r-actions t-r-actions-mobile">
-                        <div class="split-btn">
-                            <span class="sp-popup-trigger btn" tabindex="-1">
-                                <picture>
-                                    <img src="/img/telollevo/icon/more-vertical.svg" width="14" height="14">
-                                </picture>
-                                <ul class="sp-popup">
-                                    <li>
-                                        <button class="btn">CTA principal</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Ver pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Editar pedido</button>
-                                    </li>
-                                    <li>
-                                        <button class="btn">Eliminar pedido</button>
                                     </li>
                                 </ul>
                             </span>
@@ -586,6 +570,33 @@
                         <img src="/img/telollevo/icon/arrow-left.svg" width="20" height="20">
                     </picture>
                 </button>
+                <h3>¿Cómo prefieres la entrega?</h3>
+                <p>Una vez el artículo llegue a tu país destino.</p>
+            </header>
+            <main>
+                <fieldset>
+                    <input type="radio" name="order-shipping-address" value="relative" id="order-shipping-address_inplace" checked>
+                    <label for="order-shipping-address_inplace" class="btn btn-f-width">En Miraflores (Av. Aramburú 480, Piso 2 - Lima)</label>
+
+                    <input type="radio" name="order-shipping-address" value="relative" id="order-shipping-address_capital">
+                    <label for="order-shipping-address_capital" class="btn btn-f-width">Envio dentro de Lima</label>
+    
+                    <input type="radio" name="order-shipping-address" value="store" id="order-shipping-address_province">
+                    <label for="order-shipping-address_province" class="btn btn-f-width">Envio a provincia</label>
+                </fieldset>
+            </main>
+            <footer>
+                <button class="btn btn-primary btn-submit" type="submit">Continuar</button>
+            </footer>
+        </form>
+
+        <form id="register-order-step-4_form">
+            <header>
+                <button data-current-step="register-order-step-4_form" data-previous-step="register-order-step-3_form" class="btn btn-xs" type="button">
+                    <picture>
+                        <img src="/img/telollevo/icon/arrow-left.svg" width="20" height="20">
+                    </picture>
+                </button>
                 <h3>¿Quién deseas que compre tu artículo?</h3>
                 <p>Escoge a una de las opciones.</p>
             </header>
@@ -600,6 +611,20 @@
             </main>
             <footer>
                 <button class="btn btn-primary btn-submit" type="submit">Continuar</button>
+            </footer>
+        </form>
+
+        <form id="register-order-step-5_form">
+            <main>
+                <div class="card-3">
+                    <picture>
+                        <img src="/img/telollevo/illustrations/buyer-confirmation.svg" width="158">
+                    </picture>
+                    <h3>Orden de pedido<br>creada con éxito.</h3>
+                </div>
+            </main>
+            <footer>
+                <button class="btn btn-primary btn-submit" type="submit">Listo</button>
             </footer>
         </form>
     </nav>
