@@ -9,7 +9,7 @@
 body {
     position: relative;
     font: var(--font-size-min)/1.2 var(--font-family-regular);
-    color: var(--font-color);
+    color: var(--font-color-primary);
     background: var(--bg-color-body);
     max-block-size: 100vh;
     display: flex;
@@ -45,6 +45,16 @@ h6{
 
 p {
     font: var(--font-size-p)/1.2 var(--font-family-regular);
+}
+
+strong{
+    font-weight: normal;
+    font-family: var(--font-family-semibold);
+}
+
+p a{
+    font-size: inherit;
+    color: var(--btn-color-primary);
 }
 
 img,

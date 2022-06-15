@@ -176,7 +176,7 @@ fieldset.fs-search input{
     font: var(--font-size-h3)/1.2 var(--font-family-semibold);
     background: transparent;
     inline-size: calc(100% - 30px);
-    color: var(--font-color);
+    color: var(--font-color-primary);
     border: none;
     min-block-size: 52px;
     padding-inline: 0;

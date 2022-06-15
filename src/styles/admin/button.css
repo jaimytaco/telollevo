@@ -1,7 +1,7 @@
 a,
 button {
     font: var(--font-size-label)/1.2 var(--font-family-semibold);
-    color: var(--font-color);
+    color: var(--font-color-primary);
     background: transparent;
     border: none;
     cursor: pointer;
@@ -113,7 +113,7 @@ button:active{
 
 .btn.btn-round{
     border-radius: 50%;
-    background: var(--color-7);
+    background: var(--bg-color-body);
     aspect-ratio: 1 / 1;
     justify-content: center;
 }

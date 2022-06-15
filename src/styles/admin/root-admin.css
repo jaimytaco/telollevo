@@ -56,7 +56,8 @@
 
     --separator-color: hsl(var(--hsl-3) / 10%);
 
-    --font-color: var(--black-color);
+    --font-color-primary: var(--black-color);
+    --font-color-secondary: hsl(var(--hsl-3) / 60%);
     --font-family-bold: GoogleSans-Bold, sans-serif;
     --font-family-semibold: GoogleSans-Medium, sans-serif;
     --font-family-regular: GoogleSans-Regular, sans-serif;

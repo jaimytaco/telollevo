@@ -70,6 +70,7 @@
     .t-row{
         padding-block: 16px;
         padding-inline: 0;
+        gap: 16px 24px;
     }
 
     .t-r-actions.t-r-actions-mobile{
@@ -112,6 +113,52 @@
         left: calc(50% - 480px/2);
         bottom: 12px;
         border-radius: 16px;
+    }
+
+    .t-r-extra{
+        padding-inline: 52px;
+        padding-block: 0 12px;
+    }
+
+    .card-4{
+        justify-content: space-between;
+        gap: 16px 48px;
+    }
+
+    .card-5{
+        padding-inline: 16px;
+        padding-block: 16px;
+        gap: 16px;
+    }
+
+    .card-4 > .card-6,
+    .card-4 > .card-8{
+        inline-size: 30%;
+        max-inline-size: 340px;
+        padding-inline: 0;
+        flex: 1;
+    }
+
+    .card-4 > .card-6{
+        padding-inline: 16px 0;
+    }
+
+    .card-4 > .card-8{
+        padding-inline: 0 16px;
+    }
+
+    .card-6 > .card-5{
+        margin-block: 12px 0;
+    }
+
+    .card-8 > *:not(.c-8-open),
+    .card-8 > *:not(.c-8-close){
+        display: flex;
+    }
+
+    .card-8 .c-8-open,
+    .card-8 .c-8-close{
+        display: none;
     }
 }
 

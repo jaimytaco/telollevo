@@ -27,7 +27,7 @@
 
 body {
     font: 12px/1.2 IsidoraSans-Regular, sans-serif;
-    color: var(--font-color);
+    color: var(--font-color-primary);
     background: var(--white-color);
 }
 
@@ -54,7 +54,7 @@ p {
 a,
 button {
     font: 1.167em/1.2 IsidoraSans-SemiBold, sans-serif;
-    color: var(--font-color);
+    color: var(--font-color-primary);
     border: none;
     background: none;
 }

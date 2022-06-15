@@ -6,7 +6,7 @@
     margin-block: 6px 2px;
 }
 
-.card-group-2{
+.card-2-group{
     inline-size: 100%;
     display: flex;
     flex-flow: row wrap;
@@ -27,4 +27,83 @@
     flex-flow: column wrap;
     align-items: center;
     gap: 12px;
+}
+
+.card-4{
+    display: flex;
+    flex-flow: row wrap;
+    gap: 12px;
+}
+
+.card-5{
+    border-radius: 6px;
+    background: var(--bg-color-body);
+    padding-inline: 12px;
+    padding-block: 12px;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-5.c-5-bordered{
+    background: var(--white-color);
+    border: 1px solid var(--separator-color);
+}
+
+.card-4 > .card-5{
+    inline-size: 100%;
+}
+
+.card-5 p{
+    font-size: var(--font-size-label);
+    flex: 1;
+}
+
+.card-6{
+    display: flex;
+    flex-flow: column wrap;
+    gap: 8px;
+}
+
+.card-4 > .card-6{
+    padding-inline: 12px;
+}
+
+.card-7{
+    display: flex;
+    flex-flow: row wrap;
+    gap: 6px;
+}
+
+.card-7 p{
+    padding-block: 2px 0;
+    flex: 1;
+}
+
+.card-7 p span{
+    color: var(--font-color-secondary);
+}
+
+.card-7-group{
+    display: flex;
+    flex-flow: column wrap;
+    gap: 8px;
+}
+
+.card-8 > *:not(.c-8-open){
+    display: none;
+}
+
+.card-8.active > *:not(.c-8-open){
+    display: flex;
+}
+
+.card-8.active > .c-8-open{
+    display: none;
+}
+
+.card-4 > .card-8{
+    inline-size: 100%;
+    padding-inline: 12px;
 }
