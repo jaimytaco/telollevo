@@ -124,9 +124,17 @@ const initTable = () => {
     initTableExtra()
 }
 
+const initCard8 = () => {
+    const btns = [...document.querySelectorAll('[data-c-8]')]
+    btns.forEach((btn) => {
+        btn.onclick = () => btn.parentNode.classList.toggle('active')
+    })
+}
+
 const render = () => {
     initDialog()
     initTable()
+    initCard8()
 
     registerOrder()
 }

@@ -158,7 +158,7 @@
 
     .card-8 .c-8-open,
     .card-8 .c-8-close{
-        display: none;
+        display: none !important;
     }
 }
 
