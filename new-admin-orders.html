@@ -24,16 +24,25 @@
                     <input type="text" placeholder="Buscar pedidos">
                 </fieldset>
             </form>
-            <button class="btn btn-auth">
-                <picture>
-                    <img src="/img/icon/user.svg" width="40" height="40">
-                </picture>
-                <span>
-                    Fabián Delgado
-                    <br>
-                    <small>Técnico</small>
+            <div class="split-btn">
+                <span class="sp-popup-trigger btn btn-auth" tabindex="-1">
+                    <picture>
+                        <img src="/img/icon/user.svg" width="40" height="40">
+                    </picture>
+                    <span>
+                        Fabián Delgado
+                        <br>
+                        <small>Técnico</small>
+                    </span>
+                    <ul class="sp-popup">
+                        <li>
+                            <button class="btn">
+                                Cerrar sesión
+                            </button>
+                        </li>
+                    </ul>
                 </span>
-            </button>
+            </div>
         </nav>
         <nav class="n-top-2">
             <menu class="m-nav">
@@ -76,7 +85,7 @@
     <main>
         <section class="s-table">
             <header>
-                <h3>Pedidos</h3>
+                <h1>Pedidos</h1>
                 <div class="s-t-h-actions">
                     <button class="btn btn-underline">
                         <picture>
@@ -108,29 +117,32 @@
                             </div>
                         </div>
                     </div>
-                    <div class="t-r-actions">
+                    <div class="t-r-actions t-r-actions-desktop">
+                        <button class="btn btn-bordered-2">CTA principal</button>
+                        <button class="btn btn-round">
+                            <picture>
+                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
+                            </picture>
+                        </button>
+                    </div>
+                    <div class="t-r-actions t-r-actions-mobile">
                         <div class="split-btn">
-                            <button class="btn">Imprimir</button>
                             <span class="sp-popup-trigger btn" tabindex="-1">
                                 <picture>
                                     <img src="/img/icon/more-vertical.svg" width="14" height="14">
                                 </picture>
                                 <ul class="sp-popup">
                                     <li>
-                                        <button class="btn">
-                                            <picture>
-                                                <img src="/img/icon/filter.svg" width="14" height="14">
-                                            </picture>
-                                            <span>Filtrar por</span>
-                                        </button>
+                                        <button class="btn">CTA principal</button>
                                     </li>
                                     <li>
-                                        <button class="btn">
-                                            <picture>
-                                                <img src="/img/icon/minimize.svg" width="14" height="14">
-                                            </picture>
-                                            <span>Ordenar por</span>
-                                        </button>
+                                        <button class="btn">Ver pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
                                     </li>
                                 </ul>
                             </span>
@@ -152,12 +164,36 @@
                             </div>
                         </div>
                     </div>
-                    <div class="t-r-actions">
-                        <button class="btn">
+                    <div class="t-r-actions t-r-actions-desktop">
+                        <button class="btn btn-bordered-2">CTA principal</button>
+                        <button class="btn btn-round">
                             <picture>
-                                <img src="/img/icon/more-vertical.svg" width="16" height="16">
+                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                             </picture>
                         </button>
+                    </div>
+                    <div class="t-r-actions t-r-actions-mobile">
+                        <div class="split-btn">
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">CTA principal</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Ver pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="t-row">
@@ -175,12 +211,36 @@
                             </div>
                         </div>
                     </div>
-                    <div class="t-r-actions">
-                        <button class="btn">
+                    <div class="t-r-actions t-r-actions-desktop">
+                        <button class="btn btn-bordered-2">CTA principal</button>
+                        <button class="btn btn-round">
                             <picture>
-                                <img src="/img/icon/more-vertical.svg" width="16" height="16">
+                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                             </picture>
                         </button>
+                    </div>
+                    <div class="t-r-actions t-r-actions-mobile">
+                        <div class="split-btn">
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">CTA principal</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Ver pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="t-row">
@@ -198,12 +258,36 @@
                             </div>
                         </div>
                     </div>
-                    <div class="t-r-actions">
-                        <button class="btn">
+                    <div class="t-r-actions t-r-actions-desktop">
+                        <button class="btn btn-bordered-2">CTA principal</button>
+                        <button class="btn btn-round">
                             <picture>
-                                <img src="/img/icon/more-vertical.svg" width="16" height="16">
+                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                             </picture>
                         </button>
+                    </div>
+                    <div class="t-r-actions t-r-actions-mobile">
+                        <div class="split-btn">
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">CTA principal</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Ver pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="t-row">
@@ -221,12 +305,36 @@
                             </div>
                         </div>
                     </div>
-                    <div class="t-r-actions">
-                        <button class="btn">
+                    <div class="t-r-actions t-r-actions-desktop">
+                        <button class="btn btn-bordered-2">CTA principal</button>
+                        <button class="btn btn-round">
                             <picture>
-                                <img src="/img/icon/more-vertical.svg" width="16" height="16">
+                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                             </picture>
                         </button>
+                    </div>
+                    <div class="t-r-actions t-r-actions-mobile">
+                        <div class="split-btn">
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">CTA principal</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Ver pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="t-row">
@@ -244,12 +352,36 @@
                             </div>
                         </div>
                     </div>
-                    <div class="t-r-actions">
-                        <button class="btn">
+                    <div class="t-r-actions t-r-actions-desktop">
+                        <button class="btn btn-bordered-2">CTA principal</button>
+                        <button class="btn btn-round">
                             <picture>
-                                <img src="/img/icon/more-vertical.svg" width="16" height="16">
+                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                             </picture>
                         </button>
+                    </div>
+                    <div class="t-r-actions t-r-actions-mobile">
+                        <div class="split-btn">
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">CTA principal</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Ver pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="t-row">
@@ -267,12 +399,36 @@
                             </div>
                         </div>
                     </div>
-                    <div class="t-r-actions">
-                        <button class="btn">
+                    <div class="t-r-actions t-r-actions-desktop">
+                        <button class="btn btn-bordered-2">CTA principal</button>
+                        <button class="btn btn-round">
                             <picture>
-                                <img src="/img/icon/more-vertical.svg" width="16" height="16">
+                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                             </picture>
                         </button>
+                    </div>
+                    <div class="t-r-actions t-r-actions-mobile">
+                        <div class="split-btn">
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">CTA principal</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Ver pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="t-row">
@@ -290,12 +446,36 @@
                             </div>
                         </div>
                     </div>
-                    <div class="t-r-actions">
-                        <button class="btn">
+                    <div class="t-r-actions t-r-actions-desktop">
+                        <button class="btn btn-bordered-2">CTA principal</button>
+                        <button class="btn btn-round">
                             <picture>
-                                <img src="/img/icon/more-vertical.svg" width="16" height="16">
+                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                             </picture>
                         </button>
+                    </div>
+                    <div class="t-r-actions t-r-actions-mobile">
+                        <div class="split-btn">
+                            <span class="sp-popup-trigger btn" tabindex="-1">
+                                <picture>
+                                    <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                                </picture>
+                                <ul class="sp-popup">
+                                    <li>
+                                        <button class="btn">CTA principal</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Ver pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Editar pedido</button>
+                                    </li>
+                                    <li>
+                                        <button class="btn">Eliminar pedido</button>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
