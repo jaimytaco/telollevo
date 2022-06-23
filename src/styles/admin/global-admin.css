@@ -52,8 +52,10 @@ strong{
     font-family: var(--font-family-semibold);
 }
 
-p a{
-    font-size: inherit;
+p a,
+p button{
+    display: inline !important;
+    font-size: inherit !important;
     color: var(--btn-color-primary);
 }
 
@@ -83,7 +85,7 @@ nav.n-top-1 .n-t-1-end{
     display: flex;
     flex-flow: row wrap;
     justify-content: end;
-    gap: 24px;
+    gap: 16px;
 }
 
 nav.n-top-2{
@@ -103,7 +105,7 @@ menu.m-nav::-webkit-scrollbar{
     display: none;
 }
 
-nav.n-top-2 menu.m-nav{
+nav.n-top-2 > menu.m-nav{
     padding-inline: 0 24px;
     flex: 1;
 }

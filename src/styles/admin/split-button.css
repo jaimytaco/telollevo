@@ -20,7 +20,9 @@
 }
 
 .split-btn.sp-primary > .sp-label{
-    background: var(--btn-color-primary);
+    /* background: var(--btn-color-primary); */
+    /* color: var(--white-color); */
+    background: var(--bg-color-body) !important;
 }
 
 .split-btn.sp-bordered > .sp-label{
@@ -46,7 +48,9 @@
 }
 
 .split-btn.sp-primary > .sp-popup-trigger{
-    background: var(--btn-color-primary);
+    /* background: var(--btn-color-primary); */
+    background: var(--bg-color-body) !important;
+
 }
 
 .split-btn.sp-bordered > .sp-popup-trigger{

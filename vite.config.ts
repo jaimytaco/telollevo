@@ -32,11 +32,11 @@ export default defineConfig({
                 ...publicPaths,
                 ...adminPaths
             },
-            // output: {
-            //     entryFileNames: `[name].js`,
-            //     chunkFileNames: `[name].js`,
-            //     assetFileNames: `[name].[ext]`
-            // }
+            output: {
+                entryFileNames: `[name].js`,
+                chunkFileNames: `[name].js`,
+                assetFileNames: `[name].[ext]`
+            }
         },
     },
 })

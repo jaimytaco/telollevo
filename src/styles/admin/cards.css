@@ -22,6 +22,7 @@
 }
 
 .card-3{
+    text-align: center;
     inline-size: 100%;
     display: flex;
     flex-flow: column wrap;
@@ -106,4 +107,124 @@
 .card-4 > .card-8{
     inline-size: 100%;
     padding-inline: 12px;
+}
+
+.card-9-group{
+    display: flex;
+    flex-flow: column wrap;
+    gap: 24px;
+}
+
+.card-10-group{
+    position: relative;
+    inline-size: 100%;
+    display: flex;
+    flex-flow: column wrap;
+    gap: 16px;
+}
+
+fieldset.fs-list .card-10-group h3{
+    padding-inline: calc(var(--input-padding-inline)*.5);
+}
+
+.card-11-group{
+    overflow-y: auto;
+    inline-size: 100%;
+    max-block-size: 50vh;
+    /* padding-block: 0 140px; */
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 16px;
+}
+
+fieldset.fs-list .card-11-group{
+    padding-inline: calc(var(--input-padding-inline)*.5);
+}
+
+.card-10-group[data-search-is-recent] > .card-11-group > .card-11:not([data-recent]){
+    display: none;
+}
+
+.card-11{
+    inline-size: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    gap: 12px;
+}
+
+.card-11 .c-11-content{
+    display: flex;
+    flex-flow: column wrap;
+    gap: 2px;
+}
+
+.card-11 .c-11-content p{
+    font-size: var(--font-size-label);
+}
+
+.card-11 .c-11-content .c-11-c-action{
+    display: none;
+    margin-block: auto 0;
+}
+
+.card-11:is(.active, :hover) .c-11-content .c-11-c-action.active{
+    display: inherit;
+}
+
+.card-11 .c-11-more{
+    margin-inline: auto 0;
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 20px;
+}
+
+.card-12{
+    background: var(--btn-color-secondary);
+    border-radius: var(--btn-border-radius);
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.card-11 .c-11-more .card-12{
+    display: none;
+}
+
+.card-11:is(.active, :hover) .c-11-more .card-12.active{
+    display: inherit;
+}
+
+.card-12 input{
+    appearance: none;
+    padding: 0;
+    inline-size: 2.5ch;
+    text-align: center;
+    min-block-size: 44px;
+    border: none;
+    color: var(--white-color);
+}
+
+.card-12 .btn{
+    padding-inline: var(--btn-padding-block);
+    aspect-ratio: 1 / 1;
+    justify-content: center;
+}
+
+.card-13{
+    border-top: 1px solid var(--separator-color);
+    inline-size: 100%;
+    background: var(--bg-color-dialog);
+    padding-inline: calc(var(--input-padding-inline)*.5);
+    padding-block: 24px 0;
+    display: flex;
+    flex-flow: column wrap;
+    gap: 8px;
+}
+
+.card-13 p{
+    font-family: var(--font-family-semibold);
+    inline-size: 100%;
+    display: flex;
+    justify-content: space-between;
 }

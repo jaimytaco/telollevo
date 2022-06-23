@@ -65,8 +65,10 @@
 
     --font-size-h1: 1.5em;
     --font-size-h3: 1.33em;
-    --font-size-p: 1.167em;
-    --font-size-label: 1.1em;
+    /* --font-size-p: 1.167em;
+    --font-size-label: 1.1em; */
+    --font-size-p: 1.2em;
+    --font-size-label: 1.167em;
 
     --space-dialog: 32px;
     --space-nav-top-end: 82.3px;
@@ -74,4 +76,11 @@
     --btn-color-primary: var(--color-1);
     --btn-color-secondary: var(--black-color);
     --btn-color-tertiary: var(--black-color);
+
+    --btn-padding-block: 1ch;
+    --btn-padding-inline: 1.5ch;
+    --btn-border-radius: .7ch;
+
+    --input-padding-block: 1.5ch;
+    --input-padding-inline: 2ch;
 }

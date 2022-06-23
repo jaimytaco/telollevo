@@ -23,10 +23,13 @@ button:active{
 
 .btn{
     font: var(--font-size-label)/1.2 var(--font-family-semibold);
-    padding-block: 8px;
-    padding-inline: 12px;
+    /* padding-block: 8px;
+    padding-inline: 12px; */
+    padding-block: var(--btn-padding-block);
+    padding-inline: var(--btn-padding-inline);
     /* padding-block-end: 6px !important; */
-    border-radius: 6px;
+    /* border-radius: 6px; */
+    border-radius: var(--btn-border-radius);
     text-decoration: none;
     min-block-size: 40px;
     inline-size: fit-content;
@@ -36,7 +39,7 @@ button:active{
     gap: 6px;
 }
 
-.btn:not(:is(.btn-logo, .btn-auth, .btn-nav, .btn-round)) picture *{
+.btn:not(:is(.btn-logo, .btn-auth, .btn-nav, .btn-round, .btn-cart)) picture *{
     margin-block: 0 2px;
 }
 
@@ -47,6 +50,12 @@ button:active{
 }
 
 .btn.btn-auth{
+    font-size: var(--font-size-label);
+    padding-block: 0;
+    padding-inline: 0;
+}
+
+.btn.btn-cart{
     font-size: var(--font-size-label);
     padding-block: 0;
     padding-inline: 0;
@@ -71,14 +80,19 @@ button:active{
     color: var(--white-color);
 }
 
-.btn.btn-xs{
-    padding-block: 0;
+.btn.btn-xs-inline{
     padding-inline: 0;
     min-block-size: 0;
 }
 
+.btn.btn-xs-block{
+    padding-block: 0;
+    min-block-size: 0;
+}
+
 .btn.btn-sm{
-    padding-inline: 10px;
+    /* padding-inline: 10px; */
+    padding-inline: calc(var(--btn-padding-inline) - .5ch);
     min-block-size: 36px;
 }
 
@@ -98,6 +112,14 @@ button:active{
 
 .btn.btn-underline{
     text-decoration: underline;
+}
+
+.btn.btn-secondary-color{
+    color: var(--btn-color-secondary);
+}
+
+.btn.btn-bold{
+    font-family: var(--font-family-bold);
 }
 
 .btn.btn-submit{

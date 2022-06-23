@@ -29,7 +29,7 @@
         gap: 32px;
     }
 
-    nav.n-top-2 menu.m-nav{
+    nav.n-top-2 > menu.m-nav{
         padding-inline: 0 32px;
     }
 

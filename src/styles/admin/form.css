@@ -21,39 +21,29 @@ nav.n-dialog.n-d-multistep form.active{
 }
 
 form header{
-    padding-block: 0 12px;
     padding-inline: 16px;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto 1fr;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+form header .btn:is([data-close-dialog], [data-current-step], [data-previous-step]){
+    margin-block: 0 auto;
+}
+
+form header .h-heading{
+    flex: 1;
+    display: flex;
+    flex-flow: column wrap;
     gap: 4px;
-}
-
-form header .btn{
-    block-size: fit-content;
-    padding-inline: 0 6px !important;
-    grid-row: 1 / span 1;
-}
-
-form header .btn picture *{
-    margin-block: 0 !important;
-}
-
-form header h3{
-    grid-column: 2 / span 1;
-    grid-row: 1 / span 1;
-}
-
-form header p{
-    grid-column: 2 / span 1;
-    grid-row: 2 / span 1;
 }
 
 form main{
     min-block-size: 110px;
     max-block-size: 50vh;
     overflow-y: auto !important;
-    padding-block: 12px 0;
+    padding-block: 24px 0;
     padding-inline: 16px;
     display: flex;
     flex-flow: row wrap;
@@ -64,9 +54,18 @@ form main::-webkit-scrollbar{
     display: none;
 }
 
+form main.m-hug{
+    overflow-y: hidden !important;
+    max-block-size: unset;
+}
+
 form footer{
     padding-block: 12px 6px;
     padding-inline: 16px;
+    display: flex;
+    flex-flow: column wrap;
+    gap: 4px;
+    align-items: center;
 }
 
 nav.n-dialog form{
@@ -87,6 +86,25 @@ fieldset{
 
 form main fieldset{
     inline-size: 100%;
+    block-size: fit-content;
+}
+
+fieldset.fs-icon{
+    border: 1px solid var(--color-input-border);
+    border-radius: 8px;
+    /* padding-inline: 16px; */
+    padding-inline: var(--input-padding-inline);
+    block-size: fit-content;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+fieldset.fs-icon input{
+    border: none;
+    padding-inline: 0;
+    padding-block: 0;
 }
 
 fieldset.fs-search{
@@ -126,8 +144,10 @@ textarea{
     color: var(--color-input);
     background: transparent;
     border-radius: 8px;
-    padding-inline: 16px;
-    padding-block: 12px;
+    /* padding-inline: 16px;
+    padding-block: 12px; */
+    padding-inline: var(--input-padding-inline);
+    padding-block: var(--input-padding-block);
 }
 
 textarea{
@@ -150,7 +170,8 @@ input[type="radio"] + label{
 }
 
 input[type="radio"] + label.btn{
-    padding-block: 12px;
+    /* padding-block: 12px; */
+    padding-block: var(--btn-padding-inline);
 }
 
 input[type="radio"] + label.btn.btn-f-width{
@@ -168,6 +189,16 @@ fieldset input[type="radio"] + label{
     flex: 1;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 /* nav.n-dialog input{
     color: var(--white-color);
 } */
@@ -180,4 +211,8 @@ fieldset.fs-search input{
     border: none;
     min-block-size: 52px;
     padding-inline: 0;
+}
+
+fieldset.fs-list{
+    gap: 20px;
 }
