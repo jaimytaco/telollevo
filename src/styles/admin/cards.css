@@ -180,6 +180,15 @@ fieldset.fs-list .card-11-group{
     gap: 20px;
 }
 
+.card-11 .c-11-more .c-11-m-action{
+    display: none;
+    margin-block: 0 auto;
+}
+
+.card-11:is(.active, :hover) .c-11-more .c-11-m-action.active{
+    display: inherit;
+}
+
 .card-12{
     background: var(--btn-color-secondary);
     border-radius: var(--btn-border-radius);

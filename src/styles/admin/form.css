@@ -28,7 +28,7 @@ form header{
     gap: 8px;
 }
 
-form header .btn:is([data-close-dialog], [data-current-step], [data-previous-step]){
+form header .btn:is([data-close-dialog_btn], [data-current-step], [data-previous-step_btn]){
     margin-block: 0 auto;
 }
 
@@ -116,6 +116,10 @@ fieldset.fs-search{
     flex-flow: row wrap;
     align-items: center;
     gap: 14px;
+}
+
+fieldset.fs-sm{
+    inline-size: calc(50% - 20px/2);
 }
 
 fieldset input{
