@@ -108,11 +108,14 @@
     }
 
     nav.n-dialog{
-        /* inline-size: 480px; */
-        max-inline-size: 480px;
-        left: calc(50% - 480px/2);
+        /* max-inline-size: 480px;
+        left: calc(50% - 480px/2); */
         bottom: 12px;
         border-radius: 16px;
+    }
+
+    nav.n-dialog.n-d-multistep form{
+        padding-inline: calc(50% - 320px/2);
     }
 
     .t-r-extra{
@@ -193,6 +196,10 @@
         transition: all .3s ease;
     }
 
+    nav.n-dialog{
+        padding-block: 24px 12px;
+    }
+
     body nav.n-dialog{
         bottom: unset;
         top: 8px;
@@ -202,6 +209,10 @@
 
     .btn.btn-submit{
         font-size: var(--font-size-p);
+    }
+
+    nav.n-dialog.n-d-multistep form{
+        padding-inline: 0;
     }
 }
 
