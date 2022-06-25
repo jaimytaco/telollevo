@@ -9,6 +9,7 @@ nav.n-dialog{
     opacity: 0;
     visibility: hidden;
     transform: translateY(50%);
+    z-index: -1;
     transition: all .3s ease;
     padding-block: 24px 12px;
     padding-inline: 0;

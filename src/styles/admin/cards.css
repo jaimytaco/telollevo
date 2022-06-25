@@ -57,7 +57,7 @@
 }
 
 .card-5 p{
-    font-size: var(--font-size-label);
+    font-size: var(--font-size-xs);
     flex: 1;
 }
 

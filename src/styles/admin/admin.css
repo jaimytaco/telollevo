@@ -214,6 +214,11 @@
     nav.n-dialog.n-d-multistep form{
         padding-inline: 0;
     }
+
+    .card-4 > .card-6,
+    .card-4 > .card-8{
+        max-inline-size: 440px;
+    }
 }
 
 @media (min-width: 1280px){
