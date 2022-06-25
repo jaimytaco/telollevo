@@ -70,7 +70,11 @@ form footer{
 
 nav.n-dialog form{
     inline-size: 100%;
-    color: var(--color-dialog-form);
+    color: var(--color-dialog-form-light);
+}
+
+nav.n-dialog.n-dialog-dark form{
+    color: var(--color-dialog-form-dark);
 }
 
 nav.n-top-1 form{
@@ -90,7 +94,7 @@ form main fieldset{
 }
 
 fieldset.fs-icon{
-    border: 1px solid var(--color-input-border);
+    border: 1px solid var(--color-input-border-light);
     border-radius: 8px;
     /* padding-inline: 16px; */
     padding-inline: var(--input-padding-inline);
@@ -99,6 +103,15 @@ fieldset.fs-icon{
     flex-flow: row wrap;
     align-items: center;
     gap: 12px;
+}
+
+nav.n-dialog.n-dialog-dark fieldset.fs-icon{
+    border: 1px solid var(--color-input-border-dark);
+}
+
+nav.n-dialog.n-dialog-dark fieldset.fs-icon input{
+    border: none;
+    color: var(--white-color);
 }
 
 fieldset.fs-icon input{
@@ -144,7 +157,7 @@ input,
 textarea{
     font: var(--font-size-p)/1.2 var(--font-family-regular);
     min-block-size: 48px;
-    border: 1px solid var(--color-input-border);
+    border: 1px solid var(--color-input-border-light);
     color: var(--color-input);
     background: transparent;
     border-radius: 8px;
@@ -152,6 +165,11 @@ textarea{
     padding-block: 12px; */
     padding-inline: var(--input-padding-inline);
     padding-block: var(--input-padding-block);
+}
+
+nav.n-dialog.n-dialog-dark input,
+nav.n-dialog.n-dialog-dark textarea{
+    border: 1px solid var(--color-input-border-dark);
 }
 
 textarea{
@@ -166,7 +184,7 @@ input[type="radio"]{
 input[type="radio"] + label{
     text-align: center;
     background: transparent;
-    border: 1px solid var(--color-input-border);
+    border: 1px solid var(--color-input-border-light);
     min-block-size: 48px;
     transition: all .3s ease;
     align-items: center;
@@ -178,13 +196,22 @@ input[type="radio"] + label.btn{
     padding-block: var(--btn-padding-inline);
 }
 
+nav.n-dialog.n-dialog-dark input[type="radio"] + label.btn{
+    border: 1px solid var(--color-input-border-dark);
+}
+
 input[type="radio"] + label.btn.btn-f-width{
     flex: unset;
 }
 
 input[type="radio"]:checked + label{
-    border: 1px solid var(--color-input-border);
-    background: var(--bg-color-input-checked);
+    border: 1px solid var(--color-input-border-light);
+    background: var(--bg-color-input-checked-light);
+}
+
+nav.n-dialog.n-dialog-dark input[type="radio"]:checked + label{
+    border: 1px solid var(--color-input-border-dark);
+    background: var(--bg-color-input-checked-dark);
 }
 
 fieldset input,

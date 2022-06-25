@@ -42,6 +42,10 @@
         {
           "source": "/pedidos",
           "destination": "/admin-orders.html"
+        },
+        {
+          "source": "/ordenes",
+          "destination": "/admin-services.html"
         }
       ]
     }

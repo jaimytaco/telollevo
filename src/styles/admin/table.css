@@ -14,7 +14,7 @@ body > main section.s-table{
 section.s-table header{
     padding-block: 12px 6px;
     padding-inline: 16px;
-    border-bottom: 1px solid var(--separator-color);
+    border-bottom: 1px solid var(--separator-color-light);
     inline-size: 100%;
     padding-block: 12px 8px;
     display: flex;
@@ -32,7 +32,7 @@ section.s-table header .s-t-h-actions{
 
 section.s-table .s-t-body{
     inline-size: 100%;
-    background: var(--separator-color);
+    background: var(--separator-color-light);
     display: flex;
     flex-flow: column wrap;
     gap: 1px;

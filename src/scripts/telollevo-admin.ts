@@ -1,4 +1,4 @@
-import '../styles/admin/root-admin.css'
+import '../styles/admin/roots/telollevo-root-admin.css'
 import '../styles/admin/font.css'
 import '../styles/admin/global-admin.css'
 import '../styles/admin/button.css'

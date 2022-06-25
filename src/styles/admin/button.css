@@ -118,6 +118,10 @@ button:active{
     color: var(--btn-color-secondary);
 }
 
+nav.n-dialog.n-dialog-dark .btn.btn-secondary-color{
+    color: var(--white-color);
+}
+
 .btn.btn-bold{
     font-family: var(--font-family-bold);
 }

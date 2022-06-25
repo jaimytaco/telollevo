@@ -4,7 +4,7 @@ nav.n-dialog{
     left: 0;
     inline-size: 100%;
     min-block-size: 300px;
-    background: var(--bg-color-dialog);
+    background: var(--bg-color-dialog-light);
     border-radius: 16px 16px 0 0;
     opacity: 0;
     visibility: hidden;
@@ -13,6 +13,10 @@ nav.n-dialog{
     transition: all .3s ease;
     padding-block: 24px 12px;
     padding-inline: 0;
+}
+
+nav.n-dialog.n-dialog-dark{
+    background: var(--bg-color-dialog-dark);
 }
 
 nav.n-dialog.active{

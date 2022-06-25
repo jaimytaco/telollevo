@@ -15,7 +15,7 @@
 
 .card-2{
     font-size: var(--font-size-label);
-    border: 1px solid var(--separator-color);
+    border: 1px solid var(--separator-color-light);
     border-radius: 12px;
     padding-block: 4px;
     padding-inline: 8px;
@@ -49,7 +49,7 @@
 
 .card-5.c-5-bordered{
     background: var(--white-color);
-    border: 1px solid var(--separator-color);
+    border: 1px solid var(--separator-color-light);
 }
 
 .card-4 > .card-5{
@@ -175,6 +175,7 @@ fieldset.fs-list .card-11-group{
 .card-11 .c-11-content .c-11-c-action{
     display: none;
     margin-block: auto 0;
+    color: var(--color-5);
 }
 
 .card-11:is(.active, :hover) .c-11-content .c-11-c-action.active{
@@ -206,6 +207,10 @@ fieldset.fs-list .card-11-group{
     flex-flow: row wrap;
 }
 
+nav.n-dialog.n-dialog-dark .card-12{
+    background: var(--color-4);
+}
+
 .card-11 .c-11-more .card-12{
     display: none;
 }
@@ -220,7 +225,7 @@ fieldset.fs-list .card-11-group{
     inline-size: 2.5ch;
     text-align: center;
     min-block-size: 44px;
-    border: none;
+    border: none !important;
     color: var(--white-color);
 }
 
@@ -231,14 +236,19 @@ fieldset.fs-list .card-11-group{
 }
 
 .card-13{
-    border-top: 1px solid var(--separator-color);
+    border-top: 1px solid var(--separator-color-light);
     inline-size: 100%;
-    background: var(--bg-color-dialog);
+    background: var(--bg-color-dialog-light);
     padding-inline: calc(var(--input-padding-inline)*.5);
     padding-block: 24px 0;
     display: flex;
     flex-flow: column wrap;
     gap: 8px;
+}
+
+nav.n-dialog.n-dialog-dark .card-13{
+    border-top: 1px solid var(--separator-color-dark);
+    background: var(--bg-color-dialog-dark);
 }
 
 .card-13 p{

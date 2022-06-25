@@ -119,8 +119,8 @@ svg {
 }
 
 hr {
-    background: var(--separator-color);
-    border: 0.5px solid var(--separator-color);
+    background: var(--separator-color-light);
+    border: 0.5px solid var(--separator-color-light);
 }
 
 @media (min-width: 768px) {
