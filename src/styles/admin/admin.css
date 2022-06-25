@@ -144,7 +144,12 @@
     }
 
     .card-4 > .card-8{
+        padding-block: 0 !important;
         padding-inline: 0 16px;
+    }
+
+    .card-4 > .card-8::before{
+        display: none;
     }
 
     .card-6 > .card-5{

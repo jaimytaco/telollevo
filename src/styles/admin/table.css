@@ -50,6 +50,7 @@ body > main section.s-table .s-t-body{
 }
 
 .t-row{
+    position: relative;
     inline-size: 100%;
     background: var(--bg-color-table);
     padding-block: 12px;

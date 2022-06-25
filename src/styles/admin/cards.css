@@ -78,6 +78,7 @@
 }
 
 .card-7 p{
+    font-size: var(--font-size-xs);
     padding-block: 2px 0;
     flex: 1;
 }
@@ -90,6 +91,15 @@
     display: flex;
     flex-flow: column wrap;
     gap: 8px;
+}
+
+.card-4 > .card-8.active{
+    padding-block: 12px;
+}
+
+.card-8.active::before{
+    content: attr(data-heading);
+    font: var(--font-size-p)/1.2 var(--font-family-semibold);
 }
 
 .card-8 > *:not(.c-8-open){
@@ -130,7 +140,7 @@ fieldset.fs-list .card-10-group h3{
 .card-11-group{
     overflow-y: auto;
     inline-size: 100%;
-    max-block-size: 50vh;
+    max-block-size: 30vh;
     /* padding-block: 0 140px; */
     display: flex;
     flex-flow: column nowrap;
