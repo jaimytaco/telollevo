@@ -94,7 +94,7 @@
 }
 
 .card-4 > .card-8.active{
-    padding-block: 12px;
+    padding-block: 0 12px;
 }
 
 .card-8.active::before{
