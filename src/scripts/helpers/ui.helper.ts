@@ -1,9 +1,19 @@
 import { app } from '@helpers/app.helper'
 import { capitalizeString } from '@helpers/util.helper'
+import { createOrder_dialog } from '@data/admin/dialog.data'
 import paths from '@data/admin/path.data.json' // TODO: Check if this is necessary
 import orders from '@data/admin/order.data.json'
 import MOrders from '@models/orders.model'
 import CTable from '@components/table.component'
+
+const adminDialogs = (page) => {
+    switch (page){
+        case 'admin-orders':
+            return `${createOrder_dialog}`
+        default:
+            return ''
+    }
+}
 
 const adminHeader = (actions, currentPage, currentNamePlural) => {
     return `
@@ -112,6 +122,7 @@ export const adminOrders = async (wf) => {
         <main>
             ${tableHTML}
         </main>
+        ${adminDialogs('admin-orders')}
     `
 
     return {

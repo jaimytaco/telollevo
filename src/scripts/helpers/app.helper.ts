@@ -42,6 +42,7 @@ export const initApp = async () => {
     const { default: CTable } = await import('@components/table.component')
     const { default: CCard8 } = await import('@components/card8.component')
     const { getDOMElement } = await import('@helpers/util.helper')
+    const { configCreateOrderDialog } = await import('@helpers/util.helper')
 
     console.log('--- getBodyPage =', getBodyPage())
 
@@ -52,7 +53,9 @@ export const initApp = async () => {
             extraRowIds.forEach((extraRowId) => CTable.handleRowExtra(extraRowId))
 
             CCard8.handleAll()
-            
+
+            configCreateOrderDialog('create-order_dialog')
+
             break
     }
 }

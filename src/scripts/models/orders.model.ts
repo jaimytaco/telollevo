@@ -1,35 +1,35 @@
 import { capitalizeString } from '@helpers/util.helper'
 
 enum EOrderStatus{
-    registered = 'registrado',
-    quoted = 'cotizado',
-    payed = 'pagado',
-    withPurchaseOrder = 'con orden de compra',
-    withTrackingCode = 'con código de seguimiento',
-    readyToDeliver = 'listo para entrega',
-    delivered = 'entregado'
+    Registered = 'registrado',
+    Quoted = 'cotizado',
+    Payed = 'pagado',
+    WithPurchaseOrder = 'con orden de compra',
+    WithTrackingCode = 'con código de seguimiento',
+    ReadyToDeliver = 'listo para entrega',
+    Delivered = 'entregado'
 }
 
 enum EOrderShippers{
-    relative = 'un amigo, familiar u otro',
-    store = 'una tienda'
+    Relative = 'un amigo, familiar u otro',
+    Store = 'una tienda'
 }
 
 enum EOrderShippingDestination{
-    inplace = 'en el local de Te lo llevo',
-    town = 'dentro de Lima',
-    province = 'a provincia'
+    Inplace = 'en el local de Te lo llevo',
+    Town = 'dentro de Lima',
+    Province = 'a provincia'
 }
 
 enum EOrderShoppers{
-    myself = 'Yo deseo comprarlo',
-    business = 'Deseo que Te lo llevo lo compre por una comisión adicional'
+    Myself = 'Yo deseo comprarlo',
+    Business = 'Deseo que Te lo llevo lo compre por una comisión adicional'
 }
 
 enum EOrderSorters{
-    byCreatedAt = 'Por fecha de registro',
-    byProduct = 'Por producto',
-    byCategory = 'Por categoría'
+    ByCreatedAt = 'Por fecha de registro',
+    ByProduct = 'Por producto',
+    ByCategory = 'Por categoría'
 }
 
 enum ECoin{

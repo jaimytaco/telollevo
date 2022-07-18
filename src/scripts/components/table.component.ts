@@ -55,7 +55,7 @@ const renderRows = (rows: IRow[]) => {
                     <div class="t-r-actions t-r-actions-desktop">
                         <button class="btn btn-round btn-spin" data-show-table-extra_id="${row.id}">
                             <picture>
-                                <img src="/img/telollevo/icon/chevron-down-sm.svg" width="14" height="14">
+                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                             </picture>
                         </button>
                     </div>
