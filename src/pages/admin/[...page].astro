@@ -1,0 +1,35 @@
+---
+import AdminLayout from '@layouts/AdminLayout.astro';
+import paths from '@data/admin/path.data.json'
+import networkDB from '@wf/services/firebase.firestore.service'
+import { AUI } from '@wf/actors/ui.actor'
+import { app } from '@helpers/app.helper'
+import { DB_CREDENTIALS } from '@helpers/database.helper'
+import {
+    registerNetworkDB,
+    wf
+} from '@wf/lib.worker'
+export const getStaticPaths = async () => {
+    return paths
+        .map((path) => ({
+            params: {
+                page: path.page
+            },
+            props: {
+                path,
+                viewId: `admin-${path.page}`
+            }
+        }))
+}
+const { page } = Astro.params
+const { path } = Astro.props
+await registerNetworkDB(networkDB, DB_CREDENTIALS)
+const { content, err } = await AUI.getDynamicContent({ lib: wf, builders: app.ui, viewId: `admin-${page}` })
+---
+
+<AdminLayout 
+    title={err ? '' : content.head.title} 
+    meta={err ? '' : content.head.meta} 
+    body={err ? '' : content.body}
+    page={`admin-${page}`}>
+</AdminLayout>

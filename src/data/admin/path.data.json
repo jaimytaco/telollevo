@@ -1,0 +1,14 @@
+[
+    {
+        "page": "orders",
+        "icon": "package-1.svg",
+        "nameSingular": "pedido",
+        "namePlural": "pedidos"
+    },
+    {
+        "page": "flights",
+        "icon": "airplane.svg",
+        "nameSingular": "vuelo",
+        "namePlural": "vuelos"
+    }
+]

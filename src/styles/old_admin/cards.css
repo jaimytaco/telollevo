@@ -2,25 +2,8 @@
     display: none;
 }
 
-.card-1 .c-1-detail{
-    display: flex;
-    flex-flow: column wrap;
-    gap: 4px;
-}
-
 .card-1 .c-1-detail > h6{
-    margin-block: 4px 0;
-}
-
-.card-1 .c-1-detail > p{
-    display: flex;
-    flex-flow: row wrap;
-    gap: 8px;
-    align-items: center;
-}
-
-.card-1 .c-1-detail > p picture *{
-    margin-block: 0 2px;
+    margin-block: 6px 2px;
 }
 
 .card-2-group{
@@ -31,7 +14,7 @@
 }
 
 .card-2{
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-label);
     border: 1px solid var(--separator-color-light);
     border-radius: 12px;
     padding-block: 4px;
@@ -151,7 +134,7 @@
 }
 
 fieldset.fs-list .card-10-group h3{
-    padding-inline: 12px;
+    padding-inline: calc(var(--input-padding-inline)*.5);
 }
 
 .card-11-group{
@@ -165,14 +148,14 @@ fieldset.fs-list .card-10-group h3{
 }
 
 fieldset.fs-list .card-11-group{
-    padding-inline: 12px;
+    padding-inline: calc(var(--input-padding-inline)*.5);
 }
 
 .card-10-group[data-search-is-recent] > .card-11-group > .card-11:not([data-recent]){
     display: none;
 }
 
-/* .card-11{
+.card-11{
     inline-size: 100%;
     display: flex;
     flex-flow: row wrap;
@@ -215,7 +198,7 @@ fieldset.fs-list .card-11-group{
 
 .card-11:is(.active, :hover) .c-11-more .c-11-m-action.active{
     display: inherit;
-} */
+}
 
 .card-12{
     background: var(--btn-color-secondary);

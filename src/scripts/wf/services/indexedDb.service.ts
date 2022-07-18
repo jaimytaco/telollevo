@@ -29,11 +29,11 @@ const getObjetcStore = (transaction: IDBPTransaction<unknown, string[], 'version
     try {
         return transaction.objectStore(storeName);
     } catch (e) {
-        return null;
+        return null; 
     }
 }
 
-const openDatabase = () => {
+const openDatabase = (storeNames) => {
     return openDB(getDBName(), 1, {
         upgrade(upgradeDb, oldVersion, newVersion, transaction) {
             storeNames
@@ -78,19 +78,22 @@ const getAll = async (collectionName, filters) => {
                 return (doc) => formatOperation(doc[filter.field], filter.value, filter.operator)
             })
 
-    return !filterFns ? 
+    const data = !filterFns ? 
         docs : 
         filterFns
             .reduce((acc, filterFn) => {
                 acc = acc.filter((doc) => filterFn(doc))
                 return acc
             }, docs)
+
+    return { data }
 }
 
 const get = async (collectionName, id) => {
     if (!localDbPromise) throw 'offline DB not opened'
     const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
-    return query.get('by-id', id)
+    const data = query.get('by-id', id)
+    return { data }
 }
 
 const add = async (collectionName: string, doc: T) => {
@@ -98,16 +101,17 @@ const add = async (collectionName: string, doc: T) => {
     const tx = (await localDbPromise).transaction(collectionName, 'readwrite')
     const store = tx.objectStore(collectionName)
     store.put(doc)
-    return tx.oncomplete
+    // return tx.oncomplete
+    await tx.oncomplete
+    return { data: doc }
 }
 
-const register = async (prefix, models): Promise<T> => {
-    dbPrefix = 'telollevo-idb'
-    storeNames = Object.keys(models)
-
+const register = async (prefix, loaders): Promise<T> => {
+    dbPrefix = `${prefix}-idb`
+    // storeNames = Object.keys(loaders)
     await clearPreviousDB()
     const isFirstLoad = !(await existDB(getDBName()))
-    localDbPromise = openDatabase()
+    localDbPromise = openDatabase(loaders)
     const isOfflineFirst = typeof (await localDbPromise) !== 'undefined'
     return {
         isOfflineFirst,
@@ -115,9 +119,10 @@ const register = async (prefix, models): Promise<T> => {
     }
 }
 
+// const dbPrefix = 'emergencyphone-idb'
 let dbPrefix
 const dbVersion = 'v1'
-let storeNames
+// let storeNames
 let localDbPromise
 
 const stores = {}

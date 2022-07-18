@@ -15,6 +15,7 @@ button {
 button:is(:hover, :focus-visible){
     background: blue;
 }
+
 a:active,
 button:active{
     background: green;
@@ -56,23 +57,12 @@ button:active{
 
 .btn.btn-cart{
     font-size: var(--font-size-label);
-    padding-inline: var(--btn-padding-block);
+    padding-block: 0;
+    padding-inline: 0;
 }
 
-/* .btn.btn-auth > span{
-    display: none;
-} */
-
 .btn.btn-auth > span{
-    font: var(--font-size-h3)/1 var(--font-family-semibold);
-    padding-inline: 8px;
-    padding-block: 8px;
-    border-radius: 50%;
-    background: var(--black-color);
-    color: var(--white-color);
-    aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
+    display: none;
 }
 
 .btn.btn-primary{
@@ -86,8 +76,8 @@ button:active{
 }
 
 .btn.btn-tertiary{
-    background: var(--white-color);
-    color: var(--black-color);
+    background: var(--btn-color-tertiary);
+    color: var(--white-color);
 }
 
 .btn.btn-xs-inline{
@@ -108,7 +98,6 @@ button:active{
 
 .btn.btn-nav{
     font-size: var(--font-size-p);
-    text-transform: capitalize;
     border-radius: 0;
     border-bottom: 2px solid transparent;
     padding-inline: 0;
@@ -123,7 +112,6 @@ button:active{
 
 .btn.btn-underline{
     text-decoration: underline;
-    text-underline-offset: .5ch;
 }
 
 .btn.btn-secondary-color{
@@ -157,7 +145,7 @@ nav.n-dialog.n-dialog-dark .btn.btn-secondary-color{
 }
 
 .btn.btn-bordered{
-    border: 1px solid var(--black-color);
+    border: 1px solid var(--btn-color-tertiary);
 }
 
 .btn.btn-spin{
@@ -170,8 +158,4 @@ nav.n-dialog.n-dialog-dark .btn.btn-secondary-color{
 
 section.s-table header .s-t-h-actions .btn span{
     display: none;
-}
-
-.btn.btn-check{
-    cursor: pointer;
 }

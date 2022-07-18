@@ -1,10 +1,5 @@
-import {
-    models,
-    loaders,
-    sw,
-    ui,
-    // generator
-} from '../../config'
+import { app } from '@helpers/app.helper'
+import { DB_CREDENTIALS } from '@helpers/database.helper'
 
 import {
     registerNetworkDB,
@@ -12,8 +7,9 @@ import {
     updateOfflineDB,
     cacheDynamically,
     cacheFromUI,
-    wf
-} from '../lib.worker'
+    isHTMLURL,
+    wf,
+} from '@wf/lib.worker'
 
 import {
     cacheStatic,
@@ -21,48 +17,28 @@ import {
     removePreviousCaches,
     getCacheName,
     sendMessage
-} from '../helpers/sw.helper'
+} from '@wf/helpers/sw.helper'
 
-import { default as networkDB } from '../services/firebase.service'
-import { default as offlineDB } from '../services/indexedDb.service'
+import networkDB from '@wf/services/firebase.firestore.service'
+import offlineDB from '@wf/services/indexedDb.service'
 
+const onInstall = (e) => {
+    registerNetworkDB(networkDB, DB_CREDENTIALS)
+    registerOfflineDB(offlineDB, app.code, app.loaders)
 
-let registerNetworkDBPromise
-let registerOfflineDBPromise
-
-const onInstall = async (e) => {
-    // registerNetworkDBPromise = registerNetworkDB(networkDB)
-    // registerOfflineDBPromise = registerOfflineDB(offlineDB)
-
-    cacheStatic(e, getCacheName(sw.cache.prefix, SW_VERSION), sw.static)
-
-    // await registerNetworkDBPromise
-    // await registerOfflineDBPromise
-
-    // await updateDB()
-
-    // await cacheFromUI(ui, getCacheName(sw.cache.prefix, SW_VERSION))
-
-    console.log('onInstall wf =', wf)
-}
-
-// TODO: Update db only when users hit reload (start fetching)
-let isDBUpdating = false
-const updateDB = async () => {
-    if (!isDBUpdating){
-        isDBUpdating = true
-        await updateOfflineDB(models, loaders)
-        isDBUpdating = false
-    }
+    cacheStatic(e, getCacheName(`sw-${app.code}`, SW_VERSION), app.sw.static)
 }
 
 const onFetch = (e) => {
-    // e.waitUntil((async () => {
-    //     await updateDB()
-    //     await cacheDynamically({ ui, cacheName: getCacheName(sw.cache.prefix, SW_VERSION), url: new URL(e.request.url) })
-    // })())
+    e.waitUntil((async () => {
+        const url = new URL(e.request.url)
+        if (isHTMLURL(url)) {
+            await updateOfflineDB(app.loaders)
+            await cacheDynamically({ ui: app.ui, cacheName: getCacheName(`sw-${app.code}`, SW_VERSION), url })
+        }
+    })())
 
-    return serveFromCache(e.request, getCacheName(sw.cache.prefix, SW_VERSION))
+    return serveFromCache(e.request, getCacheName(`sw-${app.code}`, SW_VERSION))
 }
 
 addEventListener('install', (e) => {
@@ -75,7 +51,7 @@ addEventListener('install', (e) => {
 addEventListener('activate', (e) => {
     sendMessage({msg: 'activate'})
 
-    e.waitUntil(removePreviousCaches(sw.cache.prefix, [getCacheName(sw.cache.prefix, SW_VERSION)]))
+    e.waitUntil(removePreviousCaches(`sw-${app.code}`, [getCacheName(`sw-${app.code}`, SW_VERSION)]))
     return self.clients.claim()
 })
 
@@ -83,4 +59,4 @@ addEventListener('fetch', (e) => {
     e.respondWith(onFetch(e))
 })
 
-export const SW_VERSION = 30
+export const SW_VERSION = 52

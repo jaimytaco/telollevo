@@ -17,10 +17,6 @@
         padding-block: 24px 8px;
     } */
 
-    nav.n-top-1{
-        padding-block: 16px 12px;
-    }
-
     nav.n-top-1 form{
         max-inline-size: 320px;
     }

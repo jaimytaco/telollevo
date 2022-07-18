@@ -1,6 +1,6 @@
-import { 
-    isBrowser, 
-} from '../helpers/browser.helper'
+import {
+    isBrowser,
+} from '@wf/helpers/browser.helper'
 
 // Taken from https://stackoverflow.com/questions/37573482/to-check-if-serviceworker-is-in-waiting-state
 export const registerSW = async () => {
@@ -10,12 +10,13 @@ export const registerSW = async () => {
     if (!isBrowser()) return
     if (!navigator.serviceWorker) return
 
-    // const WSW = (await import('../workers/sw.worker?worker')).default
+    const workerPath = '/sw.worker.js'
+    // const WSW = (await import('@wf/workers/sw.worker?worker')).default
+    // const workerPath = getWorkerPath(WSW.toString())
 
     try {
         const registration = await navigator.serviceWorker.register(
-            // getWorkerPath(WSW.toString()),
-            '/sw.worker.js',
+            workerPath,
             {
                 scope: '/',
                 type: 'module',

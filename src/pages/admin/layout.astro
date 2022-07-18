@@ -1,0 +1,14 @@
+---
+import AdminLayout from '@layouts/AdminLayout.astro'
+import {
+    getTitleTag,
+    getMetaTag,
+    getBodyTag
+} from '@wf/lib.worker'
+---
+
+<AdminLayout 
+    title={getTitleTag()} 
+    meta={getMetaTag()} 
+    body={getBodyTag()}>
+</AdminLayout>

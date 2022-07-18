@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+      // Enable top-level await, and other modern ESM features.
+      "target": "ESNext",
+      "module": "ESNext",
+      // Enable node-style module resolution, for things like npm package imports.
+      "moduleResolution": "node",
+      // Enable JSON imports.
+      "resolveJsonModule": true,
+      // Enable stricter transpilation for better output.
+      "isolatedModules": true,
+      // Add type definitions for our Vite runtime.
+      "types": ["vite/client"],
+  
+      "baseUrl": ".",
+      "paths": {
+        "@astrocomponents/*": ["src/components/*"],
+        "@assets/*": ["src/assets/*"],
+        "@styles/*": ["src/styles/*"],
+        "@data/*": ["src/data/*"],
+        "@layouts/*": ["src/layouts/*"],
+        "@scripts/*": ["src/scripts/*"],
+        "@models/*": ["src/scripts/models/*"],
+        "@wf/*": ["src/scripts/wf/*"],
+        "@components/*": ["src/scripts/components/*"],
+        "@helpers/*": ["src/scripts/helpers/*"],
+      }
+    }
+  }

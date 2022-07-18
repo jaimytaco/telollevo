@@ -1,0 +1,144 @@
+* {
+    /* padding: 0;
+    margin: 0; */
+    box-sizing: border-box;
+    padding-inline: 0;
+    padding-block: 0;
+    margin-inline: 0;
+    margin-block: 0;
+}
+
+body {
+    position: relative;
+    font: var(--font-size-min)/1.2 var(--font-family-regular);
+    color: var(--font-color-primary);
+    background: var(--bg-color-body);
+    max-block-size: 100vh;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+body::before{
+    transition: all .3s ease;
+}
+
+body.on-dialog::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    background: var(--bg-color-dialog-overlay);
+    z-index: 99;
+}
+
+h1 {
+    font: var(--font-size-h1)/1.2 var(--font-family-semibold);
+}
+
+h3 {
+    font: var(--font-size-h3)/1.2 var(--font-family-semibold);
+}
+
+h6{
+    font: var(--font-size-p)/1.2 var(--font-family-semibold);
+}
+
+p {
+    font: var(--font-size-p)/1.2 var(--font-family-regular);
+}
+
+strong{
+    font-weight: normal;
+    font-family: var(--font-family-semibold);
+}
+
+p a,
+p button{
+    display: inline !important;
+    font-size: inherit !important;
+    color: var(--btn-color-primary);
+}
+
+img,
+svg {
+    vertical-align: bottom;
+}
+
+body > header{
+    padding-inline: 16px;
+}
+
+nav{
+    inline-size: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav.n-top-1{
+    padding-block: 16px 8px;
+    gap: 16px;
+}
+
+nav.n-top-1 .n-t-1-end{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: end;
+    gap: 8px;
+}
+
+nav.n-top-2{
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+}
+
+menu.m-nav{
+    overflow-x: auto;
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 16px;
+}
+
+menu.m-nav::-webkit-scrollbar{
+    display: none;
+}
+
+nav.n-top-2 > menu.m-nav{
+    padding-inline: 0 24px;
+    flex: 1;
+}
+
+nav.n-top-2 .n-t-actions-2{
+    position: relative;
+    padding-inline-start: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+nav.n-top-2 .n-t-actions-2::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    right: calc(100% - 1px);
+    inline-size: 48px;
+    block-size: 100%;
+    background: linear-gradient(to left,var(--bg-color-body),rgb(255 255 255 / 0));
+}
+
+main{
+    inline-size: 100%;
+    padding-block: 32px 0;
+}
+
+body > main{
+    overflow-y: hidden;
+    max-block-size: 100%;
+    padding-block: 24px 0;
+    display: flex;
+    flex-flow: column nowrap;
+}

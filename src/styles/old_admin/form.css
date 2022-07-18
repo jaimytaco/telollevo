@@ -124,7 +124,6 @@ fieldset.fs-search{
     inline-size: 100%;
     background: var(--bg-color-search);
     border-radius: 32px;
-    box-shadow: var(--shadow-search);
     padding-inline: 24px;
     display: flex;
     flex-flow: row wrap;
@@ -159,7 +158,7 @@ textarea{
     font: var(--font-size-p)/1.2 var(--font-family-regular);
     min-block-size: 48px;
     border: 1px solid var(--color-input-border-light);
-    color: var(--color-input-light);
+    color: var(--color-input);
     background: transparent;
     border-radius: 8px;
     /* padding-inline: 16px;
@@ -171,7 +170,6 @@ textarea{
 nav.n-dialog.n-dialog-dark input,
 nav.n-dialog.n-dialog-dark textarea{
     border: 1px solid var(--color-input-border-dark);
-    color: var(--color-input-dark);
 }
 
 textarea{
@@ -179,13 +177,11 @@ textarea{
     resize: none;
 }
 
-input[type="radio"],
-.inp-radio{
+input[type="radio"]{
     display: none;
 }
 
-input[type="radio"] + label,
-.inp-radio + label{
+input[type="radio"] + label{
     text-align: center;
     background: transparent;
     border: 1px solid var(--color-input-border-light);
@@ -195,64 +191,25 @@ input[type="radio"] + label,
     justify-content: center;
 }
 
-input:is([type="radio"], [type="checkbox"]) + label.btn{
+input[type="radio"] + label.btn{
     /* padding-block: 12px; */
     padding-block: var(--btn-padding-inline);
 }
 
-input:is([type="radio"], [type="checkbox"]) + label.btn.btn-check{
-    position: relative;
-    border: none !important;
-    padding-inline: 0;
-    padding-block: 0;
-    background: none !important;
-    min-block-size: fit-content;
-    gap: 16px;
-}
-
-nav.n-dialog.n-dialog-dark input:is([type="radio"], [type="checkbox"]) + label.btn{
+nav.n-dialog.n-dialog-dark input[type="radio"] + label.btn{
     border: 1px solid var(--color-input-border-dark);
-}
-
-input:is([type="radio"], [type="checkbox"]) + label.btn.btn-check::before{
-    content: '';
-    inline-size: 16px;
-    block-size: 16px;
-    border: 1px solid var(--color-input-border-light);
-}
-
-nav.n-dialog.n-dialog-dark input:is([type="radio"], [type="checkbox"]) + label.btn.btn-check::before{
-    border: 1px solid var(--color-input-border-dark);
-}
-
-input[type="radio"]:checked + label.btn.btn-check::after{
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 1px;
-    background-image: url('/img/icon/check.svg');
-    background-size: contain;
-    transform: translateY(-50%);
-    inline-size: 16px;
-    block-size: 16px;
-}
-
-nav.n-dialog.n-dialog-dark input[type="radio"]:checked + label.btn.btn-check::after{
-    background-image: url('/img/icon/check-light.svg');
 }
 
 input[type="radio"] + label.btn.btn-f-width{
     flex: unset;
 }
 
-input[type="radio"]:checked + label,
-.inp-radio:checked + label{
+input[type="radio"]:checked + label{
     border: 1px solid var(--color-input-border-light);
     background: var(--bg-color-input-checked-light);
 }
 
-nav.n-dialog.n-dialog-dark input[type="radio"]:checked + label,
-nav.n-dialog.n-dialog-dark .inp-radio:checked + label{
+nav.n-dialog.n-dialog-dark input[type="radio"]:checked + label{
     border: 1px solid var(--color-input-border-dark);
     background: var(--bg-color-input-checked-dark);
 }

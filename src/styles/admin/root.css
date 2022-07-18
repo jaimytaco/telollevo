@@ -1,0 +1,76 @@
+:root{
+    --hsl-1: 349 100% 61%;
+    --hsl-2: 349 100% 66%;
+    --hsl-3: 0 0% 13%;
+    --hsl-4: 0 0% 20%;
+    --hsl-5: 0 0% 44%;
+    /* --hsl-6: 0 0% 87%; */
+    --hsl-7: 0 0% 93%;
+    --hsl-8: 0 0% 96%;
+    --hsl-9: 0 0% 100%;
+
+    --color-1: hsl(var(--hsl-1));
+    --color-2: hsl(var(--hsl-2));
+    --color-3: hsl(var(--hsl-3));
+    --color-4: hsl(var(--hsl-4));
+    --color-5: hsl(var(--hsl-5));
+    /* --color-6: hsl(var(--hsl-6)); */
+    --color-7: hsl(var(--hsl-7));
+    --color-8: hsl(var(--hsl-8));
+    --color-9: hsl(var(--hsl-9));
+
+    --white-color: var(--color-9);
+    --black-color: var(--color-3);
+
+    --bg-color-body: var(--color-8);
+    --bg-color-search: var(--white-color);
+    --bg-color-dialog-light: var(--color-9);
+    --bg-color-dialog-dark: var(--black-color);
+    --bg-color-dialog-overlay: hsl(var(--hsl-9) / 80%);
+    --bg-color-table: var(--white-color);
+    --bg-color-input-checked-light: var(--color-7);
+    --bg-color-input-checked-dark: var(--color-4);
+
+    --color-dialog-form-light: var(--black-color);
+    --color-dialog-form-dark: var(--white-color);
+    --color-input-light: var(--black-color);
+    --color-input-dark: var(--white-color);
+    --color-input-border-light: hsl(var(--hsl-3) / 30%);
+    --color-input-border-dark: hsl(var(--hsl-7) / 30%);
+    --color-input-checked: var(--color-7);
+
+    --shadow-search: 0 1px 2px hsl(var(--hsl-3) / 4%), 0 4px 12px hsl(var(--hsl-3) / 1%);
+    --shadow-table: var(--shadow-search);
+
+    --separator-color-light: hsl(var(--hsl-3) / 10%);
+    --separator-color-dark: hsl(var(--hsl-7) / 10%);
+
+    --font-color-primary: var(--black-color);
+    --font-color-secondary: hsl(var(--hsl-3) / 60%);
+    --font-family-bold: GoogleSans-Bold, sans-serif;
+    --font-family-semibold: GoogleSans-Medium, sans-serif;
+    --font-family-regular: GoogleSans-Regular, sans-serif;
+    --font-size-min: 12px;
+
+    --font-size-h1: 1.5em;
+    --font-size-h3: 1.33em;
+    /* --font-size-p: 1.167em;
+    --font-size-label: 1.1em; */
+    --font-size-p: 1.2em;
+    --font-size-label: 1.167em;
+    --font-size-xs: 1.1em;
+
+    --space-dialog: 32px;
+    --space-nav-top-end: 82.3px;
+
+    --btn-color-primary: var(--color-1);
+    --btn-color-secondary: var(--black-color);
+    --btn-color-tertiary: var(--black-color);
+
+    --btn-padding-block: 1ch;
+    --btn-padding-inline: 1.5ch;
+    --btn-border-radius: .7ch;
+
+    --input-padding-block: 1.5ch;
+    --input-padding-inline: 2ch;
+}

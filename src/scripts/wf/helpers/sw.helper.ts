@@ -3,14 +3,12 @@ export const cacheStatic = async (e, cacheName, staticPaths) => {
         const cache = await caches.open(cacheName)
         
         for(const path of staticPaths){
-            console.log('installing path =', path)
-            cache.addAll([path])
-                .then((r) => {
-                    console.log(r)
-                })
-                .catch((err) => {
-                    console.log(err)
-                })   
+            try{
+                await cache.addAll([path])
+                // console.info(`${path} is cached`)
+            }catch(err){
+                console.log(err)
+            } 
         }
         // cache.addAll(staticPaths)   
     } catch (err) {
@@ -29,8 +27,8 @@ export const serveFromCache = async (request, cacheName) => {
 
         if (response) {
             sendMessage({msg: `from cache: ${getPathnameFromRequest(request)}`})
-            console.info('served with cache: ', getPathnameFromRequest(request))
         }
+
         return response || fetch(request)
     } catch (err) {
         console.error(err)
@@ -44,43 +42,6 @@ export const sendMessage = async message => {
 
     clients.forEach((client) => client.postMessage(message))
 }
-
-// const streamHTML = (e, htmls) => {
-//     const responsePromises = htmls
-//         .map(html => new Response(html, {
-//             headers: { 'Content-Type': 'text/html; charset=utf-8' }
-//         }))
-
-//     const { readable, writable } = new TransformStream()
-
-//     e.waitUntil(async function () {
-//         for (const responsePromise of responsePromises) {
-//             const response = await responsePromise
-//             await response.body.pipeTo(writable, { preventClose: true })
-//         }
-//         writable.getWriter().close()
-//     }())
-
-//     return new Response(readable, {
-//         headers: {
-//             'Content-Type': 'text/html; charset=utf-8'
-//         }
-//     })
-// }
-
-// export const serveWithStreams = async (e, cacheName) => {
-//     const { pathname } = e.request
-//     // await registerOfflineDB(offlineDB)
-//     // registerModels(models)
-
-//     const { html, err } = await getHTML({ pathname })
-//     const response = err ?
-//         serveFromCache(new Request(get404Pathname()), cacheName) :
-//         streamHTML(e, [html])
-
-//     if (response) console.info('served with streams: ', getPathnameFromRequest(e.request))
-//     return response || fetch(e.request)
-// }
 
 export const removePreviousCaches = async (prefix, allCaches: string[]) => {
     const cacheNames = await caches.keys()

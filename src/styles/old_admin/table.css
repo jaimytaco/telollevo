@@ -32,10 +32,10 @@ section.s-table header .s-t-h-actions{
 
 section.s-table .s-t-body{
     inline-size: 100%;
-    /* background: var(--separator-color-light); */
+    background: var(--separator-color-light);
     display: flex;
     flex-flow: column wrap;
-    /* gap: 1px; */
+    gap: 1px;
 }
 
 section.s-table .s-t-body::-webkit-scrollbar{
@@ -62,13 +62,8 @@ body > main section.s-table .s-t-body{
     gap: 12px 24px;
 }
 
-.s-t-body > .t-row{
-    border-bottom: 1px solid var(--separator-color-light);
-}
-
 .t-row.t-r-last{
     padding-block: 24px;
-    border-bottom: none;
 }
 
 .t-r-actions{
