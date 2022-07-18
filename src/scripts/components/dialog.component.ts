@@ -11,8 +11,8 @@ const handle = (id, action) => {
 const init = (id) => {
     const dialog = getDOMElement(document, `#${id}`)
 
-    const closeBtn = getDOMElement(dialog, '[data-close-dialog_btn]')
-    if (closeBtn) closeBtn.onclick = () => handle(closeBtn.getAttribute('data-close-dialog_btn'), 'remove')
+    const closeBtns = getDOMElement(dialog, '[data-close-dialog_btn]', 'all')
+    closeBtns?.forEach((closeBtn) => closeBtn.onclick = () => handle(closeBtn.getAttribute('data-close-dialog_btn'), 'remove'))
 
     const stepBackBtns = getDOMElement(dialog, '[data-previous-step_btn]', 'all')
     stepBackBtns?.forEach((btn) => btn.onclick = () => {

@@ -182,7 +182,7 @@ export const createOrder_dialog = `
                 </div>
             </main>
             <footer>
-                <button class="btn btn-primary btn-submit" type="button" data-close-dialog_btn="create-order_dialog">Listo</button>
+                <button class="btn btn-primary btn-submit" type="submit">Listo</button>
             </footer>
         </form>
     </nav>

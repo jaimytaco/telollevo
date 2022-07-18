@@ -39,12 +39,11 @@ export const app = {
 
 export const initApp = async () => {
     const { getBodyPage } = await import('@helpers/util.helper')
+    const { default: CDialog } = await import('@components/dialog.component')
     const { default: CTable } = await import('@components/table.component')
     const { default: CCard8 } = await import('@components/card8.component')
     const { getDOMElement } = await import('@helpers/util.helper')
     const { configCreateOrderDialog } = await import('@helpers/util.helper')
-
-    console.log('--- getBodyPage =', getBodyPage())
 
     switch (getBodyPage()) {
         case 'admin-orders':
@@ -54,6 +53,7 @@ export const initApp = async () => {
 
             CCard8.handleAll()
 
+            CDialog.init('create-order_dialog')
             configCreateOrderDialog('create-order_dialog')
 
             break

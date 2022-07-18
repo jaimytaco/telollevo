@@ -59,4 +59,10 @@ export const configCreateOrderDialog = async (dialogId) => {
         step4Form.classList.remove('active')
         step5Form.classList.add('active')
     }
+
+    step5Form.onsubmit = (e) => {
+        e.preventDefault()
+        step5Form.classList.remove('active')
+        CDialog.handle('create-order_dialog', 'remove')
+    }
 }
