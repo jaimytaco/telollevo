@@ -1,20 +1,17 @@
 :root{
-    --hsl-1: 349 100% 61%;
-    --hsl-2: 349 100% 66%;
+    --hsl-1: 264 80% 51%;
+    --hsl-2: 266 78% 96%;
+    /* --hsl-3: 300 1% 26%; */
     --hsl-3: 0 0% 13%;
-    --hsl-4: 0 0% 20%;
-    --hsl-5: 0 0% 44%;
-    /* --hsl-6: 0 0% 87%; */
-    --hsl-7: 0 0% 93%;
-    --hsl-8: 0 0% 96%;
+    --hsl-4: 300 20% 83%;
+    --hsl-7: 234 50% 96%;
+    --hsl-8: 0 0% 100%;
     --hsl-9: 0 0% 100%;
 
     --color-1: hsl(var(--hsl-1));
     --color-2: hsl(var(--hsl-2));
     --color-3: hsl(var(--hsl-3));
     --color-4: hsl(var(--hsl-4));
-    --color-5: hsl(var(--hsl-5));
-    /* --color-6: hsl(var(--hsl-6)); */
     --color-7: hsl(var(--hsl-7));
     --color-8: hsl(var(--hsl-8));
     --color-9: hsl(var(--hsl-9));
@@ -22,7 +19,7 @@
     --white-color: var(--color-9);
     --black-color: var(--color-3);
 
-    --bg-color-body: var(--color-8);
+    --bg-color-body: var(--color-7);
     --bg-color-search: var(--white-color);
     --bg-color-dialog-light: var(--color-9);
     --bg-color-dialog-dark: var(--black-color);

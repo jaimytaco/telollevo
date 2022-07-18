@@ -43,7 +43,6 @@
 
     .btn.btn-auth > span{
         font: var(--font-size-label)/1.2 var(--font-family-semibold);
-        display: block;
         text-align: left;
     }
 
