@@ -17,13 +17,14 @@
         "@astrocomponents/*": ["src/components/*"],
         "@assets/*": ["src/assets/*"],
         "@styles/*": ["src/styles/*"],
-        "@data/*": ["src/data/*"],
         "@layouts/*": ["src/layouts/*"],
+        "@wf/*": ["src/wf/*"],
         "@scripts/*": ["src/scripts/*"],
         "@models/*": ["src/scripts/models/*"],
-        "@wf/*": ["src/scripts/wf/*"],
         "@components/*": ["src/scripts/components/*"],
         "@helpers/*": ["src/scripts/helpers/*"],
+        "@types/*": ["src/scripts/types/*"],
+        "@data/*": ["src/scripts/data/*"],
       }
     }
   }

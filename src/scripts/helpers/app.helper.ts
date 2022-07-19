@@ -45,6 +45,20 @@ export const initApp = async () => {
     const { getDOMElement } = await import('@helpers/util.helper')
     const { configCreateOrderDialog } = await import('@helpers/util.helper')
 
+    const { 
+        registerNetworkDB,
+        registerOfflineDB,
+        updateOfflineDB,
+        wf
+    } = await import('@wf/lib.worker')
+
+    const { DB_CREDENTIALS } = await import('@helpers/database.helper')
+    const { default: networkDB } = await import('@wf/services/firebase.firestore.service')
+    const { default: offlineDB } = await import('@wf/services/indexedDb.service')
+
+    await registerNetworkDB(networkDB, DB_CREDENTIALS)
+    await registerOfflineDB(offlineDB, app.code, app.loaders)
+    
     switch (getBodyPage()) {
         case 'admin-orders':
             const extraRows = getDOMElement(document, '.t-r-extra', 'all')
@@ -54,7 +68,7 @@ export const initApp = async () => {
             CCard8.handleAll()
 
             CDialog.init('create-order_dialog')
-            configCreateOrderDialog('create-order_dialog')
+            configCreateOrderDialog(wf, 'create-order_dialog')
 
             break
     }

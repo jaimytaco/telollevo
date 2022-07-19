@@ -1,73 +1,6 @@
 import { capitalizeString } from '@helpers/util.helper'
+import { IOrder, EOrderStatus, EOrderSorters } from '@types/order.type'
 
-enum EOrderStatus{
-    Registered = 'registrado',
-    Quoted = 'cotizado',
-    Payed = 'pagado',
-    WithPurchaseOrder = 'con orden de compra',
-    WithTrackingCode = 'con código de seguimiento',
-    ReadyToDeliver = 'listo para entrega',
-    Delivered = 'entregado'
-}
-
-enum EOrderShippers{
-    Relative = 'un amigo, familiar u otro',
-    Store = 'una tienda'
-}
-
-enum EOrderShippingDestination{
-    Inplace = 'en el local de Te lo llevo',
-    Town = 'dentro de Lima',
-    Province = 'a provincia'
-}
-
-enum EOrderShoppers{
-    Myself = 'Yo deseo comprarlo',
-    Business = 'Deseo que Te lo llevo lo compre por una comisión adicional'
-}
-
-enum EOrderSorters{
-    ByCreatedAt = 'Por fecha de registro',
-    ByProduct = 'Por producto',
-    ByCategory = 'Por categoría'
-}
-
-enum ECoin{
-    PEN = {
-        name: 'soles',
-        symbol: 'S/',
-        code: 'PEN'
-    }
-}
-
-interface ICoin{
-    name: string,
-    symbol: string,
-    code: string
-}
-
-interface IProduct{
-    name: string,
-    category: string,
-    url: string,
-    price: number,
-    coin: ICoin,
-    isBoxIncluded: boolean,
-    weightMore5kg: boolean,
-    isTaller50cm: boolean,
-    units: number,
-    unitsPerProduct: number
-}
-
-interface IOrder{
-    id: string,
-    status: string,
-    product: IProduct,
-    shipper: string,
-    shippingDestination: string,
-    shopper: string,
-    comments: string
-}
 
 const formatProductDetails = (order: IOrder) => {
     return `
@@ -76,7 +9,7 @@ const formatProductDetails = (order: IOrder) => {
                 <picture>
                     <img src="/img/icon/package.svg" width="18" height="18">
                 </picture>
-                <p>El pedido incluye ${order.product.units} producto(s)</p>
+                <p>El pedido incluye ${order.product.units} producto${order.product.units > 1 ? 's' : ''}</p>
             </div>
         ${
             order.product.isBoxIncluded ? `
@@ -109,12 +42,12 @@ const formatProductDetails = (order: IOrder) => {
             ` : ''
         }
         ${
-            order.product.unitsPerProduct > 1 ? `
+            order.product.isOneUnitPerProduct ? `
                 <div class="card-7">
                     <picture>
                         <img src="/img/icon/package.svg" width="18" height="18">
                     </picture>
-                    <p>En un producto vienen ${order.product.unitsPerProduct} unidades</p>
+                    <p>En un producto viene muchas unidades</p>
                 </div>
             ` : ''
         }
@@ -161,7 +94,7 @@ const formatRowExtra = (order: IOrder) => {
                     <div class="card-7-group">
                         <div class="card-7">
                             <picture>
-                                <img src="/img/icon/package.svg" width="20" height="20">
+                                <img src="/img/icon/link.svg" width="16" height="16">
                             </picture>
                             <p>
                                 Link del artículo:
@@ -171,12 +104,12 @@ const formatRowExtra = (order: IOrder) => {
                         </div>
                         <div class="card-7">
                             <picture>
-                                <img src="/img/icon/package.svg" width="20" height="20">
+                                <img src="/img/icon/coin.svg" width="16" height="16">
                             </picture>
                             <p>
                                 Valor del artículo:
                                 <br>
-                                <span>El artículo tiene un precio de ${order.product.price} ${order.product.coin.code}.</span>
+                                <span>El artículo tiene un precio de ${order.product.price} ${order.product.coin}.</span>
                             </p>
                         </div>
                     </div>
@@ -216,5 +149,5 @@ export default{
     collection: 'orders',
     toRow,
     EOrderStatus,
-    EOrderSorters
+    EOrderSorters,
 }

@@ -2,8 +2,8 @@ import { app } from '@helpers/app.helper'
 import { capitalizeString } from '@helpers/util.helper'
 import { createOrder_dialog } from '@data/admin/dialog.data'
 import paths from '@data/admin/path.data.json' // TODO: Check if this is necessary
-import orders from '@data/admin/order.data.json'
-import MOrders from '@models/orders.model'
+// import orders from '@data/admin/order.data.json'
+import MOrders from '@models/order.model'
 import CTable from '@components/table.component'
 
 const adminDialogs = (page) => {
@@ -86,9 +86,9 @@ const adminHeader = (actions, currentPage, currentNamePlural) => {
 }
 
 export const adminOrders = async (wf) => {
-    // // TODO: get orders from DB
-    // const { data: orders, err } = await wf.database.getAll(wf.mode.Offline, 'orders')
-    // if (err) throw 'error in orders fetch'
+    // TODO: get orders from local DB
+    const { data: orders, err } = await wf.database.getAll(wf.mode.Network, 'orders')
+    if (err) throw 'error in orders fetch'
     
     const rows = orders.map(MOrders.toRow)
 

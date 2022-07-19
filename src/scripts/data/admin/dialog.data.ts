@@ -1,4 +1,6 @@
 import { EProductCategory } from '@data/admin/productCategory.data'
+import { EOrderShippers, EOrderShippingDestination, EOrderShoppers } from '@types/order.type'
+import { capitalizeString } from '@helpers/util.helper'
 
 export const createOrder_dialog = `
     <nav id="create-order_dialog" class="n-dialog n-d-multistep">
@@ -18,6 +20,10 @@ export const createOrder_dialog = `
                 <fieldset>
                     <label for="product-link">Link del producto</label>
                     <input type="text" placeholder="Ingresa el link del producto" id="product-link">
+                </fieldset>
+                <fieldset>
+                    <label for="product-name">Nombre del producto</label>
+                    <input type="text" placeholder="Ingresa el nombre del producto" id="product-name">
                 </fieldset>
                 <fieldset>
                     <label for="">Categoría</label>
@@ -98,11 +104,11 @@ export const createOrder_dialog = `
                 </fieldset>
                 <fieldset>
                     <legend>¿Quién enviará tus compras al alojamiento del viajero?</legend>
-                    <input type="radio" name="order-shipper" value="relative" id="order-shipper_yes">
-                    <label for="order-shipper_yes" class="btn">Un amigo, familiar u otro</label>
+                    <input type="radio" name="order-shipper" value="${EOrderShippers.Relative}" id="order-shipper_relative">
+                    <label for="order-shipper_relative" class="btn">${capitalizeString(EOrderShippers.Relative)}</label>
 
-                    <input type="radio" name="order-shipper" value="store" id="order-shipper_no" checked>
-                    <label for="order-shipper_no" class="btn">Una tienda</label>
+                    <input type="radio" name="order-shipper" value="${EOrderShippers.Store}" id="order-shipper_store" checked>
+                    <label for="order-shipper_store" class="btn">${capitalizeString(EOrderShippers.Store)}</label>
                 </fieldset>
                 <fieldset>
                     <label for="order-extra-comment">Si deseas, puedes dejarle un comentario al viajero</label>
@@ -128,14 +134,14 @@ export const createOrder_dialog = `
             </header>
             <main>
                 <fieldset>
-                    <input type="radio" name="order-shipping-address" value="inplace" id="order-shipping-address_inplace" checked>
-                    <label for="order-shipping-address_inplace" class="btn btn-f-width">En Miraflores (Av. Aramburú 480, Piso 2 - Lima)</label>
+                    <input type="radio" name="order-shipping-address" value="${EOrderShippingDestination.Inplace}" id="order-shipping-address_inplace" checked>
+                    <label for="order-shipping-address_inplace" class="btn btn-f-width">${capitalizeString(EOrderShippingDestination.Inplace)}</label>
 
-                    <input type="radio" name="order-shipping-address" value="town" id="order-shipping-address_town">
-                    <label for="order-shipping-address_town" class="btn btn-f-width">Envio dentro de Lima</label>
+                    <input type="radio" name="order-shipping-address" value="${EOrderShippingDestination.Town}" id="order-shipping-address_town">
+                    <label for="order-shipping-address_town" class="btn btn-f-width">Envio ${EOrderShippingDestination.Town}</label>
 
-                    <input type="radio" name="order-shipping-address" value="province" id="order-shipping-address_province">
-                    <label for="order-shipping-address_province" class="btn btn-f-width">Envio a provincia</label>
+                    <input type="radio" name="order-shipping-address" value="${EOrderShippingDestination.Province}" id="order-shipping-address_province">
+                    <label for="order-shipping-address_province" class="btn btn-f-width">Envio ${EOrderShippingDestination.Province}</label>
                 </fieldset>
             </main>
             <footer>
@@ -157,12 +163,11 @@ export const createOrder_dialog = `
             </header>
             <main>
                 <fieldset>
-                    <input type="radio" name="order-buyer" value="relative" id="order-buyer_myself">
-                    <label for="order-buyer_myself" class="btn btn-f-width">Yo deseo comprarlo</label>
+                    <input type="radio" name="order-shopper" value="${EOrderShoppers.Myself}" id="order-shopper_myself">
+                    <label for="order-shopper_myself" class="btn btn-f-width">${capitalizeString(EOrderShoppers.Myself)}</label>
 
-                    <input type="radio" name="order-buyer" value="store" id="order-buyer_business" checked>
-                    <label for="order-buyer_business" class="btn btn-f-width">Deseo que Te lo llevo lo compre por una comisión
-                        adicional</label>
+                    <input type="radio" name="order-shopper" value="${EOrderShoppers.Business}" id="order-shopper_business" checked>
+                    <label for="order-shopper_business" class="btn btn-f-width">${capitalizeString(EOrderShoppers.Business)}</label>
                 </fieldset>
             </main>
             <footer>

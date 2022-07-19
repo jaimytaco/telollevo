@@ -4,8 +4,8 @@
         "status": "registrado",
         "product": {
             "name": "Apple Iphone XR 128GB",
-            "category": "Celulares, Tabletas y Smartphones",
-            "url": "https://www.chilis.pe/",
+            "category": "Celulares, Tablets, Smartphones",
+            "url": "",
             "price": 99.99,
             "coin": {
                 "name": "soles",
@@ -16,7 +16,7 @@
             "weightMore5kg": true,
             "isTaller50cm": true,
             "units": 2,
-            "unitsPerProduct": 1
+            "isOneUnitPerProduct": true
         },
         "shipper": "un amigo, familiar u otro",
         "shippingDestination": "en el local de Te lo llevo",
