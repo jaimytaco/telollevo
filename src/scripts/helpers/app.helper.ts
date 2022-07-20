@@ -1,5 +1,6 @@
 import {
     adminOrders,
+    adminFlights,
 } from '@helpers/ui.helper'
 
 import {
@@ -18,6 +19,11 @@ export const app = {
             pathname: '/admin/orders',
             builder: adminOrders,
             pattern: '/admin/orders{/}?'
+        },
+        'admin-flights': {
+            pathname: '/admin/flights',
+            builder: adminFlights,
+            pattern: '/admin/flights{/}?'
         }
     },
     loaders: {
@@ -43,7 +49,10 @@ export const initApp = async () => {
     const { default: CTable } = await import('@components/table.component')
     const { default: CCard8 } = await import('@components/card8.component')
     const { getDOMElement } = await import('@helpers/util.helper')
-    const { configCreateOrderDialog } = await import('@helpers/util.helper')
+    const { 
+        configCreateOrderDialog,
+        configCreateFlightDialog
+    } = await import('@helpers/util.helper')
 
     const { 
         registerNetworkDB,
@@ -63,6 +72,7 @@ export const initApp = async () => {
         case 'admin-orders':
             const extraRows = getDOMElement(document, '.t-r-extra', 'all')
             const extraRowIds = extraRows.map((extraRow) => extraRow.id)
+            console.log('--- extraRowIds =', extraRowIds)
             extraRowIds.forEach((extraRowId) => CTable.handleRowExtra(extraRowId))
 
             CCard8.handleAll()
@@ -71,5 +81,9 @@ export const initApp = async () => {
             configCreateOrderDialog(wf, 'create-order_dialog')
 
             break
+
+        case 'admin-flights':
+            CDialog.init('create-flight_dialog')
+            configCreateFlightDialog(wf, 'create-flight_dialog')
     }
 }

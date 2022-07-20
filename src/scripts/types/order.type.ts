@@ -1,4 +1,4 @@
-import { ECoin } from '@types/coin.type'
+import { ECoin, EShippingDestination } from '@types/util.type'
 
 
 export enum EOrderStatus{
@@ -14,12 +14,6 @@ export enum EOrderStatus{
 export enum EOrderShippers{
     Relative = 'un amigo, familiar u otro',
     Store = 'una tienda'
-}
-
-export enum EOrderShippingDestination{
-    Inplace = 'en el local de Te lo llevo',
-    Town = 'dentro de Lima',
-    Province = 'a provincia'
 }
 
 export enum EOrderShoppers{
@@ -48,11 +42,12 @@ export interface IProduct{
 
 export interface IOrder{
     id: string,
-    status: string,
+    status: EOrderStatus,
     product: IProduct,
     shipper: EOrderShippers,
-    shippingDestination: EOrderShippingDestination,
+    shippingDestination: EShippingDestination,
     shopper: EOrderShoppers,
     comments: string,
-    buyerId: string
+    buyerId: string,
+    flightIds: string[]
 }

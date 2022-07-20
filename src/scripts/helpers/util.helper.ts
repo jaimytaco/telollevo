@@ -14,13 +14,13 @@ export const getDOMElement = (parent, query, mode: 'all' | undefined) => {
 
 export const configCreateOrderDialog = async (wf, dialogId) => {
     const dialog = getDOMElement(document, `#${dialogId}`)
-    const createOrderBtns = getDOMElement(document, '[data-create-order-dialog_btn]', 'all')
     const step1Form = getDOMElement(dialog, '#create-order-step-1_form')
     const step2Form = getDOMElement(dialog, '#create-order-step-2_form')
     const step3Form = getDOMElement(dialog, '#create-order-step-3_form')
     const step4Form = getDOMElement(dialog, '#create-order-step-4_form')
     const step5Form = getDOMElement(dialog, '#create-order-confirmation-step-5_form')
     
+    const createOrderBtns = getDOMElement(document, '[data-create-order-dialog_btn]', 'all')
     const { default: CDialog } = await import('@components/dialog.component')
 
     createOrderBtns?.forEach((createOrderBtn) => createOrderBtn.onclick = () => {
@@ -28,8 +28,8 @@ export const configCreateOrderDialog = async (wf, dialogId) => {
         step1Form.classList.add('active')
     })
 
-    const { ECoin } = await import('@types/coin.type')
-    const { EOrderStatus } = await import('@types/order.type')
+    const { ECoin, EShippingDestination } = await import('@types/util.type')
+    const { EOrderStatus, EOrderShoppers } = await import('@types/order.type')
 
     // TODO: use order local object
     const order = {}
@@ -96,9 +96,9 @@ export const configCreateOrderDialog = async (wf, dialogId) => {
     step3Form.onsubmit = (e) => {
         e.preventDefault()
 
-        const shippingDestination = (getDOMElement(step3Form, '[name="order-shipping-address"]:checked')).value
+        const shippingDestinationKey = (getDOMElement(step3Form, '[name="order-shipping-address"]:checked')).value
         // TODO: validate order info in step-3
-        order.shippingDestination = shippingDestination
+        order.shippingDestination = EShippingDestination[shippingDestinationKey]
 
         console.log('--- step 3 - order =', order)
 
@@ -109,9 +109,9 @@ export const configCreateOrderDialog = async (wf, dialogId) => {
     step4Form.onsubmit = async (e) => {
         e.preventDefault()
 
-        const shopper = (getDOMElement(step4Form, '[name="order-shopper"]')).value
+        const shopperKey = (getDOMElement(step4Form, '[name="order-shopper"]')).value
         // TODO: validate order info in step-4
-        order.shopper = shopper
+        order.shopper = EOrderShoppers[shopperKey]
 
         console.log('--- step 4 - order =', order)
 
@@ -125,5 +125,74 @@ export const configCreateOrderDialog = async (wf, dialogId) => {
         e.preventDefault()
         step5Form.classList.remove('active')
         CDialog.handle('create-order_dialog', 'remove')
+    }
+}
+
+export const configCreateFlightDialog = async (wf, dialogId) => {
+    const dialog = getDOMElement(document, `#${dialogId}`)
+    const step1Form = getDOMElement(dialog, '#create-flight-step-1_form')
+    const step2Form = getDOMElement(dialog, '#create-flight-step-2_form')
+    const step3Form = getDOMElement(dialog, '#create-flight-step-3_form')
+    const step4Form = getDOMElement(dialog, '#create-flight-step-4_form')
+    const step5Form = getDOMElement(dialog, '#create-flight-step-5_form')
+    const step6Form = getDOMElement(dialog, '#create-flight-confirmation-step-6_form')
+    
+    const createFlightBtns = getDOMElement(document, '[data-create-flight-dialog_btn]', 'all')
+    const { default: CDialog } = await import('@components/dialog.component')
+
+    createFlightBtns?.forEach((createFlightBtn) => createFlightBtn.onclick = () => {
+        CDialog.handle('create-flight_dialog', 'add')
+        step1Form.classList.add('active')
+    })
+
+    step1Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        // TODO: logic for create-flight step-1
+
+        step1Form.classList.remove('active')
+        step2Form.classList.add('active')
+    }
+
+    step2Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        // TODO: logic for create-flight step-2
+
+        step2Form.classList.remove('active')
+        step3Form.classList.add('active')
+    }
+
+    step3Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        // TODO: logic for create-flight step-3
+
+        step3Form.classList.remove('active')
+        step4Form.classList.add('active')
+    }
+
+    step4Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        // TODO: logic for create-flight step-4
+
+        step4Form.classList.remove('active')
+        step5Form.classList.add('active')
+    }
+
+    step5Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        // TODO: logic for create-flight step-5
+
+        step5Form.classList.remove('active')
+        step6Form.classList.add('active')
+    }
+
+    step6Form.onsubmit = (e) => {
+        e.preventDefault()
+        step6Form.classList.remove('active')
+        CDialog.handle('create-flight_dialog', 'remove')
     }
 }

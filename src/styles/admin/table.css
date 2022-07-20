@@ -45,6 +45,7 @@ section.s-table .s-t-body::-webkit-scrollbar{
 body > main section.s-table .s-t-body{
     overflow-y: auto;
     max-block-size: 100%;
+    block-size: 100vh;
     display: flex;
     flex-flow: column nowrap;
 }

@@ -1,15 +1,20 @@
 import { app } from '@helpers/app.helper'
 import { capitalizeString } from '@helpers/util.helper'
-import { createOrder_dialog } from '@data/admin/dialog.data'
+
+import { createOrder_dialog, createFlight_dialog } from '@data/admin/dialog.data'
+
 import paths from '@data/admin/path.data.json' // TODO: Check if this is necessary
-// import orders from '@data/admin/order.data.json'
+
 import MOrders from '@models/order.model'
+import MFlights from '@models/flight.model'
 import CTable from '@components/table.component'
 
 const adminDialogs = (page) => {
     switch (page){
         case 'admin-orders':
             return `${createOrder_dialog}`
+        case 'admin-flights':
+            return `${createFlight_dialog}`
         default:
             return ''
     }
@@ -114,7 +119,7 @@ export const adminOrders = async (wf) => {
                         <picture>
                             <img src="/img/icon/plus-light.svg" width="14" height="14">
                         </picture>
-                        <span>Crear pedido</span>
+                        <span>Registrar pedido</span>
                     </button>
                 </div>
             `, 'orders', 'órdenes')
@@ -123,6 +128,49 @@ export const adminOrders = async (wf) => {
             ${tableHTML}
         </main>
         ${adminDialogs('admin-orders')}
+    `
+
+    return {
+        head: { title, meta },
+        body
+    }
+}
+
+export const adminFlights = async (wf) => {
+    // TODO: get orders from local DB
+    const { data: flights, err } = await wf.database.getAll(wf.mode.Network, 'flights')
+    if (err) throw 'error in orders fetch'
+
+    const rows = flights.map(MFlights.toRow)
+
+    const filters = []
+    const sorters = []
+
+    const tableHTML = CTable.render('Vuelos', rows, filters, sorters)
+
+    const title = `${app.name} | Pedidos`
+    const meta = `
+        <meta name="description" content="DESCRIPTION">
+        <meta property="og:url" content="OG_URL">
+        <meta property="og:type" content="OG_TYPE">
+    `
+    const body = `
+        ${
+            adminHeader(`
+                <div class="n-t-actions-2">
+                    <button class="btn btn-secondary btn-sm" data-create-flight-dialog_btn>
+                        <picture>
+                            <img src="/img/icon/plus-light.svg" width="14" height="14">
+                        </picture>
+                        <span>Registrar vuelo</span>
+                    </button>
+                </div>
+            `, 'flights', 'vuelos')
+        }
+        <main>
+            ${tableHTML}
+        </main>
+        ${adminDialogs('admin-flights')}
     `
 
     return {

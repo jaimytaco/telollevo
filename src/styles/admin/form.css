@@ -174,6 +174,19 @@ nav.n-dialog.n-dialog-dark textarea{
     color: var(--color-input-dark);
 }
 
+input[type="checkbox"]{
+    inline-size: 20px;
+    block-size: 20px;
+    min-block-size: 24px;
+    accent-color: var(--btn-color-primary);
+    flex: unset;
+}
+
+input[type="checkbox"] + label{
+    font-family: var(--font-family-regular);
+    flex: 1;
+}
+
 textarea{
     min-block-size: 112px;
     resize: none;
@@ -198,6 +211,11 @@ input[type="radio"] + label,
 input:is([type="radio"], [type="checkbox"]) + label.btn{
     /* padding-block: 12px; */
     padding-block: var(--btn-padding-inline);
+}
+
+input:is([type="radio"], [type="checkbox"]) + label.btn.btn-h-width{
+    inline-size: calc(50% - 4px);
+    flex: unset;
 }
 
 input:is([type="radio"], [type="checkbox"]) + label.btn.btn-check{

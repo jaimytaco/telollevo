@@ -131,6 +131,17 @@ const formatRowExtra = (order: IOrder) => {
     `
 }
 
+const formatRowActions = (order: IOrder) => {
+    switch(order.status){
+        case EOrderStatus.Registered:
+            return `
+                <button class="btn btn-primary" data-show-table-extra_id="id-quoted-listing">
+                    <span>Aprobar pedido</span>
+                </button>
+            `
+    }
+}
+
 const toRow = (order: IOrder) => {
     return {
         id: order.id,

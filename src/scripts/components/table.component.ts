@@ -130,19 +130,18 @@ const render = (heading, rows, filters, sorters) => {
 }
 
 const handleRowExtra = (id) => {
-    const handleTableBtn = getDOMElement(document, `[data-show-table-extra_id="${id}"]`)
-    handleTableBtn.onclick = () => {
+    const handleTableBtns = getDOMElement(document, `[data-show-table-extra_id="${id}"]`, 'all')
+    handleTableBtns?.forEach((handleTableBtn) => handleTableBtn.onclick = () => {
         const extra = getDOMElement(document, `#${id}`)
 
-        const btns = getDOMElement(document, `[data-show-table-extra_id="${id}"`, 'all')
-        btns.forEach((btn) => {
+        handleTableBtns.forEach((btn) => {
             const content = btn.getAttribute(`data-show-table-extra_id-${extra.matches('.active') ? 'open' : 'close'}`)
             if (content) btn.textContent = content
             btn.classList.toggle('active')
         })
 
         extra.classList.toggle('active')
-    }   
+    })
 }
 
 export default {

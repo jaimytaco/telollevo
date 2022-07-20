@@ -15,3 +15,7 @@ export interface IUser{
 export interface IBuyer extends IUser{
     orderIds: string[]
 }
+
+export interface ITraveler extends IUser{
+    flightIds: string[]
+}

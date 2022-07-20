@@ -1,7 +1,7 @@
 [
     {
         "page": "orders",
-        "icon": "package-1.svg",
+        "icon": "packages.svg",
         "nameSingular": "pedido",
         "namePlural": "pedidos"
     },
