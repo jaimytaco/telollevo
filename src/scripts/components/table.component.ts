@@ -52,27 +52,7 @@ const renderRows = (rows: IRow[]) => {
                             </div>
                         </div>
                     </div>
-                    <div class="t-r-actions t-r-actions-desktop">
-                        <button class="btn btn-round btn-spin" data-show-table-extra_id="${row.id}">
-                            <picture>
-                                <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
-                            </picture>
-                        </button>
-                    </div>
-                    <div class="t-r-actions t-r-actions-mobile">
-                        <div class="split-btn">
-                            <span class="sp-popup-trigger btn" tabindex="-1">
-                                <picture>
-                                    <img src="/img/icon/more-vertical.svg" width="14" height="14">
-                                </picture>
-                                <ul class="sp-popup">
-                                    <li>
-                                        <button class="btn" data-show-table-extra_id="${row.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
-                                    </li>  
-                                </ul>
-                            </span>
-                        </div>
-                    </div>
+                    ${row.actions}
                     ${row.extra}
                 </div>
             `).join('')
