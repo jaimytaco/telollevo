@@ -1,6 +1,7 @@
 import { capitalizeString } from '@helpers/util.helper'
 import { IOrder, EOrderStatus, EOrderSorters } from '@types/order.type'
-
+import { IQuotation } from '@types/quotation.type'
+import MQuotation from '@models/quotation.model'
 
 const formatProductDetails = (order: IOrder) => {
     return `
@@ -136,35 +137,40 @@ const formatRowExtra = (order: IOrder) => {
                             <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                         </div>
                         <div class="card-14-group">
-                            <div class="card-14">
-                                <div class="card-7 c-7-p">
-                                    <p>
-                                        Nombre del viajero
-                                        <br>
-                                        <span>Ecuador <span class="c-tertiary">→</span> Perú</span>
-                                    </p>
-                                </div>
-                                <button class="btn btn-primary">Elegir por S/ 19.99</button>
-                                <div class="card-15">
-                                    <p>
-                                        <span>Recibe pedido  ·  Del 10/01/2022 al 11/01/2022</span>
-                                        <span>Entrega pedido  ·  11/01/2022</span>
-                                    </p>
-                                </div>
-                                <div class="card-8 c-8-visible card-7-group" data-heading="Dirección de envío">
-                                    <div class="card-7 c-7-p">
-                                        <p class="c-7-close">
-                                            <span>
-                                                400 University Terrace<br>
-                                                EE.UU., Reno Nevada<br>
-                                                89503
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn>Ver dirección de envío</button>
-                                    <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-close" data-c-8_btn>Ocultar dirección de envío</button>
-                                </div>
-                            </div>
+                            ${
+                                order.quotations
+                                    .map((quotation: IQuotation) => `
+                                        <div class="card-14">
+                                            <div class="card-7 c-7-p">
+                                                <p>
+                                                    <strong>Fabián Delgado</strong>
+                                                    <br>
+                                                    <span>${quotation.flight.from} <span class="c-tertiary">→</span> ${quotation.flight.to}</span>
+                                                </p>
+                                            </div>
+                                            <button class="btn btn-primary">Elegir por ${quotation.priceStr}</button>
+                                            <div class="card-15">
+                                                <p>
+                                                    <span>Recibe pedido  ·  ${quotation.flight.receiveOrdersSince} al ${quotation.flight.receiveOrdersUntil}</span>
+                                                    <span>Entrega pedido  ·  ${quotation.flight.deliverOrderAt}</span>
+                                                </p>
+                                            </div>
+                                            <div class="card-8 c-8-visible card-7-group" data-heading="Dirección de envío">
+                                                <div class="card-7 c-7-p">
+                                                    <p class="c-7-close">
+                                                        <span>
+                                                            ${quotation.flight.housing.address}, ${quotation.flight.housing.place.district}<br>
+                                                            ${quotation.flight.housing.place.city}, ${quotation.flight.housing.place.state}, ${quotation.flight.housing.place.country}<br>
+                                                            ${quotation.flight.housing.place.zipcode}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                                <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn>Ver dirección de envío</button>
+                                                <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-close" data-c-8_btn>Ocultar dirección de envío</button>
+                                            </div>
+                                        </div>
+                                    `)
+                            }
                         </div>
                     </div>
                 </div>
@@ -241,9 +247,29 @@ const toRow = (order: IOrder) => {
     }
 }
 
+const getAll = async (db, mode) => {
+    const responseOrders = await db.getAll(mode, 'orders')
+    if (responseOrders?.err) throw 'error querying orders in order-model'
+    const orders = responseOrders.data as IOrder[]
+
+    const quotations = await MQuotation.getAll(db, mode)
+
+    for (const order of orders){
+        order.quotations = quotations
+            .filter((quotation) => quotation.orderId === order.id)
+    }
+    
+    return orders.map(format)
+}
+
+const format = (order: IOrder) => order
+
 export default{
     collection: 'orders',
     toRow,
     EOrderStatus,
     EOrderSorters,
+
+    format,
+    getAll
 }

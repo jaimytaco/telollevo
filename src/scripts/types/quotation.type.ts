@@ -1,5 +1,4 @@
-import { ECoin } from '@types/util.type'
-
+import { IFlight } from '@types/flight.type'
 
 export enum EQuotationStatus{
     Registered = 'registrado',
@@ -8,8 +7,13 @@ export enum EQuotationStatus{
 
 export interface IQuotation{
     id: string,
+    orderId: string,
+    flightId: string,
     price: number,
-    coin: ECoin,
+    coin: string,
     status: EQuotationStatus,  
-    createdAt: Date 
+    createdAt: Date,
+
+    flight?: IFlight,
+    priceStr?: string
 }

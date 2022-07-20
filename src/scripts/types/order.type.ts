@@ -1,5 +1,5 @@
-import { ECoin, EShippingDestination } from '@types/util.type'
-
+import { EShippingDestination } from '@types/util.type'
+import { IQuotation } from '@types/quotation.type'
 
 export enum EOrderStatus{
     Registered = 'registrado',
@@ -32,7 +32,7 @@ export interface IProduct{
     category: string,
     url: string,
     price: number,
-    coin: ECoin,
+    coin: string,
     isBoxIncluded: boolean,
     weightMore5kg: boolean,
     isTaller50cm: boolean,
@@ -49,5 +49,7 @@ export interface IOrder{
     shopper: EOrderShoppers,
     comments: string,
     buyerId: string,
-    flightIds: string[]
+    flightIds: string[],
+
+    quotations?: IQuotation[],
 }

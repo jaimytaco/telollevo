@@ -23,7 +23,7 @@ const formatRowExtra = (flight: IFlight) => {
                                     </picture>
                                     -->
                                     <p>Recepción:<br>
-                                        <span>El pedido será recepcionado del ${formatLocaleDate(flight.receiveOrdersSince)} al ${formatLocaleDate(flight.receiveOrdersUntil)}.</span>
+                                        <span>El pedido será recepcionado del ${flight.receiveOrdersSince} al ${flight.receiveOrdersUntil}.</span>
                                     </p>
                                 </div>
                                 <div class="card-7">
@@ -33,7 +33,7 @@ const formatRowExtra = (flight: IFlight) => {
                                     </picture>
                                     -->
                                     <p>Entrega:<br>
-                                        <span>El pedido será entregado el ${formatLocaleDate(flight.deliverOrderAt)}.</span>
+                                        <span>El pedido será entregado el ${flight.deliverOrderAt}.</span>
                                     </p>
                                 </div>
                             </div>  
@@ -149,7 +149,24 @@ const toRow = (flight: IFlight) => {
     }
 }
 
+const get = async (db, mode, id) => {
+    const responseFlight = await db.get(mode, 'flights', id)
+    if (responseFlight?.err) throw 'error querying flight in flight-model'
+    
+    return format(responseFlight.data as IFlight)
+}
+
+const format = (flight: IFlight) => {
+    flight.receiveOrdersSince = formatLocaleDate(flight.receiveOrdersSince)
+    flight.receiveOrdersUntil = formatLocaleDate(flight.receiveOrdersUntil)
+    flight.deliverOrderAt = formatLocaleDate(flight.deliverOrderAt)
+    return flight
+}
+
 export default{
     collection: 'flights',
-    toRow
+    toRow,
+
+    format,
+    get
 }

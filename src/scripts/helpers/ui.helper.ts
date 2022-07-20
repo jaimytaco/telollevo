@@ -92,8 +92,9 @@ const adminHeader = (actions, currentPage, currentNamePlural) => {
 
 export const adminOrders = async (wf) => {
     // TODO: get orders from local DB
-    const { data: orders, err } = await wf.database.getAll(wf.mode.Network, 'orders')
-    if (err) throw 'error in orders fetch'
+    // const { data: orders, err } = await wf.database.getAll(wf.mode.Network, 'orders')
+    // if (err) throw 'error in orders fetch'
+    const orders = await MOrders.getAll(wf.database, wf.mode.Network)
     
     const rows = orders.map(MOrders.toRow)
 

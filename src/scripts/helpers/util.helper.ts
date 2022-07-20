@@ -1,4 +1,4 @@
-export const formatLocaleDate = (date) => date.toLocaleDateString('es-PE')
+export const formatLocaleDate = (date) => date.toLocaleDateString ? date.toLocaleDateString('es-PE') : date
 
 export const capitalizeString = (str) => {
     if (!str) return ''
