@@ -1,11 +1,13 @@
 import { ECountry, EShippingDestination } from '@types/util.type'
+import { IQuotation } from '@types/quotation.type'
+
 
 export enum EHousingType{
     RentedApartment = 'departamento o casa arrendada',
     Hotel = 'hotel',
     FriendsApartment = 'departamento o casa de un amigo',
     Store = 'bodega',
-    Home = 'departamento/casa donde vivo'
+    Home = 'departamento o casa donde vivo'
 }
 
 export interface IPlace{
@@ -47,5 +49,8 @@ export interface IFlight{
     deliverOrderAt: Date,
     code: string,
     airline: string,
+    from: ECountry,
+    to: ECountry,
+    quotations: IQuotation[],
     orderIds: string[]
 }

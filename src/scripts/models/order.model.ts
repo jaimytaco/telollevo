@@ -80,64 +80,125 @@ const formatProductDetails = (order: IOrder) => {
 }
 
 const formatRowExtra = (order: IOrder) => {
-    return `
-        <div id="${order.id}" class="t-r-extra">
-            <div class="card-4">
-                <div class="card-5 c-5-bordered">
-                    <picture>
-                        <img src="/img/icon/alert-secondary.svg" widtht="20" height="20">
-                    </picture>
-                    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </div>
-                <div class="card-6">
-                    <h6>Detalles del artículo</h6>
-                    <div class="card-7-group">
-                        <div class="card-7">
-                            <!--
+    switch(order.status){
+        case EOrderStatus.Registered:
+            return `
+                <div id="${order.id}" class="t-r-extra">
+                    <div class="card-4">
+                        <div class="card-5 c-5-bordered">
                             <picture>
-                                <img src="/img/icon/link.svg" width="16" height="16">
+                                <img src="/img/icon/alert-secondary.svg" widtht="20" height="20">
                             </picture>
-                            -->
-                            <p>
-                                Link del artículo:
-                                <br>
-                                <span>Revisa <a href="${order.product.url}" target="_blank">aquí</a> el artículo.</span>
-                            </p>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                         </div>
-                        <div class="card-7">
-                            <!--
+                        <div class="card-6">
+                            <h6>Detalles del artículo</h6>
+                            <div class="card-7-group">
+                                <div class="card-7">
+                                    <p>
+                                        Link del artículo:
+                                        <br>
+                                        <span>Revisa <a href="${order.product.url}" target="_blank">aquí</a> el artículo.</span>
+                                    </p>
+                                </div>
+                                <div class="card-7">
+                                    <p>
+                                        Valor del artículo:
+                                        <br>
+                                        <span>El artículo tiene un precio de ${order.product.price} ${order.product.coin}.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            ${
+                                order.comments.length ? `
+                                    <div class="card-5">
+                                        <p>
+                                            <strong>Mensaje del comprador:</strong>
+                                            <br>
+                                            ${order.comments}
+                                        </p>
+                                    </div>
+                                ` : ''
+                            }
+                        </div>
+                        ${formatProductDetails(order)}
+                    </div>
+                </div>
+            `
+        case EOrderStatus.Quoted:
+            return `
+                <div id="${order.id}" class="t-r-extra">
+                    <div class="card-4">
+                        <div class="card-5 c-5-bordered">
                             <picture>
-                                <img src="/img/icon/coin.svg" width="16" height="16">
+                                <img src="/img/icon/alert-secondary.svg" widtht="20" height="20">
                             </picture>
-                            -->
-                            <p>
-                                Valor del artículo:
-                                <br>
-                                <span>El artículo tiene un precio de ${order.product.price} ${order.product.coin}.</span>
-                            </p>
+                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+                        <div class="card-14-group">
+                            <div class="card-14">
+                                <div class="card-7 c-7-p">
+                                    <p>
+                                        Nombre del viajero
+                                        <br>
+                                        <span>Ecuador <span class="c-tertiary">→</span> Perú</span>
+                                    </p>
+                                </div>
+                                <button class="btn btn-primary">Elegir por S/ 19.99</button>
+                                <div class="card-15">
+                                    <p>
+                                        <span>Recibe pedido  ·  Del 10/01/2022 al 11/01/2022</span>
+                                        <span>Entrega pedido  ·  11/01/2022</span>
+                                    </p>
+                                </div>
+                                <div class="card-8 c-8-visible card-7-group" data-heading="Dirección de envío">
+                                    <div class="card-7 c-7-p">
+                                        <p class="c-7-close">
+                                            <span>
+                                                400 University Terrace<br>
+                                                EE.UU., Reno Nevada<br>
+                                                89503
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn>Ver dirección de envío</button>
+                                    <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-close" data-c-8_btn>Ocultar dirección de envío</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    ${
-                        order.comments.length ? `
-                            <div class="card-5">
-                                <p>
-                                    <strong>Mensaje del comprador:</strong>
-                                    <br>
-                                    ${order.comments}
-                                </p>
-                            </div>
-                        ` : ''
-                    }
                 </div>
-                ${formatProductDetails(order)}
-            </div>
-        </div>
-    `
+            `
+    }
 }
 
 const formatRowActions = (order: IOrder) => {
     switch(order.status){
         case EOrderStatus.Registered:
+            return `
+                <div class="t-r-actions t-r-actions-desktop">
+                    <button class="btn btn-round btn-spin" data-show-table-extra_id="${order.id}">
+                        <picture>
+                            <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
+                        </picture>
+                    </button>
+                </div>
+                <div class="t-r-actions t-r-actions-mobile">
+                    <div class="split-btn">
+                        <span class="sp-popup-trigger btn" tabindex="-1">
+                            <picture>
+                                <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                            </picture>
+                            <ul class="sp-popup">
+                                <li>
+                                    <button class="btn" data-show-table-extra_id="${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
+                                </li>  
+                            </ul>
+                        </span>
+                    </div>
+                </div>
+            `
+        case EOrderStatus.Quoted:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
                     <button class="btn btn-round btn-spin" data-show-table-extra_id="${order.id}">

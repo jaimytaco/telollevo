@@ -4,6 +4,7 @@
     /* --hsl-3: 300 1% 26%; */
     --hsl-3: 0 0% 13%;
     --hsl-4: 300 20% 83%;
+    --hsl-5: 43 87% 62%;
     --hsl-7: 234 50% 96%;
     --hsl-8: 0 0% 100%;
     --hsl-9: 0 0% 100%;
@@ -12,6 +13,7 @@
     --color-2: hsl(var(--hsl-2));
     --color-3: hsl(var(--hsl-3));
     --color-4: hsl(var(--hsl-4));
+    --color-5: hsl(var(--hsl-5));
     --color-7: hsl(var(--hsl-7));
     --color-8: hsl(var(--hsl-8));
     --color-9: hsl(var(--hsl-9));
@@ -44,6 +46,7 @@
 
     --font-color-primary: var(--black-color);
     --font-color-secondary: hsl(var(--hsl-3) / 60%);
+    --font-color-tertiary: var(--color-5);
     --font-family-bold: GoogleSans-Bold, sans-serif;
     --font-family-semibold: GoogleSans-Medium, sans-serif;
     --font-family-regular: GoogleSans-Regular, sans-serif;
@@ -62,7 +65,7 @@
 
     --btn-color-primary: var(--color-1);
     --btn-color-secondary: var(--black-color);
-    --btn-color-tertiary: var(--black-color);
+    --btn-color-tertiary: var(--color-5);
 
     --btn-padding-block: 1ch;
     --btn-padding-inline: 1.5ch;

@@ -255,9 +255,13 @@ export const configCreateFlightDialog = async (wf, dialogId) => {
 
         const code = (getDOMElement(step5Form, '#code')).value
         const airline = (getDOMElement(step5Form, '#airline')).value
+        const from = (getDOMElement(step5Form, '[list="from"]')).value
+        const to = (getDOMElement(step5Form, '[list="to"]')).value
 
         flight.code = code
         flight.airline = airline
+        flight.from = from
+        flight.to = to
 
         // TODO: validate flight info step-5
 

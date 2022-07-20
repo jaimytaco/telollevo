@@ -412,6 +412,28 @@ export const createFlight_dialog = `
                     <label for="airline">Aerolínea</label>
                     <input type="text" id="airline" placeholder="Ingresa la aerolínea encargada de su vuelo">
                 </fieldset>
+                <fieldset>
+                    <label for="from">País origen</label>
+                    <input list="from" placeholder="Selecciona un país">
+                    <datalist id="from">
+                        ${
+                            Object.values(ECountry)
+                                .map((value) => `<option value="${value}"></option>`)
+                                .join('')
+                        }
+                    </datalist>
+                </fieldset>
+                <fieldset>
+                    <label for="to">País destino</label>
+                    <input list="to" placeholder="Selecciona un país">
+                    <datalist id="to">
+                        ${
+                            Object.values(ECountry)
+                                .map((value) => `<option value="${value}"></option>`)
+                                .join('')
+                        }
+                    </datalist>
+                </fieldset>
             </main>
             <footer>
                 <button class="btn btn-primary btn-submit" type="submit">Continuar</button>

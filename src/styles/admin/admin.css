@@ -167,9 +167,35 @@
         display: flex;
     }
 
+    .card-8.c-8-visible > *:not(.c-8-open),
+    .card-8.c-8-visible > *:not(.c-8-close){
+        display: none;
+    }
+
+    .card-8.c-8-visible.active > *:not(.c-8-open),
+    .card-8.c-8-visible.active > *:not(.c-8-close){
+        display: flex;
+    }
+
     .card-8 .c-8-open,
     .card-8 .c-8-close{
         display: none !important;
+    }
+
+    .card-8.c-8-visible .c-8-open{
+        display: flex !important;
+    }
+
+    .card-8.c-8-visible.active .c-8-open{
+        display: none !important;
+    }
+
+    .card-8.c-8-visible.active .c-8-close{
+        display: flex !important;
+    }
+
+    .card-14-group{
+        padding-inline: 16px;
     }
 }
 
@@ -221,6 +247,14 @@
     .card-4 > .card-6,
     .card-4 > .card-8{
         max-inline-size: 440px;
+    }
+
+    .card-14-group{
+        gap: 32px;
+    }
+
+    .card-14-group .card-14{
+        max-inline-size: calc(50% - 32px/2);
     }
 }
 
