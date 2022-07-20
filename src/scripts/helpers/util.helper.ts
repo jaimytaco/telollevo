@@ -276,3 +276,17 @@ export const configCreateFlightDialog = async (wf, dialogId) => {
         CDialog.handle('create-flight_dialog', 'remove')
     }
 }
+
+export const configApproveFlight = async (wf) => {
+    const visibleFlightBtns = getDOMElement(document, '[data-visible-flight_id]', 'all')
+    visibleFlightBtns?.forEach((visibleFlightBtn) => visibleFlightBtn.onclick = async () => {
+        // TODO: visible flight logic
+        const { EFlightStatus } = await import('@types/flight.type')
+        const id = visibleFlightBtn.getAttribute('data-visible-flight_id')
+        const { data: flight, err } = await wf.database.get(wf.mode.Network, 'flights', id)
+        if (err) return
+        // TODO: check if flight has quotations
+        flight.status = flight.status === EFlightStatus.Registered ? EFlightStatus.Visible : EFlightStatus.Registered
+        await wf.database.update(wf.mode.Network, 'flights', flight)
+    })
+}

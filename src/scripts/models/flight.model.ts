@@ -68,6 +68,9 @@ const formatRowActions = (flight: IFlight) => {
         case EFlightStatus.Registered:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
+                    <button class="btn btn-primary" data-visible-flight_id="${flight.id}">
+                        <span>Aprobar vuelo</span>
+                    </button>
                     <button class="btn btn-round btn-spin" data-show-table-extra_id="${flight.id}">
                         <picture>
                             <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
@@ -83,7 +86,40 @@ const formatRowActions = (flight: IFlight) => {
                             <ul class="sp-popup">
                                 <li>
                                     <button class="btn" data-show-table-extra_id="${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
-                                </li>  
+                                </li> 
+                                <li>
+                                    <button class="btn  data-visible-flight_id="${flight.id}">Aprobar vuelo</button>
+                                </li> 
+                            </ul>
+                        </span>
+                    </div>
+                </div>
+            `
+        case EFlightStatus.Visible:
+            return `
+                <div class="t-r-actions t-r-actions-desktop">
+                    <button class="btn btn-primary" data-visible-flight_id="${flight.id}">
+                        <span>Desaprobar vuelo</span>
+                    </button>
+                    <button class="btn btn-round btn-spin" data-show-table-extra_id="${flight.id}">
+                        <picture>
+                            <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
+                        </picture>
+                    </button>
+                </div>
+                <div class="t-r-actions t-r-actions-mobile">
+                    <div class="split-btn">
+                        <span class="sp-popup-trigger btn" tabindex="-1">
+                            <picture>
+                                <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                            </picture>
+                            <ul class="sp-popup">
+                                <li>
+                                    <button class="btn" data-show-table-extra_id="${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
+                                </li> 
+                                <li>
+                                    <button class="btn data-visible-flight_id="${flight.id}">Desaprobar vuelo</button>
+                                </li> 
                             </ul>
                         </span>
                     </div>
