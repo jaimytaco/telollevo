@@ -72,6 +72,7 @@ export const initApp = async () => {
 
     const extraRows = getDOMElement(document, '.t-r-extra', 'all')
     const extraRowIds = extraRows.map((extraRow) => extraRow.id)
+    console.log('--- extraRowIds =', extraRowIds)
     extraRowIds.forEach((extraRowId) => CTable.handleRowExtra(extraRowId))
     
     switch (getBodyPage()) {

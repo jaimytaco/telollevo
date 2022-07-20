@@ -132,8 +132,8 @@
     }
 
     .card-5{
-        padding-inline: 16px;
-        padding-block: 16px;
+        padding-inline: 14px;
+        padding-block: 12px;
         gap: 16px;
     }
 
@@ -159,7 +159,7 @@
     }
 
     .card-6 > .card-5{
-        margin-block: 12px 0;
+        margin-block: 8px 0;
     }
 
     .card-8 > *:not(.c-8-open),

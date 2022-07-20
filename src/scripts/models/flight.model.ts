@@ -5,7 +5,7 @@ const formatRowExtra = (flight: IFlight) => {
     switch(flight.status){
         case EFlightStatus.Registered:
             return `
-                <div id="${flight.id}" class="t-r-extra">
+                <div id="te-${flight.id}" class="t-r-extra">
                     <div class="card-4">
                         <div class="card-5 c-5-bordered">
                             <picture>
@@ -76,7 +76,7 @@ const formatRowActions = (flight: IFlight) => {
                     <button class="btn btn-primary" data-visible-flight_id="${flight.id}">
                         <span>Aprobar vuelo</span>
                     </button>
-                    <button class="btn btn-round btn-spin" data-show-table-extra_id="${flight.id}">
+                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
                         <picture>
                             <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                         </picture>
@@ -90,7 +90,7 @@ const formatRowActions = (flight: IFlight) => {
                             </picture>
                             <ul class="sp-popup">
                                 <li>
-                                    <button class="btn" data-show-table-extra_id="${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
+                                    <button class="btn" data-show-table-extra_id="te-${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
                                 </li> 
                                 <li>
                                     <button class="btn  data-visible-flight_id="${flight.id}">Aprobar vuelo</button>
@@ -106,7 +106,7 @@ const formatRowActions = (flight: IFlight) => {
                     <button class="btn btn-primary" data-visible-flight_id="${flight.id}">
                         <span>Desaprobar vuelo</span>
                     </button>
-                    <button class="btn btn-round btn-spin" data-show-table-extra_id="${flight.id}">
+                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
                         <picture>
                             <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                         </picture>
@@ -120,7 +120,7 @@ const formatRowActions = (flight: IFlight) => {
                             </picture>
                             <ul class="sp-popup">
                                 <li>
-                                    <button class="btn" data-show-table-extra_id="${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
+                                    <button class="btn" data-show-table-extra_id="te-${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
                                 </li> 
                                 <li>
                                     <button class="btn data-visible-flight_id="${flight.id}">Desaprobar vuelo</button>

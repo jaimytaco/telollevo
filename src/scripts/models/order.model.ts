@@ -66,12 +66,14 @@ const formatProductDetails = (order: IOrder) => {
         </div>
         ${
             order.comments.length ? `
+                <!--
                 <div class="card-7">
                     <picture>
                         <img src="/img/icon/package.svg" width="18" height="18">
                     </picture>
                     <p>Comentarios: ${order.comments}</p>
                 </div>
+                -->
             ` : ''
         }
         <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn>Ver más detalles</button>
@@ -84,7 +86,7 @@ const formatRowExtra = (order: IOrder) => {
     switch(order.status){
         case EOrderStatus.Registered:
             return `
-                <div id="${order.id}" class="t-r-extra">
+                <div id="te-${order.id}" class="t-r-extra">
                     <div class="card-4">
                         <div class="card-5 c-5-bordered">
                             <picture>
@@ -128,7 +130,7 @@ const formatRowExtra = (order: IOrder) => {
             `
         case EOrderStatus.Quoted:
             return `
-                <div id="${order.id}" class="t-r-extra">
+                <div id="te-${order.id}" class="t-r-extra">
                     <div class="card-4">
                         <div class="card-5 c-5-bordered">
                             <picture>
@@ -183,7 +185,7 @@ const formatRowActions = (order: IOrder) => {
         case EOrderStatus.Registered:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
-                    <button class="btn btn-round btn-spin" data-show-table-extra_id="${order.id}">
+                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${order.id}">
                         <picture>
                             <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                         </picture>
@@ -197,7 +199,7 @@ const formatRowActions = (order: IOrder) => {
                             </picture>
                             <ul class="sp-popup">
                                 <li>
-                                    <button class="btn" data-show-table-extra_id="${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
+                                    <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
                                 </li>  
                             </ul>
                         </span>
@@ -207,7 +209,7 @@ const formatRowActions = (order: IOrder) => {
         case EOrderStatus.Quoted:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
-                    <button class="btn btn-round btn-spin" data-show-table-extra_id="${order.id}">
+                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${order.id}">
                         <picture>
                             <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                         </picture>
@@ -221,7 +223,7 @@ const formatRowActions = (order: IOrder) => {
                             </picture>
                             <ul class="sp-popup">
                                 <li>
-                                    <button class="btn" data-show-table-extra_id="${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
+                                    <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
                                 </li>  
                             </ul>
                         </span>
