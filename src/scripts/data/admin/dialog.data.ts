@@ -273,7 +273,7 @@ export const createFlight_dialog = `
                 </fieldset>
                 <fieldset>
                     <label for="district">Consuma/distrito/barrio/pueblo</label>
-                    <input type="text" id="distric" placeholder="Ingresa una consuma/distrito/barrio/pueblo">
+                    <input type="text" id="district" placeholder="Ingresa una consuma/distrito/barrio/pueblo">
                 </fieldset>
                 <fieldset class="fs-sm">
                     <label for="country">País</label>
@@ -328,7 +328,6 @@ export const createFlight_dialog = `
                 </fieldset>
 
                 <!-- TODO: add traveler's chores alert -->
-
             </main>
             <footer>
                 <button class="btn btn-primary btn-submit" type="submit">Continuar</button>

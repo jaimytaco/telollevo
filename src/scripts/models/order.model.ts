@@ -93,9 +93,11 @@ const formatRowExtra = (order: IOrder) => {
                     <h6>Detalles del artículo</h6>
                     <div class="card-7-group">
                         <div class="card-7">
+                            <!--
                             <picture>
                                 <img src="/img/icon/link.svg" width="16" height="16">
                             </picture>
+                            -->
                             <p>
                                 Link del artículo:
                                 <br>
@@ -103,9 +105,11 @@ const formatRowExtra = (order: IOrder) => {
                             </p>
                         </div>
                         <div class="card-7">
+                            <!--
                             <picture>
                                 <img src="/img/icon/coin.svg" width="16" height="16">
                             </picture>
+                            -->
                             <p>
                                 Valor del artículo:
                                 <br>

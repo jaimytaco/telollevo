@@ -15,17 +15,6 @@ import {
     updateDoc
 } from 'firebase/firestore/lite'
 
-// const FIREBASE_CONFIG = {
-//     apiKey: "AIzaSyBgHfhl4LDM82e6J1Fq76HAsArGK7nTdms",
-//     authDomain: "emergencyphone-11968.firebaseapp.com",
-//     projectId: "emergencyphone-11968",
-//     storageBucket: "emergencyphone-11968.appspot.com",
-//     messagingSenderId: "103394936209",
-//     appId: "1:103394936209:web:12208f21d4386a7d7a0630"
-// }
-
-// const firestore = getFirestore(initializeApp(FIREBASE_CONFIG))
-
 let firestore
 
 const register = (credentials) => {

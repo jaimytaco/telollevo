@@ -19,7 +19,7 @@ export interface IPlace{
 export interface IHousing{
     type: EHousingType,
     address: string,
-    addressDetail: string,
+    addressMore: string,
     place: IPlace,
     hotelName?: string
 }

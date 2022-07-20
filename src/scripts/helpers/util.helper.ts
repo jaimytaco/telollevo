@@ -1,3 +1,5 @@
+export const formatLocaleDate = (date) => date.toLocaleDateString('es-PE')
+
 export const capitalizeString = (str) => {
     if (!str) return ''
     const [first, ...rest] = str
@@ -145,10 +147,26 @@ export const configCreateFlightDialog = async (wf, dialogId) => {
         step1Form.classList.add('active')
     })
 
+    const { ECountry, EShippingDestination } = await import('@types/util.type')
+    const { EFlightStatus, EHousingType } = await import('@types/flight.type')
+
+    // TODO: use flight local object
+    const flight = {}
+
     step1Form.onsubmit = (e) => {
         e.preventDefault()
 
-        // TODO: logic for create-flight step-1
+        const status = EFlightStatus.Registered
+        const receiveOrdersSince = (getDOMElement(step1Form, '#receive-orders-since')).value
+        const receiveOrdersUntil = (getDOMElement(step1Form, '#receive-orders-until')).value
+
+        // TODO: validate flight info step-1
+
+        flight.status = status
+        flight.receiveOrdersSince = new Date(`${receiveOrdersSince} 00:00:00`)
+        flight.receiveOrdersUntil = new Date(`${receiveOrdersUntil} 00:00:00`)
+
+        console.log('--- step 1 - flight =', flight)
 
         step1Form.classList.remove('active')
         step2Form.classList.add('active')
@@ -157,7 +175,41 @@ export const configCreateFlightDialog = async (wf, dialogId) => {
     step2Form.onsubmit = (e) => {
         e.preventDefault()
 
-        // TODO: logic for create-flight step-2
+        const type = (getDOMElement(step2Form, '[name="housing-type"]:checked'))?.value
+        const address = (getDOMElement(step2Form, '#address')).value
+        const addressMore = (getDOMElement(step2Form, '#address-more')).value
+        const district = (getDOMElement(step2Form, '#district')).value
+        const country = (getDOMElement(step2Form, '[list="country"]')).value
+        const state = (getDOMElement(step2Form, '[list="state"]')).value
+        const city = (getDOMElement(step2Form, '[list="city"]')).value
+        const zipcode = (getDOMElement(step2Form, '#zipcode')).value
+        const isResponsibleFor = (getDOMElement(step2Form, '#is-responsible-for')).checked
+        const areReceiveOrderDatesOk = (getDOMElement(step2Form, '#are-receive-order-dates-ok')).checked
+
+        // TODO: validate flight info step-2
+
+        const place = {
+            district,
+            country: ECountry[country],
+            state,
+            city,
+            zipcode
+        }
+
+        const housing = {
+            type: EHousingType[type],
+            address,
+            addressMore,
+            place
+        }
+
+        flight.housing = housing
+        flight.isResponsibleFor = isResponsibleFor
+        flight.areReceiveOrderDatesOk = areReceiveOrderDatesOk
+        
+        // TODO: validate flight info step-2
+
+        console.log('--- step 2 - flight =', flight)
 
         step2Form.classList.remove('active')
         step3Form.classList.add('active')
@@ -166,7 +218,16 @@ export const configCreateFlightDialog = async (wf, dialogId) => {
     step3Form.onsubmit = (e) => {
         e.preventDefault()
 
-        // TODO: logic for create-flight step-3
+        const name = (getDOMElement(step3Form, '#receiver-name')).value
+        const phone = (getDOMElement(step3Form, '#receiver-phone')).value
+
+        const receiver = { name, phone }
+
+        flight.receiver = receiver
+
+        // TODO: validate flight info step-3
+
+        console.log('--- step 3 - flight =', flight)
 
         step3Form.classList.remove('active')
         step4Form.classList.add('active')
@@ -175,16 +236,35 @@ export const configCreateFlightDialog = async (wf, dialogId) => {
     step4Form.onsubmit = (e) => {
         e.preventDefault()
 
-        // TODO: logic for create-flight step-4
+        const shippingDestination = (getDOMElement(step4Form, '[list="shipping-destination"]')).value
+        const deliverOrderAt = (getDOMElement(step4Form, '#deliver-order-at')).value
+
+        flight.shippingDestination = shippingDestination
+        flight.deliverOrderAt = new Date(`${deliverOrderAt} 00:00:00`)
+
+        // TODO: validate flight info step-4
+
+        console.log('--- step 4 - flight =', flight)
 
         step4Form.classList.remove('active')
         step5Form.classList.add('active')
     }
 
-    step5Form.onsubmit = (e) => {
+    step5Form.onsubmit = async (e) => {
         e.preventDefault()
 
-        // TODO: logic for create-flight step-5
+        const code = (getDOMElement(step5Form, '#code')).value
+        const airline = (getDOMElement(step5Form, '#airline')).value
+
+        flight.code = code
+        flight.airline = airline
+
+        // TODO: validate flight info step-5
+
+        const x = await wf.database.add(wf.mode.Network, 'flights', flight)
+        console.log('--- x =', x)
+
+        console.log('--- step 5 - flight =', flight)
 
         step5Form.classList.remove('active')
         step6Form.classList.add('active')

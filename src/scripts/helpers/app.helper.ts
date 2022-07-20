@@ -67,23 +67,22 @@ export const initApp = async () => {
 
     await registerNetworkDB(networkDB, DB_CREDENTIALS)
     await registerOfflineDB(offlineDB, app.code, app.loaders)
+
+    const extraRows = getDOMElement(document, '.t-r-extra', 'all')
+    const extraRowIds = extraRows.map((extraRow) => extraRow.id)
+    console.log('--- extraRowIds =', extraRowIds)
+    extraRowIds.forEach((extraRowId) => CTable.handleRowExtra(extraRowId))
     
     switch (getBodyPage()) {
         case 'admin-orders':
-            const extraRows = getDOMElement(document, '.t-r-extra', 'all')
-            const extraRowIds = extraRows.map((extraRow) => extraRow.id)
-            console.log('--- extraRowIds =', extraRowIds)
-            extraRowIds.forEach((extraRowId) => CTable.handleRowExtra(extraRowId))
-
             CCard8.handleAll()
-
             CDialog.init('create-order_dialog')
             configCreateOrderDialog(wf, 'create-order_dialog')
-
             break
-
         case 'admin-flights':
+            CCard8.handleAll()
             CDialog.init('create-flight_dialog')
             configCreateFlightDialog(wf, 'create-flight_dialog')
+            break
     }
 }
