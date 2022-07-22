@@ -5,10 +5,12 @@ export enum EOrderStatus{
     Registered = 'registrado',
     Quoted = 'cotizado',
     Payed = 'pagado',
+    Assigned = 'con viajero asignado',
     WithPurchaseOrder = 'con orden de compra',
     WithTrackingCode = 'con código de seguimiento',
     ReadyToDeliver = 'listo para entrega',
-    Delivered = 'entregado'
+    Delivered = 'entregado',
+    Canceled = 'cancelado'
 }
 
 export enum EOrderShippers{
@@ -48,8 +50,8 @@ export interface IOrder{
     shippingDestination: EShippingDestination,
     shopper: EOrderShoppers,
     comments: string,
-    buyerId: string,
-    flightIds: string[],
+    shopperId: string,
+    travelerId: string,
 
     quotations?: IQuotation[],
 }

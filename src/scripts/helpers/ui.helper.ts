@@ -92,8 +92,6 @@ const adminHeader = (actions, currentPage, currentNamePlural) => {
 
 export const adminOrders = async (wf) => {
     // TODO: get orders from local DB
-    // const { data: orders, err } = await wf.database.getAll(wf.mode.Network, 'orders')
-    // if (err) throw 'error in orders fetch'
     const orders = await MOrders.getAll(wf.database, wf.mode.Network)
     
     const rows = orders.map(MOrders.toRow)
@@ -139,17 +137,17 @@ export const adminOrders = async (wf) => {
 
 export const adminFlights = async (wf) => {
     // TODO: get orders from local DB
-    const { data: flights, err } = await wf.database.getAll(wf.mode.Network, 'flights')
-    if (err) throw 'error in orders fetch'
+    const flights = await MFlights.getAll(wf.database, wf.mode.Network)
 
     const rows = flights.map(MFlights.toRow)
 
+    // TODO: complete filters and sorters for admin-flights
     const filters = []
     const sorters = []
 
     const tableHTML = CTable.render('Vuelos', rows, filters, sorters)
 
-    const title = `${app.name} | Pedidos`
+    const title = `${app.name} | Vuelos`
     const meta = `
         <meta name="description" content="DESCRIPTION">
         <meta property="og:url" content="OG_URL">

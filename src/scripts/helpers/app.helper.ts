@@ -53,7 +53,8 @@ export const initApp = async () => {
         configCreateOrderDialog,
 
         configCreateFlightDialog,
-        configApproveFlight
+        configApproveFlight,
+        configSelectQuotationInQuotedOrder
     } = await import('@helpers/util.helper')
 
     const { 
@@ -70,9 +71,9 @@ export const initApp = async () => {
     await registerNetworkDB(networkDB, DB_CREDENTIALS)
     await registerOfflineDB(offlineDB, app.code, app.loaders)
 
+    // TODO: make component of table-extra-row
     const extraRows = getDOMElement(document, '.t-r-extra', 'all')
     const extraRowIds = extraRows.map((extraRow) => extraRow.id)
-    console.log('--- extraRowIds =', extraRowIds)
     extraRowIds.forEach((extraRowId) => CTable.handleRowExtra(extraRowId))
     
     switch (getBodyPage()) {
@@ -80,6 +81,7 @@ export const initApp = async () => {
             CCard8.handleAll()
             CDialog.init('create-order_dialog')
             configCreateOrderDialog(wf, 'create-order_dialog')
+            configSelectQuotationInQuotedOrder(wf)
             break
         case 'admin-flights':
             CCard8.handleAll()

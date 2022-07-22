@@ -1,3 +1,7 @@
+export const delay = (ms) => new Promise((resolve, reject) => {
+    setTimeout(() => resolve(), ms)
+})
+
 export const formatLocaleDate = (date) => date.toLocaleDateString ? date.toLocaleDateString('es-PE') : date
 
 export const capitalizeString = (str) => {
@@ -274,23 +278,38 @@ export const configCreateFlightDialog = async (wf, dialogId) => {
         step6Form.classList.add('active')
     }
 
-    step6Form.onsubmit = (e) => {
+    step6Form.onsubmit = async (e) => {
         e.preventDefault()
         step6Form.classList.remove('active')
         CDialog.handle('create-flight_dialog', 'remove')
+
+        // TODO: reload
+        await delay(1500)
+        location.reload()
     }
 }
 
 export const configApproveFlight = async (wf) => {
-    const visibleFlightBtns = getDOMElement(document, '[data-visible-flight_id]', 'all')
+    const visibleFlightBtns = getDOMElement(document, '[data-visible-flight_btn]', 'all')
     visibleFlightBtns?.forEach((visibleFlightBtn) => visibleFlightBtn.onclick = async () => {
         // TODO: visible flight logic
         const { EFlightStatus } = await import('@types/flight.type')
-        const id = visibleFlightBtn.getAttribute('data-visible-flight_id')
+        const id = visibleFlightBtn.getAttribute('data-visible-flight_btn')
         const { data: flight, err } = await wf.database.get(wf.mode.Network, 'flights', id)
         if (err) return
+
         // TODO: check if flight has quotations
         flight.status = flight.status === EFlightStatus.Registered ? EFlightStatus.Visible : EFlightStatus.Registered
         await wf.database.update(wf.mode.Network, 'flights', flight)
+
+        // TODO: reload
+        location.reload() 
+    })
+}
+
+export const configSelectQuotationInQuotedOrder = async (wf) => {
+    const selectQuotationBtns = getDOMElement(document, '[data-select-quotation_btn]', 'all')
+    selectQuotationBtns?.forEach((selectQuotationBtn) => selectQuotationBtn.onclick = async () => {
+        console.log('--- selectQuotationBtn =', selectQuotationBtn)
     })
 }

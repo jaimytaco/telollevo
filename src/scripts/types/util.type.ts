@@ -13,6 +13,6 @@ export enum EShippingDestination{
 }
 
 export enum ECountry{
-    Peru = 'Perú',
+    Peru = 'Peru',
     Ecuador = 'Ecuador'
 }

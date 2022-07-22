@@ -12,7 +12,7 @@ export interface IUser{
     type: string
 }
 
-export interface IBuyer extends IUser{
+export interface IShopper extends IUser{
     orderIds: string[]
 }
 

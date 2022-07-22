@@ -150,7 +150,7 @@ const formatRowExtra = (order: IOrder) => {
                                                     <span>${quotation.flight.from} <span class="c-tertiary">→</span> ${quotation.flight.to}</span>
                                                 </p>
                                             </div>
-                                            <button class="btn btn-primary">Elegir por ${quotation.priceStr}</button>
+                                            <button class="btn btn-primary" data-select-quotation_btn="q-${quotation.id}">Elegir por ${quotation.priceStr}</button>
                                             <div class="card-15">
                                                 <p>
                                                     <span>Recibe pedido  ·  ${quotation.flight.receiveOrdersSince} al ${quotation.flight.receiveOrdersUntil}</span>
@@ -209,6 +209,9 @@ const formatRowActions = (order: IOrder) => {
         case EOrderStatus.Quoted:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
+                    <button class="btn btn-primary" data-show-table-extra_id="te-${order.id}">
+                        <span>Elegir viajero</span>
+                    </button>
                     <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${order.id}">
                         <picture>
                             <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
@@ -224,7 +227,10 @@ const formatRowActions = (order: IOrder) => {
                             <ul class="sp-popup">
                                 <li>
                                     <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
-                                </li>  
+                                </li> 
+                                <li>
+                                    <button class="btn" data-show-table-extra_id="te-${order.id}">Elegir viajero</button>
+                                </li> 
                             </ul>
                         </span>
                     </div>
