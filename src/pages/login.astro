@@ -1,0 +1,78 @@
+---
+import '@styles/admin/root.css'
+import '@styles/admin/font.css'
+import '@styles/admin/global.css'
+import '@styles/admin/button.css'
+import '@styles/admin/form.css'
+import '@styles/admin/card-16.css'
+import '@styles/admin/card-17.css'
+import '@styles/admin/responsive.css'
+
+import { app } from '@helpers/app.helper'
+---
+
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{app.name} | Login</title>
+    
+</head>
+<body data-page="public-login">
+    <main>
+        <div class="card-16">
+            <div class="c-16-thumbnail">
+            </div>
+            <div class="c-16-form">
+                <form id="login-form">
+                    <header>
+                        <div class="h-heading">
+                            <div class="card-17">
+                                <picture>
+                                    <img src="/img/icon/logotype.svg" height="40">
+                                </picture>
+                                <h1>Iniciar sesión</h1>
+                                <p>¡Hola! Bienvenido nuevamente a tu cuenta de {app.name}, te hemos extrañado</p>
+                                <button class="btn">
+                                    <span>Iniciar sesión con Facebook</span>
+                                </button>
+                                <span class="c-17-hr">o inicia sesión con email</span>
+                            </div>
+                        </div>
+                    </header>
+                    <main>
+                        <fieldset>
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" placeholder="Ingresa tu email" autocomplete="email" required>                            
+                        </fieldset>
+                        <fieldset>
+                            <label for="login-password">Contraseña</label>
+                            <input type="password" id="login-password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>                                                        
+                        </fieldset>
+                        <fieldset>
+                            <button class="btn btn-underline">
+                                <span>Olvidé mi contraseña</span>
+                            </button>
+                        </fieldset>
+                    </main>
+                    <footer>
+                        <button class="btn btn-primary btn-submit" type="submit">Iniciar sesión</button>
+                        <p>
+                            ¿Eres usuario nuevo?
+                            <a href="/" class="btn btn-underline">Regístrate</a>
+                        </p>
+                    </footer>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script>
+        import { initApp } from '@helpers/app.helper'
+        initApp()
+    </script>
+</body>
+
+</html>
