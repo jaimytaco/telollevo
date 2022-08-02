@@ -262,12 +262,13 @@ const getAll = async (db, mode) => {
 
     const quotations = await MQuotation.getAll(db, mode)
 
-    for (const order of orders){
+    const ordersWithQuotation = orders.map((order) => {
         order.quotations = quotations
             .filter((quotation) => quotation.orderId === order.id)
-    }
+        return order
+    })
     
-    return orders.map(format)
+    return ordersWithQuotation.map(format)
 }
 
 const format = (order: IOrder) => order

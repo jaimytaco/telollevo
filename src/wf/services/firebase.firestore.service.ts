@@ -1,6 +1,7 @@
-import {
-    initializeApp
-} from 'firebase/app'
+import { 
+    initApp,
+    getApp
+} from '@wf/services/firebase.app.service'
 
 import {
     getFirestore,
@@ -17,8 +18,10 @@ import {
 
 let firestore
 
-const register = (credentials) => {
-    firestore = getFirestore(initializeApp(credentials))
+const register = () => {
+    const app = getApp()
+    if (!app) throw 'firebase-app not initialized firebase/firestore'
+    firestore = getFirestore(app)
 }
 
 const getAll = async (collectionName, filters) => {
@@ -134,6 +137,8 @@ const formatDocForFirebase = (data) => {
 }
 
 export default {
+    initApp,
+
     register,
     getAll,
     update,

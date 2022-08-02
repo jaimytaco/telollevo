@@ -4,7 +4,7 @@ import paths from '@data/admin/path.data.json'
 import networkDB from '@wf/services/firebase.firestore.service'
 import { AUI } from '@wf/actors/ui.actor'
 import { app } from '@helpers/app.helper'
-import { DB_CREDENTIALS } from '@helpers/database.helper'
+import { CREDENTIALS } from '@helpers/database.helper'
 import {
     registerNetworkDB,
     wf
@@ -23,7 +23,7 @@ export const getStaticPaths = async () => {
 }
 const { page } = Astro.params
 const { path } = Astro.props
-await registerNetworkDB(networkDB, DB_CREDENTIALS)
+await registerNetworkDB(networkDB, CREDENTIALS)
 const { content, err } = await AUI.getDynamicContent({ lib: wf, builders: app.ui, viewId: `admin-${page}` })
 ---
 

@@ -6,8 +6,6 @@ interface IOfflineDbInit {
     isFirstLoad: boolean,
 }
 
-const dataLoaders = {}
-
 let NetworkDB
 let OfflineDB
 
@@ -15,8 +13,10 @@ const setNetworkDB = (db: T) => NetworkDB = db
 
 const setOfflineDB = (db: T) => OfflineDB = db
 
-const register = async ({ mode, prefix, loaders, credentials }): Promise<void> | Promise<IOfflineDbInit> => {
-    if (mode === EDatabaseMode.Network) return NetworkDB.register(credentials)
+const initApp = (db, credentials) => db.initApp(credentials)
+
+const register = async ({ mode, prefix, loaders }): Promise<void> | Promise<IOfflineDbInit> => {
+    if (mode === EDatabaseMode.Network) return NetworkDB.register()
     if (mode === EDatabaseMode.Offline) return OfflineDB.register(prefix, loaders)
 }
 
@@ -46,14 +46,13 @@ const ADatabaseMethods = {
     get
 }
 
-const isNetworkDBRegistered = () => !!NetworkDB
-
 export const ADatabase = {
+    initApp,
+
     register,
     ...ADatabaseMethods,
     methods: Object.keys(ADatabaseMethods),
     
     setNetworkDB,
     setOfflineDB,
-    isNetworkDBRegistered
 }

@@ -29,7 +29,7 @@ export const serveFromCache = async (request, cacheName) => {
             sendMessage({msg: `from cache: ${getPathnameFromRequest(request)}`})
         }
 
-        return response || fetch(request)
+        return response
     } catch (err) {
         console.error(err)
     }
@@ -53,3 +53,7 @@ export const removePreviousCaches = async (prefix, allCaches: string[]) => {
 }
 
 export const getCacheName = (prefix, version) => `${prefix}-static-${version}`
+
+export const isDocumentRequest = (request: Request) => request.destination === 'document'
+
+export const isRequestHandledBySW = (request) => location.origin === (new URL(request.url)).origin

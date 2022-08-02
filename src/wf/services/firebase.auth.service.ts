@@ -1,16 +1,12 @@
-import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    updateProfile,
-    updateEmail,
-    sendPasswordResetEmail,
-    signOut,
-    updateCurrentUser
-} from 'firebase/auth'
+import * as FirebaseAuth from 'firebase/auth'
+import { 
+    initApp,
+    getApp
+} from '@wf/services/firebase.app.service'
 
 interface IUserProfile {
+    accessToken: string,
+    phoneNumber: string,
     displayName: string,
     photoURL: string
 }
@@ -29,98 +25,125 @@ interface IUserInfo {
     user: IUser
 }
 
-const auth = getAuth()
+let auth
 
-const createUser = async (email, password) => {
+const register = () => {
+    const app = getApp()
+    if (!app) throw 'firebase-app not initialized for firebase/auth'
+    auth = FirebaseAuth.getAuth()
+}
+
+const createUserWithEmailAndPassword = async (email, password) => {
     try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+        const userCredential = await FirebaseAuth.createUserWithEmailAndPassword(auth, email, password)
         const { user } = userCredential
         return { user } as IUserInfo
     } catch (err) {
-        return { err } as IError
+        const { code } = err
+        return { err: code } as IError
     }
 }
 
-const createUserWithoutLogin = async (email, password) => {
+const createUserWithEmailAndPasswordWithoutLogin = async (email, password) => {
     try {
         const currentUser = getCurrentUser()
-        const { user, err } = await createUser(email, password)
+        const { user, err } = await FirebaseAuth.createUserWithEmailAndPassword(email, password)
         if (err) throw err
-        await updateCurrentUser(currentUser)
+        await FirebaseAuth.updateCurrentUser(currentUser)
         return { user } as IUserInfo
     } catch (err) {
-        return { err } as IError
+        const { code } = err
+        return { err: code } as IError
     }
 }
 
-const signInUser = async (email, password) => {
+const signInWithEmailAndPassword = async (email, password) => {
     try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password)
+        const userCredential = await FirebaseAuth.signInWithEmailAndPassword(auth, email, password)
         const { user } = userCredential
         return { user } as IUserInfo
     } catch (err) {
-        return { err } as IError
+        const { code } = err
+        return { err: code } as IError
     }
 }
 
-const signOutUser = async () => {
+const signOut = async () => {
     try {
-        await signOut(auth)
+        await FirebaseAuth.signOut(auth)
         return 'sign out succesfully!'
     } catch (err) {
         return { err } as IError
     }
 }
 
-const subscribeAuthState = (callback) => onAuthStateChanged(auth, (user: IUser | null) => callback(user?.uid))
+const formatUser = (user: IUser | null) => {
+    if (!user) return user
+    const { uid, email, emailVerified, photoURL, displayName, phoneNumber, accessToken } = user
+    return { uid, email, emailVerified, photoURL, displayName, phoneNumber, accessToken } as IUser
+}
 
-const getCurrentUser = () => auth.currentUser as IUser
+const onAuthStateChanged = (callback) => FirebaseAuth.onAuthStateChanged(auth, (user: IUser | null) => callback(formatUser(user)))
 
-const updateUserProfile = async (data: IUserProfile) => {
+const getCurrentUser = () => formatUser(auth.currentUser as IUser)
+
+const updateProfile = async (data: IUserProfile) => {
     try {
-        await updateProfile(getCurrentUser(), data)
+        await FirebaseAuth.updateProfile(getCurrentUser(), data)
         return { user: getCurrentUser() } as IUserInfo
     } catch (err) {
         return { err } as IError
     }
 }
 
-const updateUserEmail = async (email: string) => {
+const updateEmail = async (email: string) => {
     try {
-        await updateEmail(getCurrentUser(), email)
+        await FirebaseAuth.updateEmail(getCurrentUser(), email)
         return { user: getCurrentUser() } as IUserInfo
     } catch (err) {
         return { err } as IError
     }
 }
 
-const requestPasswordResetEmail = async (email: string) => {
+const sendPasswordResetEmail = async (email: string) => {
     try {
-        await sendPasswordResetEmail(auth, email)
+        await FirebaseAuth.sendPasswordResetEmail(auth, email)
         return 'password reset email sent!'
     } catch (err) {
         return { err } as IError
     }
 }
 
-const checkPasswordResetCode = async (code: string) => {
+enum EErrorVerifyPasswordResetCode{
+    Expired = 'auth/expired-action-code',
+    Invalid = 'auth/invalid-action-code',
+    UserDisabled = 'auth/user-disabled',
+    UserNotFound = 'auth/user-not-found'
+}
+
+const verifyPasswordResetCode = async (code: string) => {
     try {
-        await verifyPasswordResetCode(code)
-        return 'password reset code verified successfully!'
+        const email = await FirebaseAuth.verifyPasswordResetCode(code)
+        const err = Object.values(EErrorVerifyPasswordResetCode).find((errCode) => errCode === email)
+        if (err) throw err
+        return email as String
     } catch (err) {
         return { err } as IError
     }
 }
 
 export default{
-    createUser,
-    createUserWithoutLogin,
-    signInUser,
-    signOutUser,
-    subscribeAuthState,
+    initApp,
+        
+    register,
+    createUserWithEmailAndPassword,
+    createUserWithEmailAndPasswordWithoutLogin,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
     getCurrentUser,
-    updateUserProfile,
-    updateUserEmail,
-    requestPasswordResetEmail,
-    checkPasswordResetCode
+    updateProfile,
+    updateEmail,
+    sendPasswordResetEmail,
+    verifyPasswordResetCode,
 }

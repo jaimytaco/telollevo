@@ -313,3 +313,15 @@ export const configSelectQuotationInQuotedOrder = async (wf) => {
         console.log('--- selectQuotationBtn =', selectQuotationBtn)
     })
 }
+
+export const configLogin = async (wf) => {
+    const loginForm = getDOMElement(document, '#login-form')
+    loginForm.onsubmit = async (e) => {
+        e.preventDefault()
+        const email = (getDOMElement(loginForm, '#login-email')).value
+        const password = (getDOMElement(loginForm, '#login-password')).value
+        
+        const x = await wf.auth.signInWithEmailAndPassword(email, password)
+        console.log('--- x =', x)
+    }  
+}

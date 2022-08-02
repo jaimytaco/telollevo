@@ -10,6 +10,9 @@ import {
 
 import {
     isNode,
+    isBrowser,
+    isServiceWorker,
+    isWorker,
     supportsWorkerType,
     supportsIndexedDB,
 } from '@wf/helpers/browser.helper'
@@ -21,6 +24,10 @@ import {
 import { 
     ADatabase 
 } from '@wf/actors/database.actor'
+
+import { 
+    AAuth 
+} from '@wf/actors/auth.actor'
 
 import WDatabase from '@wf/workers/database.worker?worker'
 
@@ -42,7 +49,7 @@ const formatDatabaseActor = () => {
     return ADatabase
 }
 
-const formatDB = (db) => {
+const formatforWorker = (db) => {
     if (isNode()) return db
     if (supportsWorkerType()) proxy(db)
     return db
@@ -50,21 +57,32 @@ const formatDB = (db) => {
 
 export const registerNetworkDB = async (networkDB: T, credentials) => {
     if (!wf?.database) wf.database = await formatDatabaseActor()
+    
+    const formattedDB = formatforWorker(networkDB)
+    if (!wf?.appInitialized) wf.appInitialized = await wf.database.initApp(formattedDB, credentials)
 
-    await wf.database.setNetworkDB(formatDB(networkDB))
-    wf.database.register({ mode: EDatabaseMode.Network, credentials })
+    await wf.database.setNetworkDB(formattedDB)
+    wf.database.register({ mode: EDatabaseMode.Network })
 }
 
 export const registerOfflineDB = async (offlineDB: T, prefix, loaders) => {
     if (!wf?.database) wf.database = await formatDatabaseActor()
 
-    await wf.database.setOfflineDB(formatDB(offlineDB))
+    await wf.database.setOfflineDB(formatforWorker(offlineDB))
     
     if (supportsIndexedDB()) {
         const { isOfflineFirst, isFirstLoad } = await wf.database.register({ mode: EDatabaseMode.Offline, prefix, loaders: Object.keys(loaders) })
         wf.isOfflineFirst = isOfflineFirst
         wf.isFirstLoad = isFirstLoad
     }
+}
+
+export const registerAuthenticator = async (authenticator: T, credentials) => {
+    if (!wf?.auth) wf.auth = AAuth
+    if (!wf?.appInitialized) wf.appInitialized = await wf.auth.initApp(credentials)
+    
+    await wf.auth.setAuthenticator(authenticator)
+    await wf.auth.register()
 }
 
 export const updateOfflineDB = async (loaders) => {
@@ -160,7 +178,24 @@ const isDynamicPathname = ({ ui, url, pattern }) => {
         .find(key => testPattern(url, new URLPattern({ pathname: ui[key].pattern })))
 }
 
-export const isHTMLURL = (url) => {
-    const { origin, pathname } = url
-    return location.origin === origin && (pathname.includes('.html') || !pathname.includes('.'))
+// export const isHTMLURL = (url) => {
+//     const { origin, pathname } = url
+//     return location.origin === origin && (pathname.includes('.html') || !pathname.includes('.'))
+// }
+
+export const pathnameRequiresAuth = ({ ui, url }) => {
+    const key = isDynamicPathname({ ui, url })
+    const el = key ? ui[key] : null
+    return el?.withAuth
+}
+
+export const logger = (msg, args) => {
+    let scope = '[]'
+    if (isNode()) scope = '[Node]'
+    if (isBrowser()) scope = '[Window]'
+    if (isWorker()) scope = '[Worker]'
+    if (isServiceWorker()) scope = '[ServiceWorker]'
+    
+    if (args) console.info(`${scope} ${msg}`, args)
+    else console.info(`${scope} ${msg}`)
 }

@@ -1,4 +1,4 @@
-export const DB_CREDENTIALS = {
+export const CREDENTIALS = {
     apiKey: "AIzaSyCTuRFw8EAuWbtzzx00flegmKU73wqyzdc",
     authDomain: "telollevo-e311e.firebaseapp.com",
     projectId: "telollevo-e311e",

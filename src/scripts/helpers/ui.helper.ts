@@ -7,6 +7,7 @@ import paths from '@data/admin/path.data.json' // TODO: Check if this is necessa
 
 import MOrders from '@models/order.model'
 import MFlights from '@models/flight.model'
+ 
 import CTable from '@components/table.component'
 
 const adminDialogs = (page) => {
