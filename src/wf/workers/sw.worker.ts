@@ -10,7 +10,9 @@ import {
     wf,
 
     registerAuthenticator,
-    logger,
+    getDynamicResponse,
+    isDynamicPathname,
+    updateOfflineTimestamp
 } from '@wf/lib.worker'
 
 import {
@@ -20,77 +22,109 @@ import {
     getCacheName,
     sendMessage,
     isDocumentRequest,
-    isRequestHandledBySW
+    isRequestHandledBySW,
+    offlineFirst,
 } from '@wf/helpers/sw.helper'
+
+import { logger } from '@wf/helpers/browser.helper'
 
 import networkDB from '@wf/services/firebase.firestore.service'
 import offlineDB from '@wf/services/indexedDb.service'
 
 import authenticator from '@wf/services/firebase.auth.service'
 
+import MUser from '@models/user.model'
+
 let userCredential
 
-const onInstall = async (e) => {
-    await registerNetworkDB(networkDB, CREDENTIALS)
-    await registerAuthenticator(authenticator, CREDENTIALS)
+const installHdlr = (e) => {
+    const fn = async () => {
+        logger(`Installing SW (v.${SW_VERSION})`)
 
-    wf.auth.onAuthStateChanged(async (credential) => {
-        userCredential = credential
-        const msg = credential ? 'User logged in:' : 'User logged out'
-        logger(msg, credential)
-    })
+        await registerNetworkDB(networkDB, CREDENTIALS)
+        await registerAuthenticator(authenticator, CREDENTIALS)
+        await registerOfflineDB(offlineDB, app.code, app.loaders)
 
-    const x =  typeof ServiceWorkerGlobalScope !== 'undefined'
-    console.log('x =', x)
+        wf.auth.onAuthStateChanged(async (credential) => {
+            userCredential = credential
+            const msg = credential ? 'User logged in:' : 'User logged out'
+            logger(msg, credential)
 
-    await registerOfflineDB(offlineDB, app.code, app.loaders)
-
-    cacheStatic(e, getCacheName(`sw-${app.code}`, SW_VERSION), app.sw.static)
-}
-
-const onFetch = (e) => {
-    let fetchResponse
-
-    e.waitUntil((async () => {
-        if (isDocumentRequest(e.request)) {
-            const url = new URL(e.request.url)
-            const doesPathnameRequiresAuth = pathnameRequiresAuth({ ui: app.ui, url })
-            const redirectForAuth = !userCredential && doesPathnameRequiresAuth
-
-            if (redirectForAuth) {
-                fetchResponse = Response.redirect('/login', 302)
-                return
+            // TODO: unregister/register user content in offline-DB
+            if (userCredential) {
+                // await MUser.installOnAuth(wf, userCredential.uid)
             }
+        })
 
-            console.log(`${e.request.url} updating cache`)
-            await updateOfflineDB(app.loaders)
-            await cacheDynamically({ ui: app.ui, cacheName: getCacheName(`sw-${app.code}`, SW_VERSION), url })
+        await cacheStatic(e, CACHE_NAME, app.sw.static)
 
-            fetchResponse = serveFromCache(e.request, getCacheName(`sw-${app.code}`, SW_VERSION))
+        logger(`Installed SW (v.${SW_VERSION})`)
+        skipWaiting()
+    }
+
+    e.waitUntil(fn())
+}
+
+const activateHdlr = async (e) => {
+    const fn = async () => {
+        logger(`Activating SW (v.${SW_VERSION})`)
+
+        removePreviousCaches(`sw-${app.code}`, [CACHE_NAME])
+
+        logger(`Activated SW (v.${SW_VERSION})`)
+
+        logger(`Claiming clients SW (v.${SW_VERSION})`)
+        await clients.claim()
+        logger(`Claimed clients SW (v.${SW_VERSION})`)
+    }
+
+    e.waitUntil(fn())
+}
+
+
+const fetchHdlr = (e) => {
+    const updateBeforeFetch = async (request) => {
+        const url = new URL(e.request.url)
+        const { ui } = app
+
+        if (!isDocumentRequest(request)) return
+
+        const dynamicKey = isDynamicPathname({ ui, url })
+        if (!dynamicKey) return
+
+        const { loader } = ui[dynamicKey]
+        if (!loader)
+            logger(`Module ${dynamicKey} has no loader function to work offline for ${e.request.url}`)
+        
+        const loaderStatus = await loader(wf)
+        if (loaderStatus?.err){
+            logger(`Error in loader for '${dynamicKey}' ~`, loaderStatus?.err)
+            // TODO: Indicate in someway that the document is rendered with data outdated
+            return
         }
-    })())
 
-    return fetchResponse || fetch(e.request)
+        const { response } = await getDynamicResponse({ ui, url, cacheName: CACHE_NAME })
+        if (!response){
+            logger(`Dynamic response for ${e.request.url} couldn't be built`)
+            return
+        }
+
+        const cache = await caches.open(CACHE_NAME)
+        await cache.put(new Request(url.pathname), response)
+        logger(`Dynamic response cached successfully`)
+    }
+
+    const fn = async () => {
+        await updateBeforeFetch(e.request)
+        return offlineFirst(e.request, CACHE_NAME)
+    }
+
+    if (isRequestHandledBySW(e.request)) e.respondWith(fn())
 }
 
-const onActivate = (e) => {
-    removePreviousCaches(`sw-${app.code}`, [getCacheName(`sw-${app.code}`, SW_VERSION)])
-}
+addEventListener('install', installHdlr)
+addEventListener('activate', activateHdlr)
+addEventListener('fetch', fetchHdlr)
 
-addEventListener('install', (e) => {
-    sendMessage({ msg: 'install' })
-    skipWaiting()
-    e.waitUntil(onInstall(e))
-})
-
-addEventListener('activate', (e) => {
-    sendMessage({ msg: 'activate' })
-    e.waitUntil(onActivate(e))
-    return self.clients.claim()
-})
-
-addEventListener('fetch', (e) => {
-    if (isRequestHandledBySW(e.request)) e.respondWith(onFetch(e))
-})
-
-export const SW_VERSION = 65
+export const SW_VERSION = 190
+const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)

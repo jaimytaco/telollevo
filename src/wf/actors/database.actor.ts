@@ -15,12 +15,12 @@ const setOfflineDB = (db: T) => OfflineDB = db
 
 const initApp = (db, credentials) => db.initApp(credentials)
 
-const register = async ({ mode, prefix, loaders }): Promise<void> | Promise<IOfflineDbInit> => {
+const register = async ({ mode, prefix, loaderKeys }): Promise<void> | Promise<IOfflineDbInit> => {
     if (mode === EDatabaseMode.Network) return NetworkDB.register()
-    if (mode === EDatabaseMode.Offline) return OfflineDB.register(prefix, loaders)
+    if (mode === EDatabaseMode.Offline) return OfflineDB.register(prefix, loaderKeys)
 }
 
-const getAll = (mode, collectionName, filters) => {
+const getAll = (mode, collectionName, filters?) => {
     if (isNode()) mode = EDatabaseMode.Network
     if (mode === EDatabaseMode.Network) return NetworkDB.getAll(collectionName, filters)
     if (mode === EDatabaseMode.Offline) return OfflineDB.getAll(collectionName, filters)
@@ -33,10 +33,12 @@ const add = (mode, collectionName: string, doc: T): Promise<T> => {
 
 const update = (mode, collectionName: string, doc: T): Promise<T> => {
     if (mode === EDatabaseMode.Network) return NetworkDB.update(collectionName, doc);
+    if (mode === EDatabaseMode.Offline) return OfflineDB.update(collectionName, doc);
 }
 
 const get = (mode, collectionName, id) => {
     if (mode === EDatabaseMode.Network) return NetworkDB.get(collectionName, id)
+    if (mode === EDatabaseMode.Offline) return OfflineDB.get(collectionName, id);
 }
 
 const ADatabaseMethods = {

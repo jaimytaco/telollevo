@@ -50,3 +50,14 @@ export const getWorkerPath = (fn: string) => {
     const WORKER_PREFIX = DEV ? '/src/scripts/workers/' : '/'
     return fn.split(WORKER_PREFIX)[1]?.split('",')?.[0]
 }
+
+export const logger = (msg, args) => {
+    let scope = '[]'
+    if (isNode()) scope = '[Node]'
+    if (isBrowser()) scope = '[Window]'
+    if (isWorker()) scope = '[Worker]'
+    if (isServiceWorker()) scope = '[ServiceWorker]'
+    
+    if (args) console.info(`${scope} ${msg}`, args)
+    else console.info(`${scope} ${msg}`)
+}

@@ -3,6 +3,8 @@ import { IOrder, EOrderStatus, EOrderSorters } from '@types/order.type'
 import { IQuotation } from '@types/quotation.type'
 import MQuotation from '@models/quotation.model'
 
+import { logger } from '@wf/helpers/browser.helper'
+
 const formatProductDetails = (order: IOrder) => {
     return `
         <div class="card-8 card-7-group" data-heading="Más detalles">
@@ -255,20 +257,60 @@ const toRow = (order: IOrder) => {
     }
 }
 
-const getAll = async (db, mode) => {
-    const responseOrders = await db.getAll(mode, 'orders')
-    if (responseOrders?.err) throw 'error querying orders in order-model'
+const getAllByShopperId = (wf, mode, isFormatted, shopperId, date?) => {
+    const { operator } = wf
+
+    const byShopper = {
+        field: 'shopperId',
+        operator: operator.EqualTo,
+        value: shopperId
+    }
+
+    const byRecent = {
+        field: 'updatedAt',
+        operator: operator.GreaterThanOrEqualTo,
+        value: date
+    }
+
+    const filters = date ? 
+        [byShopper, byRecent] :
+        [byShopper]
+
+    return getAll(wf, mode, isFormatted, filters)
+}
+
+const add = (wf, mode, order: IOrder) => {
+    const { database: db } = wf
+    return db.add(mode, 'orders', order)
+}
+
+const getAll = async (wf, mode, isFormatted: 'format' | 'raw', filters?) => {
+    const { database: db } = wf    
+    const responseOrders = await db.getAll(mode, 'orders', filters)
+    if (responseOrders?.err) {
+        const { err } = responseOrders
+        logger(err)
+        return { err }
+    }
+
     const orders = responseOrders.data as IOrder[]
 
-    const quotations = await MQuotation.getAll(db, mode)
+    const quotations = await MQuotation.getAll(wf, mode, isFormatted)
+    if (quotations?.err){
+        const { err } = quotations
+        logger(err)
+        return { err }
+    }
 
     const ordersWithQuotation = orders.map((order) => {
         order.quotations = quotations
             .filter((quotation) => quotation.orderId === order.id)
         return order
     })
-    
-    return ordersWithQuotation.map(format)
+
+    return isFormatted === 'raw' ? 
+        ordersWithQuotation :
+        ordersWithQuotation.map(format)
 }
 
 const format = (order: IOrder) => order
@@ -280,5 +322,8 @@ export default{
     EOrderSorters,
 
     format,
-    getAll
+    getAll,
+    add,
+
+    getAllByShopperId,
 }

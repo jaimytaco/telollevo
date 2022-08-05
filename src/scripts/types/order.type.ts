@@ -52,6 +52,8 @@ export interface IOrder{
     comments: string,
     shopperId: string,
     travelerId: string,
+    createdAt: Date,
+    updatedAt: Date,
 
     quotations?: IQuotation[],
 }

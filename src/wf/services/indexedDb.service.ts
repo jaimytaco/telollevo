@@ -33,11 +33,13 @@ const getObjetcStore = (transaction: IDBPTransaction<unknown, string[], 'version
     }
 }
 
-const openDatabase = (storeNames) => {
+const openDatabase = (storeNames: string[]) => {
     return openDB(getDBName(), 1, {
         upgrade(upgradeDb, oldVersion, newVersion, transaction) {
-            storeNames
-                .forEach(store => stores[store] = getObjetcStore(transaction, store))
+
+            storeNames.push('offline-timestamp')
+            for (const storeName of storeNames)
+                stores[storeName] = getObjetcStore(transaction, storeName)
 
             switch (oldVersion) {
                 case 0:
@@ -92,7 +94,7 @@ const getAll = async (collectionName, filters) => {
 const get = async (collectionName, id) => {
     if (!localDbPromise) throw 'offline DB not opened'
     const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
-    const data = query.get('by-id', id)
+    const data = await query.get(id)
     return { data }
 }
 
@@ -106,12 +108,13 @@ const add = async (collectionName: string, doc: T) => {
     return { data: doc }
 }
 
-const register = async (prefix, loaders): Promise<T> => {
+const update = add
+
+const register = async (prefix, loaderKeys): Promise<T> => {
     dbPrefix = `${prefix}-idb`
-    // storeNames = Object.keys(loaders)
     await clearPreviousDB()
     const isFirstLoad = !(await existDB(getDBName()))
-    localDbPromise = openDatabase(loaders)
+    localDbPromise = openDatabase(loaderKeys)
     const isOfflineFirst = typeof (await localDbPromise) !== 'undefined'
     return {
         isOfflineFirst,
@@ -130,5 +133,7 @@ const stores = {}
 export default {
     register,
     add,
-    getAll
+    update,
+    getAll,
+    get
 }

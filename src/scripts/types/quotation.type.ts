@@ -13,6 +13,7 @@ export interface IQuotation{
     coin: string,
     status: EQuotationStatus,  
     createdAt: Date,
+    updatedAt: Date,
 
     flight?: IFlight,
     priceStr?: string

@@ -19,6 +19,11 @@ const getViewIdByPathname = (builders: T, pathname: string) => {
 const getDynamicContent = ({ lib, builders, pathname, viewId }) => {
     if (!viewId) viewId = getViewIdByPathname(builders, pathname)
     return getViewContent(lib, builders, viewId)
+    // try{
+    //     return getViewContent(lib, builders, viewId)
+    // }catch(err){
+    //     return { err }
+    // }
 }
 
 export const AUI = {

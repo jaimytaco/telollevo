@@ -23,16 +23,16 @@ export const registerSW = async () => {
             }
         )
 
-        navigator.serviceWorker.addEventListener('message', ({ data }) => {
-            const message = data.msg
-            console.log(`FROM SW:`, message)
-        })
+        // navigator.serviceWorker.addEventListener('message', ({ data }) => {
+        //     const message = data.msg
+        //     console.log(`FROM SW:`, message)
+        // })
 
         if (registration.waiting && registration.active) {
             // The page has been loaded when there's already a waiting and active SW.
             // This would happen if skipWaiting() isn't being called, and there are
             // still old tabs open.
-            console.info('Please close all tabs to get updates.')
+            // console.info('Please close all tabs to get updates.')
         } else {
             // updatefound is also fired for the very first install. ¯\_(ツ)_/¯
             registration.addEventListener('updatefound', () => {
@@ -42,12 +42,12 @@ export const registerSW = async () => {
                             // If there's already an active SW, and skipWaiting() is not
                             // called in the SW, then the user needs to close all their
                             // tabs before they'll get updates.
-                            console.info('Please close all tabs to get updates.')
+                            // console.info('Please close all tabs to get updates.')
                         } else {
                             // Otherwise, this newly installed SW will soon become the
                             // active SW. Rather than explicitly wait for that to happen,
                             // just show the initial "content is cached" message.
-                            console.info('Content is cached for the first time!')
+                            // console.info('Content is cached for the first time!')
 
                             // // Force control of SW in initial state
                             // location.reload()

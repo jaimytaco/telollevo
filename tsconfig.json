@@ -25,6 +25,7 @@
         "@helpers/*": ["src/scripts/helpers/*"],
         "@types/*": ["src/scripts/types/*"],
         "@data/*": ["src/scripts/data/*"],
+        "@modules/*": ["src/scripts/modules/*"],
       }
     }
   }

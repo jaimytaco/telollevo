@@ -9,6 +9,7 @@ import {
     registerNetworkDB,
     wf
 } from '@wf/lib.worker'
+
 export const getStaticPaths = async () => {
     return paths
         .map((path) => ({
@@ -21,6 +22,7 @@ export const getStaticPaths = async () => {
             }
         }))
 }
+
 const { page } = Astro.params
 const { path } = Astro.props
 await registerNetworkDB(networkDB, CREDENTIALS)

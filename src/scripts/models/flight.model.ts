@@ -1,6 +1,9 @@
 import { IFlight, EFlightStatus } from '@types/flight.type'
 import { capitalizeString, formatLocaleDate } from '@helpers/util.helper'
 
+import { logger } from '@wf/helpers/browser.helper'
+
+
 const formatRowExtra = (flight: IFlight) => {
     return `
         <div id="te-${flight.id}" class="t-r-extra">
@@ -134,17 +137,33 @@ const toRow = (flight: IFlight) => {
     }
 }
 
-const get = async (db, mode, id) => {
+const get = async (wf, mode, id, isFormatted='format'|'raw') => {
+    const { database: db } = wf
     const responseFlight = await db.get(mode, 'flights', id)
-    if (responseFlight?.err) throw 'error querying flight in flight-model'
+    if (responseFlight?.err) {
+        const { err } = responseFlight
+        logger(err)
+        return { err }
+    }
     
-    return format(responseFlight.data as IFlight)
+    return isFormatted === 'raw' ?
+        responseFlight.data as IFlight :
+        format(responseFlight.data as IFlight)
 }
 
-const getAll = async (db, mode) => {
-    const responseFlight = await db.getAll(mode, 'flights')
-    if (responseFlight?.err) throw 'error quering flights in flight-model'
-    return (responseFlight.data as IFlight[]).map(format)
+const getAll = async (wf, mode, isFormatted='format'|'raw', filters?) => {
+    const { database: db } = wf
+    const responseFlight = await db.getAll(mode, 'flights', filters)
+    if (responseFlight?.err) {
+        logger(responseFlight?.err)
+        const { err } = responseFlight
+        logger(err)
+        return { err }
+    }
+
+    return isFormatted === 'raw' ?
+        responseFlight.data as IFlight[] :
+        (responseFlight.data as IFlight[]).map(format)
 }
 
 const format = (flight: IFlight) => {

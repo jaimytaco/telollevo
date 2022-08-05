@@ -10,12 +10,14 @@ import {
 
 import {
     isNode,
-    isBrowser,
     isServiceWorker,
-    isWorker,
     supportsWorkerType,
     supportsIndexedDB,
 } from '@wf/helpers/browser.helper'
+
+import {  
+    serveFromCache 
+} from '@wf/helpers/sw.helper'
 
 import { 
     AUI 
@@ -71,7 +73,7 @@ export const registerOfflineDB = async (offlineDB: T, prefix, loaders) => {
     await wf.database.setOfflineDB(formatforWorker(offlineDB))
     
     if (supportsIndexedDB()) {
-        const { isOfflineFirst, isFirstLoad } = await wf.database.register({ mode: EDatabaseMode.Offline, prefix, loaders: Object.keys(loaders) })
+        const { isOfflineFirst, isFirstLoad } = await wf.database.register({ mode: EDatabaseMode.Offline, prefix, loaderKeys: Object.keys(loaders) })
         wf.isOfflineFirst = isOfflineFirst
         wf.isFirstLoad = isFirstLoad
     }
@@ -85,6 +87,7 @@ export const registerAuthenticator = async (authenticator: T, credentials) => {
     await wf.auth.register()
 }
 
+// TODO: Delete this method
 export const updateOfflineDB = async (loaders) => {
     if (!wf?.database) throw 'database actor not registered'
     if (wf?.isOfflineFirst && wf?.isFirstLoad) console.info('Populating DB for the first time')
@@ -108,17 +111,24 @@ export const updateOfflineDB = async (loaders) => {
     await Promise.all(promises)
 }
 
-export const getContent = async ({ ui, pathname, viewId }) => {
-    return AUI.getDynamicContent({ lib: wf, builders: ui, pathname, viewId })
-}
+export const getContent = async ({ ui, pathname, viewId }) => AUI.getDynamicContent({ lib: wf, builders: ui, pathname, viewId })
 
-export const getHTML = async ({ ui, pathname, viewId }) => {
+export const getHTML = async ({ ui, pathname, viewId, cacheName }) => {
     const { content, err } = await getContent({ ui, pathname, viewId })
     if (err) return { err }
 
-    const layoutResponse = await fetch(getLayoutPathname())
-    const layoutText = await layoutResponse.text()
+    const request = new Request(getLayoutPathname())
+    const layoutFetchPromise = isServiceWorker() ? 
+        serveFromCache(request, cacheName) :
+        fetch(request)
+    
+    const layoutResponse = await layoutFetchPromise
+    if (layoutFetchPromise.err) return { err: layoutFetchPromise.err }
+    
+    const { response } = layoutResponse
 
+    const layoutText = await (response ?? layoutResponse).text()
+    
     const html = layoutText
         .replace(getTitleTag(), content.head.title)
         .replace(getMetaTag(), content.head.meta)
@@ -127,15 +137,28 @@ export const getHTML = async ({ ui, pathname, viewId }) => {
     return { html }
 }
 
+export const getDynamicResponse = async ({ ui, url, cacheName }) => {
+    const { pathname } = url
+    const { html, err } = await getHTML({ ui, pathname, cacheName })
+    if (err) return { err }
+
+    return {
+        response: new Response(html, {
+            headers: { 'Content-Type': 'text/html; charset=utf-8' }
+        })
+    }
+}
+
 export const cacheDynamically = async ({ ui, cacheName, url, pattern }) => {
     const { pathname } = url
     const isDynamic = isDynamicPathname({ ui, url, pattern })
     if (!isDynamic) return
+    
     const { html, err } = await getHTML({ ui, pathname })
     if (err) return { err }
 
     const cache = await caches.open(cacheName)
-    return cache.put(new Request(pathname), new Response(html, {
+    await cache.put(new Request(pathname), new Response(html, {
         headers: { 'Content-Type': 'text/html; charset=utf-8' }
     }))
 }
@@ -172,7 +195,7 @@ export const getBodyTag = () => '<!-- [BODY] -->'
 // const testPattern = (url, pattern) => (new URLPattern({ pathname: pattern })).test(url.href)
 const testPattern = (url, pattern) => pattern.test(url.href)
 
-const isDynamicPathname = ({ ui, url, pattern }) => {
+export const isDynamicPathname = ({ ui, url, pattern }) => {
     if (pattern) return testPattern(url, pattern)
     return Object.keys(ui)
         .find(key => testPattern(url, new URLPattern({ pathname: ui[key].pattern })))
@@ -189,13 +212,11 @@ export const pathnameRequiresAuth = ({ ui, url }) => {
     return el?.withAuth
 }
 
-export const logger = (msg, args) => {
-    let scope = '[]'
-    if (isNode()) scope = '[Node]'
-    if (isBrowser()) scope = '[Window]'
-    if (isWorker()) scope = '[Worker]'
-    if (isServiceWorker()) scope = '[ServiceWorker]'
-    
-    if (args) console.info(`${scope} ${msg}`, args)
-    else console.info(`${scope} ${msg}`)
+export const getOfflineTimestamp = async (id) => (await wf.database.get(wf.mode.Offline, 'offline-timestamp', id))?.data?.at
+
+export const updateOfflineTimestamp = (id, date: Date) => {
+    return wf.database.update(wf.mode.Offline, 'offline-timestamp', {
+        id,
+        at: date
+    })
 }

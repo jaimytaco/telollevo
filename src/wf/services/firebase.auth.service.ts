@@ -133,8 +133,7 @@ const verifyPasswordResetCode = async (code: string) => {
 }
 
 export default{
-    initApp,
-        
+    initApp, 
     register,
     createUserWithEmailAndPassword,
     createUserWithEmailAndPasswordWithoutLogin,

@@ -1,3 +1,7 @@
+import {
+    logger
+} from '@wf/helpers/browser.helper'
+
 export const cacheStatic = async (e, cacheName, staticPaths) => {
     try {
         const cache = await caches.open(cacheName)
@@ -29,9 +33,9 @@ export const serveFromCache = async (request, cacheName) => {
             sendMessage({msg: `from cache: ${getPathnameFromRequest(request)}`})
         }
 
-        return response
+        return { response }
     } catch (err) {
-        console.error(err)
+       return { err }
     }
 }
 
@@ -57,3 +61,27 @@ export const getCacheName = (prefix, version) => `${prefix}-static-${version}`
 export const isDocumentRequest = (request: Request) => request.destination === 'document'
 
 export const isRequestHandledBySW = (request) => location.origin === (new URL(request.url)).origin
+
+export const offlineFirst = async (request, cacheName) => {
+    const { response: offlineResponse } = await serveFromCache(request, cacheName)
+    if (offlineResponse) {
+        logger(`Request fetched from cache for ${request.url}`)
+        return offlineResponse
+    }
+
+    const failResponse = new Response(null, { status: 404 })
+
+    try {
+        const networkResponse = await fetch(request)
+        if (networkResponse && networkResponse.ok) {
+            logger(`Request fetched from network for ${request.url}`)
+            return networkResponse
+        }
+
+        logger(`Request couldn't be fetched from network for ${request.url}`)
+        return failResponse
+    } catch (err) {
+        logger(`Error catched while fetching from network for ${request.url}`)
+        return failResponse
+    }
+}
