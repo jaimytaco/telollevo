@@ -126,5 +126,5 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 190
+export const SW_VERSION = 194
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)

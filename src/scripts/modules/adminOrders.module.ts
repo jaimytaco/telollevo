@@ -1,6 +1,7 @@
 import MOrder from '@models/order.model'
 import MQuotation from '@models/quotation.model'
 import { IOrder } from '@types/order.type'
+import { EFormat } from '@types/util.type'
 import { IQuotation } from '@types/quotation.type'
 import { 
     logger,
@@ -22,7 +23,7 @@ const loader = async (wf) => {
     const lastUpdate = await getOfflineTimestamp('orders')
     const { uid: userId } = await auth.getCurrentUser()
 
-    const orders = await MOrder.getAllByShopperId(wf, mode.Network, 'raw', userId, lastUpdate) as IOrder[]
+    const orders = await MOrder.getAllByShopperId(wf, mode.Network, EFormat.Raw, userId, lastUpdate) as IOrder[]
     
     if (orders?.err){
         const { err } = orders
@@ -44,7 +45,7 @@ const loader = async (wf) => {
     await updateOfflineTimestamp('orders', new Date())
 
     const quotationsByOrder = await Promise.all(
-        orders.map((order) => MQuotation.getAllByOrderId(wf, mode.Network, 'raw', order.id))
+        orders.map((order) => MQuotation.getAllByOrderId(wf, mode.Network, EFormat.Raw, order.id))
     )
 
     for (const quotations of quotationsByOrder){
@@ -76,7 +77,7 @@ const builder = async (wf) => {
             body: `${createOrder_dialog}`
         }
 
-    const orders = await MOrder.getAll(wf, wf.mode.Offline, 'format')
+    const orders = await MOrder.getAll(wf, wf.mode.Offline, EFormat.Pretty)
     if (orders?.err){
         logger(orders.err)
         return { err: orders.err }

@@ -16,3 +16,9 @@ export enum ECountry{
     Peru = 'Peru',
     Ecuador = 'Ecuador'
 }
+
+export enum EFormat{
+    Raw = 'raw',
+    Related = 'related',
+    Pretty = 'pretty'
+}

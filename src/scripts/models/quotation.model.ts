@@ -1,4 +1,5 @@
 import { IQuotation } from '@types/quotation.type'
+import { EFormat } from '@types/util.type'
 import { formatLocaleDate } from '@helpers/util.helper'
 import MFlight from '@models/flight.model'
 import { ECoin } from '@types/util.type'
@@ -6,7 +7,7 @@ import { ECoin } from '@types/util.type'
 import { logger } from '@wf/helpers/browser.helper'
 
 
-const getAllByOrderId = async (wf, mode, isFormatted, orderId) => {
+const getAllByOrderId = async (wf, mode, isFormatted: EFormat, orderId) => {
     const { operator } = wf
 
     const byOrder = {
@@ -25,7 +26,7 @@ const add = (wf, mode, quotation: IQuotation) => {
     return db.add(mode, 'quotations', quotation)
 }
 
-const getAll = async (wf, mode, isFormatted: 'format'|'raw', filters?) => {
+const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     const { database: db } = wf
     const responseQuotations = await db.getAll(mode, 'quotations', filters)
     if (responseQuotations?.err) {
@@ -33,15 +34,17 @@ const getAll = async (wf, mode, isFormatted: 'format'|'raw', filters?) => {
         logger(err)
         return { err }
     }
+
+    const quotations = responseQuotations.data as IQuotation[]
+    if (isFormatted === EFormat.Raw) return quotations
     
-    for (const quotationData of responseQuotations.data){
-        quotationData.flight = await MFlight.get(wf, mode, quotationData.flightId, isFormatted)
+    for (const quotation of quotations){
+        quotation.flight = await MFlight.get(wf, mode, quotation.flightId, isFormatted)
     }
 
-    return isFormatted === 'raw' ? 
-        responseQuotations.data as IQuotation[] :
-        (responseQuotations.data as IQuotation[])
-            .map((quotation) => format(quotation))
+    return isFormatted === EFormat.Related ? 
+        quotations :
+        quotations.map(format)
 }
 
 const format = (quotation: IQuotation) => {

@@ -1,4 +1,5 @@
 import { IFlight, EFlightStatus } from '@types/flight.type'
+import { EFormat } from '@types/util.type'
 import { capitalizeString, formatLocaleDate } from '@helpers/util.helper'
 
 import { logger } from '@wf/helpers/browser.helper'
@@ -137,7 +138,7 @@ const toRow = (flight: IFlight) => {
     }
 }
 
-const get = async (wf, mode, id, isFormatted='format'|'raw') => {
+const get = async (wf, mode, id, isFormatted: EFormat) => {
     const { database: db } = wf
     const responseFlight = await db.get(mode, 'flights', id)
     if (responseFlight?.err) {
@@ -145,13 +146,16 @@ const get = async (wf, mode, id, isFormatted='format'|'raw') => {
         logger(err)
         return { err }
     }
+
+    const flight = responseFlight.data as IFlight
+    if (isFormatted === EFormat.Raw) return flight
     
-    return isFormatted === 'raw' ?
-        responseFlight.data as IFlight :
-        format(responseFlight.data as IFlight)
+    return isFormatted === EFormat.Related ?
+        flight :
+        format(flight)
 }
 
-const getAll = async (wf, mode, isFormatted='format'|'raw', filters?) => {
+const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     const { database: db } = wf
     const responseFlight = await db.getAll(mode, 'flights', filters)
     if (responseFlight?.err) {
@@ -161,9 +165,12 @@ const getAll = async (wf, mode, isFormatted='format'|'raw', filters?) => {
         return { err }
     }
 
-    return isFormatted === 'raw' ?
-        responseFlight.data as IFlight[] :
-        (responseFlight.data as IFlight[]).map(format)
+    const flights = responseFlight.data as IFlight[]
+    if (isFormatted === EFormat.Raw) return flights
+
+    return isFormatted === EFormat.Related ?
+        flights :
+        flights.map(format)
 }
 
 const format = (flight: IFlight) => {

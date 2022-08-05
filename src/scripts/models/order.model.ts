@@ -1,5 +1,6 @@
 import { capitalizeString } from '@helpers/util.helper'
 import { IOrder, EOrderStatus, EOrderSorters } from '@types/order.type'
+import { EFormat } from '@types/util.type'
 import { IQuotation } from '@types/quotation.type'
 import MQuotation from '@models/quotation.model'
 
@@ -257,7 +258,7 @@ const toRow = (order: IOrder) => {
     }
 }
 
-const getAllByShopperId = (wf, mode, isFormatted, shopperId, date?) => {
+const getAllByShopperId = (wf, mode, isFormatted: EFormat, shopperId, date?) => {
     const { operator } = wf
 
     const byShopper = {
@@ -284,7 +285,7 @@ const add = (wf, mode, order: IOrder) => {
     return db.add(mode, 'orders', order)
 }
 
-const getAll = async (wf, mode, isFormatted: 'format' | 'raw', filters?) => {
+const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     const { database: db } = wf    
     const responseOrders = await db.getAll(mode, 'orders', filters)
     if (responseOrders?.err) {
@@ -294,6 +295,8 @@ const getAll = async (wf, mode, isFormatted: 'format' | 'raw', filters?) => {
     }
 
     const orders = responseOrders.data as IOrder[]
+    console.log('--- orders =', orders)
+    if (isFormatted === EFormat.Raw) return orders
 
     const quotations = await MQuotation.getAll(wf, mode, isFormatted)
     if (quotations?.err){
@@ -308,7 +311,7 @@ const getAll = async (wf, mode, isFormatted: 'format' | 'raw', filters?) => {
         return order
     })
 
-    return isFormatted === 'raw' ? 
+    return isFormatted === EFormat.Related ? 
         ordersWithQuotation :
         ordersWithQuotation.map(format)
 }
