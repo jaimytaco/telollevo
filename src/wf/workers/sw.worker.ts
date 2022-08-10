@@ -6,7 +6,7 @@ import {
     registerOfflineDB,
     updateOfflineDB,
     cacheDynamically,
-    pathnameRequiresAuth,
+    routeRequiresAuth,
     wf,
 
     registerAuthenticator,
@@ -108,10 +108,10 @@ const updateBeforeFetch = async (request) => {
 
     const loaderStatus = await Promise.any([
         loader(wf),
-        (async (ms: number, pathname) => {
+        (async (ms: number, url) => {
             await delay(ms)
-            return { err: `Loader for ${dynamicKey} not finished in ${ms}ms` }
-        })(MAX_LOADER_MS, ui[dynamicKey].pathname)
+            return { err: `Loader for ${url} not finished in ${ms}ms` }
+        })(MAX_LOADER_MS, url)
     ])
 
     if (loaderStatus?.err) {
@@ -119,6 +119,11 @@ const updateBeforeFetch = async (request) => {
         logger(err, loaderStatus.err)
         // TODO: Indicate in someway that the document is rendered with data outdated
         return { err: `${err} ${loaderStatus.err}`}
+    }
+
+    if (!loaderStatus?.done){
+        logger(`Loader skipped for ${url}`)
+        return
     }
 
     const { response } = await buildDynamicResponse({ ui, url, cacheName: CACHE_NAME })
@@ -130,14 +135,24 @@ const updateBeforeFetch = async (request) => {
 
     const cache = await caches.open(CACHE_NAME)
     await cache.put(new Request(url), response)
+
     logger(`Dynamic response cached successfully for ${url}`)
 }
 
 const fetchHdlr = (e) => {
     const fn = async () => {
         if (isDocumentRequest(e.request)) {
-            const updateBeforeFetchPromise = updateBeforeFetch(e.request)
             const url = new URL(e.request.url)
+
+            const redirectForAuth = !userCredential && routeRequiresAuth({ ui: app.ui, url })
+            if (redirectForAuth){
+                logger('Redirecting to login because user is not authenticated')
+                // TODO: Clear cached routes that need authentication
+                return Response.redirect('/login', 302)
+            }
+
+            const updateBeforeFetchPromise = updateBeforeFetch(e.request)
+            
             const prefetchStatus = await Promise.any([
                 updateBeforeFetchPromise,
                 (async (ms, url) => {
@@ -146,8 +161,9 @@ const fetchHdlr = (e) => {
                 })(MAX_FETCH_MS, url)
             ])
 
-            prefetchStatus?.err ? logger(prefetchStatus?.err) : logger(`Fetch for ${url.pathname} is up to date!`)
+            prefetchStatus?.err ? logger(prefetchStatus?.err) : logger(`Fetch for ${url} is up to date!`)
         }
+
         return offlineFirst(e.request, CACHE_NAME)
     }
 
@@ -158,7 +174,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 229
+export const SW_VERSION = 234
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000
 const MAX_FETCH_MS = 1500

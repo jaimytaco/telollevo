@@ -32,15 +32,17 @@ const loader = async (wf) => {
     }
 
     if (!orders.length){
-        logger('orders not cached offline for admin-orders')
+        logger('There is no orders to cache offline for admin-orders')
         return
     }
 
-    logger(`orders to cache offline for admin-orders: `, orders)
+    logger(`Orders to cache offline for admin-orders: `, orders)
+    
     await Promise.all(
         orders.map((order) => MOrder.add(wf, mode.Offline, order))
     )
-    logger('orders cached offline succesfully')
+
+    logger('All orders cached offline succesfully')
 
     await updateOfflineTimestamp('orders', new Date())
 
@@ -57,14 +59,19 @@ const loader = async (wf) => {
     }
 
     const allQuotations = quotationsByOrder.flat(1)
-    logger(`quotations to cache offline for admin-orders: `, allQuotations)
+
+    logger(`All quotations to cache offline for admin-orders: `, allQuotations)
+    
     await Promise.all(
         allQuotations
             .map((quotation) => MQuotation.add(wf, mode.Offline, quotation))
     )
-    logger('quotations cached offline succesfully')
+
+    logger('All quotations cached offline succesfully')
 
     await updateOfflineTimestamp('quotations', new Date())
+    
+    return { done: 1 }
 }
 
 const builder = async (wf) => {

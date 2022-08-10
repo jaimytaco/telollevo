@@ -205,7 +205,7 @@ export const isDynamicPathname = ({ ui, url, pattern }) => {
 //     return location.origin === origin && (pathname.includes('.html') || !pathname.includes('.'))
 // }
 
-export const pathnameRequiresAuth = ({ ui, url }) => {
+export const routeRequiresAuth = ({ ui, url }) => {
     const key = isDynamicPathname({ ui, url })
     const el = key ? ui[key] : null
     return el?.withAuth
