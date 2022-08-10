@@ -10,7 +10,7 @@ import {
     wf,
 
     registerAuthenticator,
-    getDynamicResponse,
+    buildDynamicResponse,
     isDynamicPathname,
     updateOfflineTimestamp
 } from '@wf/lib.worker'
@@ -37,6 +37,14 @@ import MUser from '@models/user.model'
 
 let userCredential
 
+const prefetchDynamicRoutes = (ui) => Promise.all(
+    Object.keys(ui)
+        .map((key) => {
+            logger(`Prefetching for ${ui[key].pathname}`)
+            return updateBeforeFetch(new Request(ui[key].pathname))
+        })
+)
+
 const installHdlr = (e) => {
     const fn = async () => {
         logger(`Installing SW (v.${SW_VERSION})`)
@@ -44,6 +52,7 @@ const installHdlr = (e) => {
         await registerNetworkDB(networkDB, CREDENTIALS)
         await registerAuthenticator(authenticator, CREDENTIALS)
         await registerOfflineDB(offlineDB, app.code, app.loaders)
+        await cacheStatic(e, CACHE_NAME, app.sw.static)
 
         wf.auth.onAuthStateChanged(async (credential) => {
             userCredential = credential
@@ -53,12 +62,12 @@ const installHdlr = (e) => {
             // TODO: unregister/register user content in offline-DB
             if (userCredential) {
                 // await MUser.installOnAuth(wf, userCredential.uid)
+                await prefetchDynamicRoutes(app.ui)
             }
         })
 
-        await cacheStatic(e, CACHE_NAME, app.sw.static)
-
         logger(`Installed SW (v.${SW_VERSION})`)
+
         skipWaiting()
     }
 
@@ -81,41 +90,64 @@ const activateHdlr = async (e) => {
     e.waitUntil(fn())
 }
 
+const delay = (ms) => new Promise((resolve) => setTimeout(() => resolve(), ms))
 
-const fetchHdlr = (e) => {
-    const updateBeforeFetch = async (request) => {
-        const url = new URL(e.request.url)
-        const { ui } = app
+const updateBeforeFetch = async (request) => {
+    const url = new URL(request.url)
+    const { ui } = app
 
-        if (!isDocumentRequest(request)) return
+    const dynamicKey = isDynamicPathname({ ui, url })
+    if (!dynamicKey) return
 
-        const dynamicKey = isDynamicPathname({ ui, url })
-        if (!dynamicKey) return
-
-        const { loader } = ui[dynamicKey]
-        if (!loader)
-            logger(`Module ${dynamicKey} has no loader function to work offline for ${e.request.url}`)
-        
-        const loaderStatus = await loader(wf)
-        if (loaderStatus?.err){
-            logger(`Error in loader for '${dynamicKey}' ~`, loaderStatus?.err)
-            // TODO: Indicate in someway that the document is rendered with data outdated
-            return
-        }
-
-        const { response } = await getDynamicResponse({ ui, url, cacheName: CACHE_NAME })
-        if (!response){
-            logger(`Dynamic response for ${e.request.url} couldn't be built`)
-            return
-        }
-
-        const cache = await caches.open(CACHE_NAME)
-        await cache.put(new Request(url.pathname), response)
-        logger(`Dynamic response cached successfully`)
+    const { loader } = ui[dynamicKey]
+    if (!loader) {
+        const err = `Module ${dynamicKey} has no loader function to work offline for ${url}`
+        logger(err)
+        return { err }
     }
 
+    const loaderStatus = await Promise.any([
+        loader(wf),
+        (async (ms: number, pathname) => {
+            await delay(ms)
+            return { err: `Loader for ${dynamicKey} not finished in ${ms}ms` }
+        })(MAX_LOADER_MS, ui[dynamicKey].pathname)
+    ])
+
+    if (loaderStatus?.err) {
+        const err = `Error in loader for ${url} ~` 
+        logger(err, loaderStatus.err)
+        // TODO: Indicate in someway that the document is rendered with data outdated
+        return { err: `${err} ${loaderStatus.err}`}
+    }
+
+    const { response } = await buildDynamicResponse({ ui, url, cacheName: CACHE_NAME })
+    if (!response) {
+        const err = `Dynamic response for ${url} couldn't be built`
+        logger(err)
+        return { err }
+    }
+
+    const cache = await caches.open(CACHE_NAME)
+    await cache.put(new Request(url), response)
+    logger(`Dynamic response cached successfully for ${url}`)
+}
+
+const fetchHdlr = (e) => {
     const fn = async () => {
-        await updateBeforeFetch(e.request)
+        if (isDocumentRequest(e.request)) {
+            const updateBeforeFetchPromise = updateBeforeFetch(e.request)
+            const url = new URL(e.request.url)
+            const prefetchStatus = await Promise.any([
+                updateBeforeFetchPromise,
+                (async (ms, url) => {
+                    await delay(ms)
+                    return { err: `Fetch for ${url} took more than ${ms}ms. Content updated will be ready for next fetch` }
+                })(MAX_FETCH_MS, url)
+            ])
+
+            prefetchStatus?.err ? logger(prefetchStatus?.err) : logger(`Fetch for ${url.pathname} is up to date!`)
+        }
         return offlineFirst(e.request, CACHE_NAME)
     }
 
@@ -126,5 +158,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 194
+export const SW_VERSION = 229
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
+const MAX_LOADER_MS = 3000
+const MAX_FETCH_MS = 1500

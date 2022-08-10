@@ -60,7 +60,7 @@ export const initApp = async () => {
     const { SW_VERSION } = await import('@wf/workers/sw.worker') // Hack to generate sw.worker.js file
     const { registerSW } = await import('@wf/actors/pwa.actor')
 
-    registerSW()
+    registerSW(app.ui)
 
     const { 
         configCreateOrderDialog,

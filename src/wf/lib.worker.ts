@@ -123,11 +123,10 @@ export const getHTML = async ({ ui, pathname, viewId, cacheName }) => {
         fetch(request)
     
     const layoutResponse = await layoutFetchPromise
-    if (layoutFetchPromise.err) return { err: layoutFetchPromise.err }
+    if (layoutResponse.err) return { err: layoutResponse.err }
     
     const { response } = layoutResponse
-
-    const layoutText = await (response ?? layoutResponse).text()
+    const layoutText = await (response || layoutResponse).text()
     
     const html = layoutText
         .replace(getTitleTag(), content.head.title)
@@ -137,7 +136,7 @@ export const getHTML = async ({ ui, pathname, viewId, cacheName }) => {
     return { html }
 }
 
-export const getDynamicResponse = async ({ ui, url, cacheName }) => {
+export const buildDynamicResponse = async ({ ui, url, cacheName }) => {
     const { pathname } = url
     const { html, err } = await getHTML({ ui, pathname, cacheName })
     if (err) return { err }

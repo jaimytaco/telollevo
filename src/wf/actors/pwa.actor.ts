@@ -3,7 +3,7 @@ import {
 } from '@wf/helpers/browser.helper'
 
 // Taken from https://stackoverflow.com/questions/37573482/to-check-if-serviceworker-is-in-waiting-state
-export const registerSW = async () => {
+export const registerSW = async (ui) => {
     const { DEV } = import.meta.env
     if (DEV) return
 
@@ -24,8 +24,14 @@ export const registerSW = async () => {
         )
 
         // navigator.serviceWorker.addEventListener('message', ({ data }) => {
+        //     console.log('--- data =', data)
+            
         //     const message = data.msg
-        //     console.log(`FROM SW:`, message)
+
+        //     if (message === 'START_PREFETCH'){
+        //         const keys = Object.keys(ui)
+        //         keys.map((key) => fetch(ui[key].pathname))
+        //     }
         // })
 
         if (registration.waiting && registration.active) {

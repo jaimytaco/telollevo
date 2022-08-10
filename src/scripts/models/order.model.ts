@@ -295,7 +295,6 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     }
 
     const orders = responseOrders.data as IOrder[]
-    console.log('--- orders =', orders)
     if (isFormatted === EFormat.Raw) return orders
 
     const quotations = await MQuotation.getAll(wf, mode, isFormatted)

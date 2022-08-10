@@ -29,9 +29,9 @@ export const serveFromCache = async (request, cacheName) => {
         const cache = await caches.open(cacheName)
         const response = await cache.match(request, { ignoreSearch: true })
 
-        if (response) {
-            sendMessage({msg: `from cache: ${getPathnameFromRequest(request)}`})
-        }
+        // if (response) {
+        //     sendMessage({msg: `from cache: ${getPathnameFromRequest(request)}`})
+        // }
 
         return { response }
     } catch (err) {
@@ -39,7 +39,7 @@ export const serveFromCache = async (request, cacheName) => {
     }
 }
 
-export const sendMessage = async message => {
+export const sendMessage = async (message) => {
     const clients = await self.clients.matchAll({
         includeUncontrolled: true,
     })
