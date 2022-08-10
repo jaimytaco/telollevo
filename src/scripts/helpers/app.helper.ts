@@ -35,6 +35,7 @@ export const app = {
     loaders: {
         'orders': () => {},
         'quotations': () => {},
+        'users': () => {},
     },
     sw: {
         cache: {

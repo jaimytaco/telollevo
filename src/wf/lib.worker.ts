@@ -123,7 +123,8 @@ export const getHTML = async ({ ui, pathname, viewId, cacheName }) => {
         fetch(request)
     
     const layoutResponse = await layoutFetchPromise
-    if (layoutResponse.err) return { err: layoutResponse.err }
+    if (!layoutResponse) return { err: layoutResponse }
+    if (layoutResponse?.err) return { err: layoutResponse.err }
     
     const { response } = layoutResponse
     const layoutText = await (response || layoutResponse).text()

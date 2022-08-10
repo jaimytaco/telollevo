@@ -1,37 +1,49 @@
 import { IOrder } from '@types/order.type'
 import MOrder from '@models/order.model'
+import { EFormat } from '@types/util.type'
 
 import { logger } from '@wf/helpers/browser.helper'
+import {
+    getOfflineTimestamp,
+    updateOfflineTimestamp
+} from '@wf/lib.worker'
 
 interface IUser{
     id: string,
     email: string,
     name: string,
     lastName: string,
+    createdAt: Date,
+    updatedAt: Date,
 }
 
-const installOnAuth = async (wf, userId) => {
-    const { mode, operator } = wf
-    const orders = await MOrder.getAll(wf, mode.Network, 'raw', [{
-        field: 'shopperId',
-        operator: operator.EqualTo,
-        value: userId
-    }]) as IOrder[]
+const install = async (wf, id) => {
+    const lastUpdate = await getOfflineTimestamp('users')
+    
+    const user = await get(wf, wf.mode.Network, id, EFormat.Raw)
+    await add(wf, wf.mode.Offline, user)
+    
+    logger(`User ${user} installed successfully`)
 
-    await Promise.all(
-        orders.map((order) => MOrder.add(wf, mode.Offline, order))
-    )
+    await updateOfflineTimestamp('users', new Date())
 }
 
-const get = async (wf, mode, id) => {
+const add = (wf, mode, user: IUser) => {
+    const { database: db } = wf
+    return db.add(mode, 'users', user)
+}
+
+const get = async (wf, mode, id, isFormatted: EFormat) => {
+    const { database: db } = wf
     const responseUser = await db.get(mode, 'users', id)
     if (responseUser?.err) {
         const { err } = responseUser
         logger(err)
         return { err }
     }
-    
-    return format(responseUser.data as IUser)
+
+    const user = responseUser.data as IUser
+    return mode === EFormat.Pretty ? format(user) : user
 }
 
 const format = (user: IUser) => user
@@ -39,7 +51,9 @@ const format = (user: IUser) => user
 export default{
     collection: 'users',
     
-    installOnAuth,
-    get,
     format,
+    get,
+    add,
+
+    install,
 }

@@ -28,10 +28,6 @@
       ],
       "rewrites": [
         {
-          "source": "/blank",
-          "destination": "/blank.html"
-        },
-        {
           "source": "/traveler",
           "destination": "/traveler.html"
         },
@@ -40,12 +36,24 @@
           "destination": "/shopper.html"
         },
         {
-          "source": "/pedidos",
-          "destination": "/admin-orders.html"
+          "source": "/login",
+          "destination": "/login.html"
         },
         {
-          "source": "/ordenes",
-          "destination": "/admin-services.html"
+          "source": "/404",
+          "destination": "/404.html"
+        },
+        {
+          "source": "/admin/layout ",
+          "destination": "/admin/layout.html"
+        },
+        {
+          "source": "/admin/orders",
+          "destination": "/admin/orders.html"
+        },
+        {
+          "source": "/admin/flights",
+          "destination": "/admin/flights.html"
         }
       ]
     }

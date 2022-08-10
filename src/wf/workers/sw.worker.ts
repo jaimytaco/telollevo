@@ -41,7 +41,7 @@ const prefetchDynamicRoutes = (ui) => Promise.all(
     Object.keys(ui)
         .map((key) => {
             logger(`Prefetching for ${ui[key].pathname}`)
-            return updateBeforeFetch(new Request(ui[key].pathname))
+            return prefetchRequest(new Request(ui[key].pathname))
         })
 )
 
@@ -59,10 +59,12 @@ const installHdlr = (e) => {
             const msg = credential ? 'User logged in:' : 'User logged out'
             logger(msg, credential)
 
-            // TODO: unregister/register user content in offline-DB
             if (userCredential) {
-                // await MUser.installOnAuth(wf, userCredential.uid)
+                const userId = userCredential.uid
+                const user = await MUser.install(wf, userId)
                 await prefetchDynamicRoutes(app.ui)
+            }else{
+                 // TODO: unregister user content in offline-DB
             }
         })
 
@@ -92,7 +94,7 @@ const activateHdlr = async (e) => {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(() => resolve(), ms))
 
-const updateBeforeFetch = async (request) => {
+const prefetchRequest = async (request) => {
     const url = new URL(request.url)
     const { ui } = app
 
@@ -151,10 +153,10 @@ const fetchHdlr = (e) => {
                 return Response.redirect('/login', 302)
             }
 
-            const updateBeforeFetchPromise = updateBeforeFetch(e.request)
+            const prefetchRequestPromise = prefetchRequest(e.request)
             
             const prefetchStatus = await Promise.any([
-                updateBeforeFetchPromise,
+                prefetchRequestPromise,
                 (async (ms, url) => {
                     await delay(ms)
                     return { err: `Fetch for ${url} took more than ${ms}ms. Content updated will be ready for next fetch` }
@@ -174,7 +176,8 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 234
+export const SW_VERSION = 240
+
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000
 const MAX_FETCH_MS = 1500
