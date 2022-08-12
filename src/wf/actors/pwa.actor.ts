@@ -24,8 +24,6 @@ export const registerSW = async (ui) => {
         )
 
         // navigator.serviceWorker.addEventListener('message', ({ data }) => {
-        //     console.log('--- data =', data)
-            
         //     const message = data.msg
 
         //     if (message === 'START_PREFETCH'){

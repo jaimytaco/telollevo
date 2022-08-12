@@ -1,5 +1,6 @@
 import { IOrder } from '@types/order.type'
 import MOrder from '@models/order.model'
+import { EUserType } from '@types/user.type'
 import { EFormat } from '@types/util.type'
 
 import { logger } from '@wf/helpers/browser.helper'
@@ -15,7 +16,14 @@ interface IUser{
     lastName: string,
     createdAt: Date,
     updatedAt: Date,
+    type: EUserType
 }
+
+const getType = (user: IUserType) => `${user.type}`
+
+const getFullName = (user: IUser) => `${user.name} ${user.lastName}`
+
+const getAcronym = (user: IUser) => `${user.name.charAt(0)}${user.lastName.charAt(0)}`
 
 const install = async (wf, id) => {
     const lastUpdate = await getOfflineTimestamp('users')
@@ -23,7 +31,7 @@ const install = async (wf, id) => {
     const user = await get(wf, wf.mode.Network, id, EFormat.Raw)
     await add(wf, wf.mode.Offline, user)
     
-    logger(`User ${user} installed successfully`)
+    logger(`User installed successfully!`, user)
 
     await updateOfflineTimestamp('users', new Date())
 }
@@ -56,4 +64,7 @@ export default{
     add,
 
     install,
+    getAcronym,
+    getFullName,
+    getType,
 }

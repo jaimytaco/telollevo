@@ -5,16 +5,13 @@ import {
 export const cacheStatic = async (e, cacheName, staticPaths) => {
     try {
         const cache = await caches.open(cacheName)
-        
         for(const path of staticPaths){
             try{
                 await cache.addAll([path])
-                // console.info(`${path} is cached`)
             }catch(err){
-                console.log(err)
+                logger(`Request failed while caching statically for ${path}`)
             } 
         }
-        // cache.addAll(staticPaths)   
     } catch (err) {
         console.error(err)
     }

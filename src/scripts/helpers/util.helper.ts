@@ -321,7 +321,8 @@ export const configLogin = async (wf) => {
         const email = (getDOMElement(loginForm, '#login-email')).value
         const password = (getDOMElement(loginForm, '#login-password')).value
         
-        const x = await wf.auth.signInWithEmailAndPassword(email, password)
-        console.log('--- x =', x)
+        const userCredential = await wf.auth.signInWithEmailAndPassword(email, password)
+        
+        // TODO: UI animations according to userCredential
     }  
 }

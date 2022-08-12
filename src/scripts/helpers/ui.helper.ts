@@ -5,8 +5,9 @@ import { createOrder_dialog, createFlight_dialog } from '@data/admin/dialog.data
 
 import paths from '@data/admin/path.data.json' // TODO: Check if this is necessary
 
-import MOrders from '@models/order.model'
-import MFlights from '@models/flight.model'
+import MUser from '@models/user.model'
+import MOrder from '@models/order.model'
+import MFlight from '@models/flight.model'
  
 import CTable from '@components/table.component'
 
@@ -26,7 +27,7 @@ const adminDialogs = (page) => {
     }
 }
 
-export const adminHeader = (actions, currentPage, currentNamePlural) => {
+export const adminHeader = (user, actions, currentPage, currentNamePlural) => {
     return `
         <header>
             <nav class="n-top-1">
@@ -53,16 +54,16 @@ export const adminHeader = (actions, currentPage, currentNamePlural) => {
                     -->
                     <div class="split-btn">
                         <span class="sp-popup-trigger btn btn-auth" tabindex="-1">
-                            <span>FD</span>
+                            <span>${MUser.getAcronym(user)}</span>
                             <!--
                             <picture>
                                 <img src="/img/icon/user.svg" width="20" height="20">
                             </picture>
                             -->
                             <!-- <span>
-                                Fabián Delgado
+                                ${MUser.getFullName(user)}
                                 <br>
-                                <small>Técnico</small>
+                                <small>${MUser.getType(user)}</small>
                             </span> -->
                             <ul class="sp-popup">
                                 <li>
@@ -96,63 +97,6 @@ export const adminHeader = (actions, currentPage, currentNamePlural) => {
     `
 }
 
-export const adminOrders = async (wf) => {
-    try{
-        if (isNode()) return {
-            head: { 
-                title: '', 
-                meta: '' 
-            },
-            body: `${adminDialogs('admin-orders')}`
-        }
-
-        // TODO: get orders from local DB
-        const orders = await MOrders.getAll(wf, wf.mode.Network, 'format')
-        
-        const rows = orders.map(MOrders.toRow)
-
-        const allStatus = Object.values(MOrders.EOrderStatus).map((status) => capitalizeString(status)) 
-        const filters = [...allStatus]
-
-        const allSorters = Object.values(MOrders.EOrderSorters)
-        const sorters = [...allSorters]
-
-        const tableHTML = CTable.render('Pedidos', rows, filters, sorters)
-
-        const title = `${app.name} | Pedidos`
-        const meta = `
-            <meta name="description" content="DESCRIPTION">
-            <meta property="og:url" content="OG_URL">
-            <meta property="og:type" content="OG_TYPE">
-        `
-        const body = `
-            ${
-                adminHeader(`
-                    <div class="n-t-actions-2">
-                        <button class="btn btn-secondary btn-sm" data-create-order-dialog_btn>
-                            <picture>
-                                <img src="/img/icon/plus-light.svg" width="14" height="14">
-                            </picture>
-                            <span>Registrar pedido</span>
-                        </button>
-                    </div>
-                `, 'orders', 'órdenes')
-            }
-            <main>
-                ${tableHTML}
-            </main>
-            ${adminDialogs('admin-orders')}
-        `
-
-        return {
-            head: { title, meta },
-            body
-        }
-    } catch(err){
-        logger(err)
-    }
-}
-
 export const adminFlights = async (wf) => {
     try{
         if (isNode()) return {
@@ -164,9 +108,9 @@ export const adminFlights = async (wf) => {
         }
 
         // TODO: get orders from local DB
-        const flights = await MFlights.getAll(wf, wf.mode.Network, 'format')
+        const flights = await MFlight.getAll(wf, wf.mode.Network, 'format')
 
-        const rows = flights.map(MFlights.toRow)
+        const rows = flights.map(MFlight.toRow)
 
         // TODO: complete filters and sorters for admin-flights
         const filters = []

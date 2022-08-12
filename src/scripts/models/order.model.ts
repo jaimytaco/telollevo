@@ -298,6 +298,7 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     if (isFormatted === EFormat.Raw) return orders
 
     const quotations = await MQuotation.getAll(wf, mode, isFormatted)
+
     if (quotations?.err){
         const { err } = quotations
         logger(err)

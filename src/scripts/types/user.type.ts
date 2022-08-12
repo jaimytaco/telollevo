@@ -1,7 +1,8 @@
 export enum EUserType{
-    Buyer = 'comprador',
+    Shopper = 'comprador',
     Traveler = 'viajero',
-    Admin = 'admin'
+    Admin = 'admin',
+    Multiple = 'viajero / comprador',
 }
 
 export interface IUser{

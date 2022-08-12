@@ -9,5 +9,6 @@ export enum EOperator{
     EqualTo = '==',
     GreaterThan = '>',
     GreaterThanOrEqualTo = '>=',
-    NotEqualTo = '!='
+    NotEqualTo = '!=',
+    ArrayContains = 'array-contains',
 }

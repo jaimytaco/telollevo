@@ -138,6 +138,12 @@ const toRow = (flight: IFlight) => {
     }
 }
 
+const getAllByIds = async (wf, mode, ids: string[], isFormatted: EFormat) => {
+    return Promise.all(
+        ids.map((id) => get(wf, mode, id, isFormatted))
+    )
+}
+
 const get = async (wf, mode, id, isFormatted: EFormat) => {
     const { database: db } = wf
     const responseFlight = await db.get(mode, 'flights', id)
@@ -155,6 +161,11 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
         format(flight)
 }
 
+const add = (wf, mode, flight: IFlight) => {
+    const { database: db } = wf
+    return db.add(mode, 'flights', flight)
+}
+
 const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     const { database: db } = wf
     const responseFlight = await db.getAll(mode, 'flights', filters)
@@ -166,6 +177,7 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     }
 
     const flights = responseFlight.data as IFlight[]
+
     if (isFormatted === EFormat.Raw) return flights
 
     return isFormatted === EFormat.Related ?
@@ -186,5 +198,8 @@ export default{
 
     format,
     get,
-    getAll
+    getAll,
+    add,
+
+    getAllByIds,
 }

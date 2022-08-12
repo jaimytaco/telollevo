@@ -44,7 +44,7 @@
           "destination": "/404.html"
         },
         {
-          "source": "/admin/layout ",
+          "source": "/admin/layout",
           "destination": "/admin/layout.html"
         },
         {

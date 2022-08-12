@@ -35,15 +35,18 @@ import WDatabase from '@wf/workers/database.worker?worker'
 
 interface IWF{
     mode: T
-    operator: S
+    operator: T
     isOfflineFirst: boolean
-    isFirstLoad: boolean
+    isFirstLoad: boolean,
+    app: T
 }
 
 export const wf: IWF = {
     mode: EDatabaseMode,
     operator: EOperator
 }
+
+export const registerApp = (app: T) => !wf?.app ? wf.app = app : null
 
 const formatDatabaseActor = () => {
     if (isNode()) return ADatabase

@@ -1,7 +1,6 @@
-import {
-    adminOrders,
-    adminFlights,
-} from '@helpers/ui.helper'
+// import {
+//     adminFlights,
+// } from '@helpers/ui.helper'
 
 import {
     fonts,
@@ -11,7 +10,8 @@ import {
     routes,
 } from '@helpers/sw.helper'
 
-import ModAdminOrders from '@modules/adminOrders.module'
+import ModAdminOrders from '@modules/admin/orders.module'
+import ModAdminFlights from '@modules/admin/flights.module'
 
 
 export const app = {
@@ -20,22 +20,23 @@ export const app = {
     ui: {
         'admin-orders': {
             pathname: '/admin/orders',
-            builder: adminOrders,
-            // builder: ModAdminOrders.builder,
+            builder: ModAdminOrders.builder,
             pattern: '/admin/orders{/}?',
             withAuth: true,
             loader: ModAdminOrders.loader,
         },
-        'admin-flights': {
-            pathname: '/admin/flights',
-            builder: adminFlights,
-            pattern: '/admin/flights{/}?',
-        }
+        // 'admin-flights': {
+        //     pathname: '/admin/flights',
+        //     builder: ModAdminFlights.builder,
+        //     pattern: '/admin/flights{/}?',
+        //     withAuth: true,
+        // },
     },
     loaders: {
         'orders': () => {},
         'quotations': () => {},
         'users': () => {},
+        'flights': () => {},
     },
     sw: {
         cache: {

@@ -12,7 +12,8 @@ import {
     registerAuthenticator,
     buildDynamicResponse,
     isDynamicPathname,
-    updateOfflineTimestamp
+    updateOfflineTimestamp,
+    registerApp,
 } from '@wf/lib.worker'
 
 import {
@@ -49,6 +50,7 @@ const installHdlr = (e) => {
     const fn = async () => {
         logger(`Installing SW (v.${SW_VERSION})`)
 
+        registerApp(app)
         await registerNetworkDB(networkDB, CREDENTIALS)
         await registerAuthenticator(authenticator, CREDENTIALS)
         await registerOfflineDB(offlineDB, app.code, app.loaders)
@@ -124,7 +126,7 @@ const prefetchRequest = async (request) => {
     }
 
     if (!loaderStatus?.done){
-        logger(`Loader skipped for ${url}`)
+        logger(`Building dynamic response skipped for ${url}`)
         return
     }
 
@@ -176,7 +178,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 240
+export const SW_VERSION = 280
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000
