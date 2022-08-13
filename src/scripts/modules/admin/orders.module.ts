@@ -125,17 +125,6 @@ const builder = async (wf) => {
     const allSorters = Object.values(MOrder.EOrderSorters)
     const sorters = [...allSorters]
 
-    const tableHTML = CTable.render('Pedidos', rows, filters, sorters)
-
-    const title = `${wf.app.name} | Pedidos`
-
-    // TODO: Define meta tags for admin-orders
-    const meta = `
-        <meta name="description" content="DESCRIPTION">
-        <meta property="og:url" content="OG_URL">
-        <meta property="og:type" content="OG_TYPE">
-    `
-
     const body = `
         ${adminHeader(
         user,
@@ -151,13 +140,16 @@ const builder = async (wf) => {
             `, 'orders', 'órdenes')
         }
         <main>
-            ${tableHTML}
+            ${CTable.render('Pedidos', rows, filters, sorters)}
         </main>
         ${createOrder_dialog}
     `
 
     return {
-        head: { title, meta },
+        head: { 
+            title: `${wf.app.name} | Pedidos`, 
+            meta: '' 
+        },
         body
     }
 }
