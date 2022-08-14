@@ -147,7 +147,6 @@ const fetchHdlr = (e) => {
     const fn = async () => {
         if (isDocumentRequest(e.request)) {
             const url = new URL(e.request.url)
-
             const redirectForAuth = !userCredential && routeRequiresAuth({ ui: app.ui, url })
             if (redirectForAuth){
                 logger('Redirecting to login because user is not authenticated')
@@ -178,7 +177,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 280
+export const SW_VERSION = 290
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000

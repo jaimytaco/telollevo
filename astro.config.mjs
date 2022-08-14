@@ -6,6 +6,24 @@ export default defineConfig({
         format: 'file'
     },
     vite: {
-        
-    }
+        build: {
+            minify: false,
+            rollupOptions: {
+                output: {
+                    entryFileNames: '[name].js',
+                    chunkFileNames: '[name].js',
+                    assetFileNames: '[name].[hash][extname]',
+                },
+            },
+        },
+        // worker: {
+        //     rollupOptions: {
+        //         output: {
+        //             entryFileNames: '[name].js',
+        //             chunkFileNames: '[name].js',
+        //             assetFileNames: '[name].[extname]',
+        //         },
+        //     },
+        // },
+    },
 })

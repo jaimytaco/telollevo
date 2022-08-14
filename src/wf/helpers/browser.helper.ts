@@ -51,7 +51,7 @@ export const getWorkerPath = (fn: string) => {
     return fn.split(WORKER_PREFIX)[1]?.split('",')?.[0]
 }
 
-export const logger = (msg, args) => {
+export const logger = async (msg, args) => {
     let scope = '[]'
     if (isNode()) scope = '[Node]'
     if (isBrowser()) scope = '[Window]'

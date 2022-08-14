@@ -39,7 +39,7 @@ export const images = [
 ]
 
 export const scripts = [
-    '/assets/database.worker.e598fa4f.js',
+    '/assets/database.worker.js',
     '/app.helper.js',
     '/card8.component.js',
     '/database.enum.js',
@@ -50,6 +50,7 @@ export const scripts = [
     '/firebase.firestore.service.js',
     '/hoisted.js',
     '/hoisted2.js',
+    '/hoisted3.js',
     '/index.js',
     '/indexedDb.service.js',
     '/lib.worker.js',
@@ -57,9 +58,11 @@ export const scripts = [
 ]
 
 export const styles = [
-    '/assets/15cc6cf6.97ba0eff.css',
-    '/assets/89589b7d.c3f18d79.css',
-    '/assets/a92a9221.dca49c66.css',
+    // '/assets/15cc6cf6.97ba0eff.css',
+    // '/assets/89589b7d.c3f18d79.css',
+    // '/assets/a92a9221.dca49c66.css',
+    '/admin-_...8f95c4be.css',
+    '/admin-_...e7d06624.css',
 ]
 
 export const routes = [

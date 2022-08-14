@@ -13,6 +13,38 @@ import {
 import ModAdminOrders from '@modules/admin/orders.module'
 import ModAdminFlights from '@modules/admin/flights.module'
 
+// import MOrder from '@models/order.model'
+// import MFlight from '@models/flight.model'
+// import MQuotation from '@models/quotation.model'
+// import MUser from '@models/user.model'
+
+// const x = {
+//     name: '',
+//     code: '',
+//     version: 1,
+//     routes: {
+//         static: [
+//             ...fonts,
+//             ...images,
+//             ...scripts,
+//             ...styles,
+//             ...routes,
+//         ],
+//         '/admin/orders': {
+//             code: 'admin-orders',
+//             pattern: '/admin/orders{/}?',
+//             builder: ModAdminOrders.builder,
+//             loader: ModAdminOrders.loader,
+//             withAuth: true,
+//         }
+//     },
+//     models: [
+//         MOrder.collection,
+//         MFlight.collection,
+//         MQuotation.collection,
+//         MUser.collection,
+//     ]
+// }
 
 export const app = {
     name: 'Te lo llevo',
@@ -59,10 +91,10 @@ export const initApp = async () => {
     const { default: CCard8 } = await import('@components/card8.component')
     const { getDOMElement } = await import('@helpers/util.helper')
 
-    const { SW_VERSION } = await import('@wf/workers/sw.worker') // Hack to generate sw.worker.js file
+    const { SW_VERSION } = await import('@scripts/workers/sw.worker') // Hack to generate sw.worker.js file
     const { registerSW } = await import('@wf/actors/pwa.actor')
 
-    registerSW(app.ui)
+    registerSW()
 
     const { 
         configCreateOrderDialog,
@@ -75,6 +107,7 @@ export const initApp = async () => {
     } = await import('@helpers/util.helper')
 
     const { 
+        registerApp,
         registerNetworkDB,
         registerOfflineDB,
         registerAuthenticator,
@@ -86,6 +119,7 @@ export const initApp = async () => {
     const { default: networkDB } = await import('@wf/services/firebase.firestore.service')
     const { default: offlineDB } = await import('@wf/services/indexedDb.service')
 
+    registerApp(app)
     await registerNetworkDB(networkDB, CREDENTIALS)
     await registerOfflineDB(offlineDB, app.code, app.loaders)
 
