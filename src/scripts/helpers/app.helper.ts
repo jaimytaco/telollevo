@@ -1,7 +1,3 @@
-// import {
-//     adminFlights,
-// } from '@helpers/ui.helper'
-
 import {
     fonts,
     images,

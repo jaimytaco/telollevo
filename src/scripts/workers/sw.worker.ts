@@ -147,6 +147,11 @@ const fetchHdlr = (e) => {
     const fn = async () => {
         if (isDocumentRequest(e.request)) {
             const url = new URL(e.request.url)
+            if (url.pathname.endsWith('/')){
+                logger('Redirecting to same pathname without /')
+                return Response.redirect(url.pathname.slice(0, -1), 302)
+            }
+
             const redirectForAuth = !userCredential && routeRequiresAuth({ ui: app.ui, url })
             if (redirectForAuth){
                 logger('Redirecting to login because user is not authenticated')
@@ -164,7 +169,7 @@ const fetchHdlr = (e) => {
                 })(MAX_FETCH_MS, url)
             ])
 
-            prefetchStatus?.err ? logger(prefetchStatus?.err) : logger(`Fetch for ${url} is up to date!`)
+            prefetchStatus?.err ? logger(prefetchStatus.err) : logger(`Fetch for ${url} is up to date!`)
         }
 
         return offlineFirst(e.request, CACHE_NAME)
@@ -177,7 +182,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 290
+export const SW_VERSION = 291
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000
