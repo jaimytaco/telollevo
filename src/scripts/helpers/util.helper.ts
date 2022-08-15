@@ -1,3 +1,5 @@
+import { logger } from '@wf/helpers/browser.helper'
+
 export const isValidString = (s) => s && typeof s === 'string' && s.length > 0
 
 export const isBoolean = (boolean) => typeof boolean === 'boolean'
@@ -30,7 +32,12 @@ export const getBodyPage = () => document.body.getAttribute('data-page')
 
 export const getDOMElement = (parent, query, mode: 'all' | undefined) => { 
     const el = parent[`querySelector${mode ? 'All' : ''}`](query)
-    if (!el) throw `'${query}' query not found in '${parent.id || parent.className}' parent element` 
+    // if (!el) throw `'${query}' query not found in '${parent.id || parent.className}' parent element` 
+    if (!el){
+        logger(`'${query}' query not found in '${parent.id || parent.className}' parent element`)
+        return
+    }
+    
     return mode ? [...el] : el
 }
 

@@ -13,6 +13,7 @@ import {
     EOrderSorters,
     EOrderFields,
     ESanitizeOrderErrors,
+    EOrderShippers,
 } from '@types/order.type'
 
 import {
@@ -335,8 +336,8 @@ const format = (order: IOrder) => order
 const sanitize = (order: IOrder) => {
     const { product } = order as IProduct
 
-    // Sanitize for step-1
     if (product) {
+        // Sanitize for step-1
         if (product.name && !isValidString(product.name))
             return {
                 err: {
@@ -391,8 +392,34 @@ const sanitize = (order: IOrder) => {
                     desc: ESanitizeOrderErrors.ProductCoin
                 }
             }
+
+        // Sanitize for step-2
+        if (!isBoolean(product.weightMore5kg))
+            return {
+                err: {
+                    field: EOrderFields.ProductWeightMore5kg,
+                    desc: ESanitizeOrderErrors.ProductWeightMore5kg
+                }
+            }
+
+        if (product.isTaller50cm && !isBoolean(product.isTaller50cm))
+            return {
+                err: {
+                    field: EOrderFields.ProductIsTaller50cm,
+                    desc: ESanitizeOrderErrors.ProductIsTaller50cm
+                }
+            }
+
+        if (product.isOneUnitPerProduct && !isBoolean(product.isOneUnitPerProduct))
+            return {
+                err: {
+                    field: EOrderFields.ProductIsOneUnitPerProduct,
+                    desc: ESanitizeOrderErrors.ProductIsOneUnitPerProduct
+                }
+            }
     }
 
+    // Sanitize for step-1
     if (order.status && !Object.values(EOrderStatus).includes(order.status))
         return {
             err: {
@@ -400,41 +427,14 @@ const sanitize = (order: IOrder) => {
             }
         }
 
-
-    // // Sanitize for step-2
-    // if (product) {
-    //     if (!isBoolean(product.weightMore5kg))
-    //         return {
-    //             err: {
-    //                 field: EOrderFields.ProductWeightMore5kg,
-    //                 desc: ESanitizeOrderErrors.ProductWeightMore5kg
-    //             }
-    //         }
-
-    //     if (!isBoolean(product.isTaller50cm))
-    //         return {
-    //             err: {
-    //                 field: EOrderFields.ProductIsTaller50cm,
-    //                 desc: ESanitizeOrderErrors.ProductIsTaller50cm
-    //             }
-    //         }
-
-    //     if (!isBoolean(product.isOneUnitPerProduct))
-    //         return {
-    //             err: {
-    //                 field: EOrderFields.ProductIsOneUnitPerProduct,
-    //                 desc: ESanitizeOrderErrors.ProductIsOneUnitPerProduct
-    //             }
-    //         }
-    // }
-
-    // if (!isBoolean(order.shipper))
-    //     return {
-    //         err: {
-    //             field: EOrderFields.Shipper,
-    //             desc: ESanitizeOrderErrors.Shipper
-    //         }
-    //     }
+    // Sanitize for step-2
+    if (order.shipper && !Object.values(EOrderShippers).includes(order.shipper))
+        return {
+            err: {
+                field: EOrderFields.Shipper,
+                desc: ESanitizeOrderErrors.Shipper
+            }
+        }
 }
 
 export default {

@@ -20,13 +20,14 @@ import { capitalizeString } from '@helpers/util.helper'
 import CTable from '@components/table.component'
 import { adminHeader } from '@helpers/ui.helper'
 
+
 const configCreateOrderDialog = async (wf, dialogId) => {
     const { getDOMElement } = await import('@helpers/util.helper')
     const { default: CForm } = await import('@components/form.component')
     const { ECoin, EShippingDestination } = await import('@types/util.type')
     const { EOrderStatus, EOrderShoppers, EOrderFields } = await import('@types/order.type')
     const { logger } = await import('@wf/helpers/browser.helper')
-    
+
     const dialog = getDOMElement(document, `#${dialogId}`)
 
     const step1Form = getDOMElement(dialog, '#create-order-step-1_form')
@@ -89,11 +90,13 @@ const configCreateOrderDialog = async (wf, dialogId) => {
                 return
             }
 
-            const invalidFieldset = getDOMElement(step1Form,`#${field}`).parentNode 
-            CForm.handleInvalid('add', desc, invalidFieldset)
-            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-            logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
-            return
+            const invalidFieldset = getDOMElement(step1Form,`#${field}`)?.parentNode 
+            if (invalidFieldset){
+                CForm.handleInvalid('add', desc, invalidFieldset)
+                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
+                return
+            }
         }
 
         logger('create-order-dialog step-1 with order:', order)
@@ -116,6 +119,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
             if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
             return
         }
+        step2Form.requestSubmit()
     }
 
     step2Form.onsubmit = (e) => {
@@ -149,11 +153,13 @@ const configCreateOrderDialog = async (wf, dialogId) => {
                 return
             }
 
-            const invalidFieldset = getDOMElement(step2Form,`#${field}`).parentNode 
-            CForm.handleInvalid('add', desc, invalidFieldset)
-            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-            logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
-            return
+            const invalidFieldset = getDOMElement(step2Form,`#${field}`)?.parentNode 
+            if (invalidFieldset){
+                CForm.handleInvalid('add', desc, invalidFieldset)
+                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
+                return
+            }
         }
 
         logger('create-order-dialog step-2 with order:', order)
