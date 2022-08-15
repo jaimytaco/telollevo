@@ -1,6 +1,6 @@
-import { EProductCategory } from '@data/admin/productCategory.data'
-import { EOrderShippers, EOrderShoppers } from '@types/order.type'
-import { EShippingDestination, ECountry } from '@types/util.type'
+import { EProductCategory } from '@types/product.type'
+import { EOrderShippers, EOrderShoppers, EOrderFields } from '@types/order.type'
+import { EShippingDestination, ECountry, ECoin, EOrderProductQty } from '@types/util.type'
 
 import { capitalizeString } from '@helpers/util.helper'
 
@@ -23,17 +23,17 @@ export const createOrder_dialog = `
             </header>
             <main>
                 <fieldset>
-                    <label for="product-link">Link del producto</label>
-                    <input type="text" placeholder="Ingresa el link del producto" id="product-link">
+                    <label for="${EOrderFields.ProductUrl}">Link del producto</label>
+                    <input type="text" placeholder="Ingresa el link del producto" id="${EOrderFields.ProductUrl}" required>
                 </fieldset>
                 <fieldset>
-                    <label for="product-name">Nombre del producto</label>
-                    <input type="text" placeholder="Ingresa el nombre del producto" id="product-name">
+                    <label for="${EOrderFields.ProductName}">Nombre del producto</label>
+                    <input type="text" placeholder="Ingresa el nombre del producto" id="${EOrderFields.ProductName}" required>
                 </fieldset>
                 <fieldset>
-                    <label for="product-category">Categoría</label>
-                    <input list="product-category" placeholder="Selecciona una categoría">
-                    <datalist id="product-category">
+                    <label for="${EOrderFields.ProductCategory}">Categoría</label>
+                    <input list="${EOrderFields.ProductCategory}" placeholder="Selecciona una categoría" required>
+                    <datalist id="${EOrderFields.ProductCategory}">
                         ${
                             Object.values(EProductCategory)
                                 .map((value) => `<option value="${value}"></option>`)
@@ -42,20 +42,28 @@ export const createOrder_dialog = `
                     </datalist>
                 </fieldset>
                 <fieldset class="fs-sm">
-                    <label for="product-pu">Valor unitario</label>
-                    <input type="number" placeholder="0.00" id="product-pu">
+                    <label for="${EOrderFields.ProductPrice}">
+                        Valor unitario
+                        <br>
+                        <small>(en ${ECoin.USD.code})</small>
+                    </label>
+                    <input type="number" placeholder="0.00" id="${EOrderFields.ProductPrice}" required>
                 </fieldset>
                 <fieldset class="fs-sm">
-                    <label for="product-qty">Cantidad</label>
-                    <input type="number" placeholder="0" id="product-qty">
+                    <label for="product-qty">
+                        Cantidad
+                        <br>
+                        <small>(mínimo ${EOrderProductQty.Min} unidad)</small>
+                    </label>
+                    <input type="number" placeholder="0" id="product-qty" min=${EOrderProductQty.Min} required>
                 </fieldset>
                 <fieldset>
                     <legend>¿Necesitas la caja del producto?</legend>
-                    <input type="radio" name="product-need-box" value="yes" id="product-need-box_yes">
-                    <label for="product-need-box_yes" class="btn">Sí</label>
+                    <input type="radio" name="${EOrderFields.ProductIsBoxIncluded}" value="yes" id="${EOrderFields.ProductIsBoxIncluded}_yes" required>
+                    <label for="${EOrderFields.ProductIsBoxIncluded}_yes" class="btn">Sí</label>
 
-                    <input type="radio" name="product-need-box" value="no" id="product-need-box_no" checked>
-                    <label for="product-need-box_no" class="btn">No</label>
+                    <input type="radio" name="${EOrderFields.ProductIsBoxIncluded}" value="no" id="${EOrderFields.ProductIsBoxIncluded}_no" checked required>
+                    <label for="${EOrderFields.ProductIsBoxIncluded}_no" class="btn">No</label>
                 </fieldset>
             </main>
             <footer>

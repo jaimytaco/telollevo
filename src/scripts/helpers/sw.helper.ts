@@ -60,11 +60,9 @@ export const scripts = [
 ]
 
 export const styles = [
-    // '/assets/15cc6cf6.97ba0eff.css',
-    // '/assets/89589b7d.c3f18d79.css',
-    // '/assets/a92a9221.dca49c66.css',
-    '/admin-_...8f95c4be.css',
-    '/admin-_...e7d06624.css',
+    '/admin-_...css',
+    '/index-shopper-traveler.css',
+    '/login.css',
 ]
 
 export const routes = [

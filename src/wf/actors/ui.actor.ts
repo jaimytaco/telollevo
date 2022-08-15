@@ -10,22 +10,7 @@ const getViewContent = async (lib: T, builders: T, viewId: string) => {
     }
 }
 
-const getViewIdByPathname = (builders: T, pathname: string) => {
-    const keys = Object.keys(builders)
-    for (const key of keys) if (builders[key].pathname === pathname) return key
-    return null
-}
-
-
-// TODO: Remove this method
-// const getDynamicContent = ({ lib, builders, pathname, viewId }) => {
-//     if (!viewId) viewId = getViewIdByPathname(builders, pathname)
-//     return getViewContent(lib, builders, viewId)
-// }
-
 export const AUI = {
     getUIBuilder,
     getViewContent,
-    getViewIdByPathname,
-    // getDynamicContent
 }

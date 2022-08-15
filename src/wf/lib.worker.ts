@@ -136,13 +136,6 @@ export const getBodyTag = () => '<!-- [BODY] -->'
 
 const testPattern = (url, pattern) => pattern.test(url.href)
 
-// TODO: Remove this method
-// export const isDynamicPathname = ({ routes, url, pattern }) => {
-//     if (pattern) return testPattern(url, pattern)
-//     return Object.keys(routes)
-//         .find(key => testPattern(url, new URLPattern({ pathname: routes[key].pattern })))
-// }
-
 export const getOfflineTimestamp = async (id) => (await wf.database.get(wf.mode.Offline, 'offline-timestamp', id))?.data?.at
 
 export const updateOfflineTimestamp = (id, date: Date) => {

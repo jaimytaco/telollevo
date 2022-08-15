@@ -1,6 +1,26 @@
 import { EShippingDestination } from '@types/util.type'
 import { IQuotation } from '@types/quotation.type'
 
+export enum EOrderFields{
+    ProductName = 'product-name',
+    ProductCategory = 'product-category',
+    ProductUrl = 'product-link',
+    ProductPrice = 'product-pu',
+    ProductUnits = 'product-qty',
+    ProductIsBoxIncluded = 'product-need-box'
+}
+
+export enum ESanitizeOrderErrors{
+    ProductName = 'Debe indicar un nombre de producto',
+    ProductCategory = 'Debe seleccionar una categoría existente',
+    ProductUrl = 'Debe ingresar un url válido',
+    ProductPrice = 'Debe ingresar un valor válido',
+    ProductUnits = 'Debe ingresar un valor válido',
+    ProductIsBoxIncluded = 'Debe indicar si el producto necesita caja o no',
+    ProductCoin = 'Debe usar una moneda válida',
+    Status = 'Debe usar un estado de orden válido'
+}
+
 export enum EOrderStatus{
     Registered = 'registrado',
     Quoted = 'cotizado',

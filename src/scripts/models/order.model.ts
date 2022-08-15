@@ -1,10 +1,31 @@
-import { capitalizeString } from '@helpers/util.helper'
-import { IOrder, EOrderStatus, EOrderSorters } from '@types/order.type'
-import { EFormat } from '@types/util.type'
+import {
+    capitalizeString,
+    isValidHttpUrl,
+    isNumeric,
+    isBoolean,
+    isValidString,
+} from '@helpers/util.helper'
+
+import {
+    IOrder,
+    IProduct,
+    EOrderStatus,
+    EOrderSorters,
+    EOrderFields,
+    ESanitizeOrderErrors,
+} from '@types/order.type'
+
+import {
+    EFormat,
+    ECoin,
+} from '@types/util.type'
+
 import { IQuotation } from '@types/quotation.type'
+import { EProductCategory } from '@types/product.type'
 import MQuotation from '@models/quotation.model'
 
 import { logger } from '@wf/helpers/browser.helper'
+
 
 const formatProductDetails = (order: IOrder) => {
     return `
@@ -15,8 +36,7 @@ const formatProductDetails = (order: IOrder) => {
                 </picture>
                 <p>El pedido incluye ${order.product.units} producto${order.product.units > 1 ? 's' : ''}</p>
             </div>
-        ${
-            order.product.isBoxIncluded ? `
+        ${order.product.isBoxIncluded ? `
                 <div class="card-7">
                     <picture>
                         <img src="/img/icon/package.svg" width="18" height="18">
@@ -25,8 +45,7 @@ const formatProductDetails = (order: IOrder) => {
                 </div>
             ` : ''
         }
-        ${
-            order.product.weightMore5kg ? `
+        ${order.product.weightMore5kg ? `
                 <div class="card-7">
                     <picture>
                         <img src="/img/icon/package.svg" width="18" height="18">
@@ -35,8 +54,7 @@ const formatProductDetails = (order: IOrder) => {
                 </div>
             ` : ''
         }
-        ${
-            order.product.isTaller50cm ? `
+        ${order.product.isTaller50cm ? `
                 <div class="card-7">
                     <picture>
                         <img src="/img/icon/package.svg" width="18" height="18">
@@ -45,8 +63,7 @@ const formatProductDetails = (order: IOrder) => {
                 </div>
             ` : ''
         }
-        ${
-            order.product.isOneUnitPerProduct ? `
+        ${order.product.isOneUnitPerProduct ? `
                 <div class="card-7">
                     <picture>
                         <img src="/img/icon/package.svg" width="18" height="18">
@@ -67,8 +84,7 @@ const formatProductDetails = (order: IOrder) => {
             </picture>
             <p>La entrega será en ${order.shippingDestination}</p>
         </div>
-        ${
-            order.comments.length ? `
+        ${order.comments.length ? `
                 <!--
                 <div class="card-7">
                     <picture>
@@ -86,7 +102,7 @@ const formatProductDetails = (order: IOrder) => {
 }
 
 const formatRowExtra = (order: IOrder) => {
-    switch(order.status){
+    switch (order.status) {
         case EOrderStatus.Registered:
             return `
                 <div id="te-${order.id}" class="t-r-extra">
@@ -115,8 +131,7 @@ const formatRowExtra = (order: IOrder) => {
                                     </p>
                                 </div>
                             </div>
-                            ${
-                                order.comments.length ? `
+                            ${order.comments.length ? `
                                     <div class="card-5">
                                         <p>
                                             <strong>Mensaje del comprador:</strong>
@@ -125,7 +140,7 @@ const formatRowExtra = (order: IOrder) => {
                                         </p>
                                     </div>
                                 ` : ''
-                            }
+                }
                         </div>
                         ${formatProductDetails(order)}
                     </div>
@@ -142,9 +157,8 @@ const formatRowExtra = (order: IOrder) => {
                             <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                         </div>
                         <div class="card-14-group">
-                            ${
-                                order.quotations
-                                    .map((quotation: IQuotation) => `
+                            ${order.quotations
+                    .map((quotation: IQuotation) => `
                                         <div class="card-14">
                                             <div class="card-7 c-7-p">
                                                 <p>
@@ -175,7 +189,7 @@ const formatRowExtra = (order: IOrder) => {
                                             </div>
                                         </div>
                                     `)
-                            }
+                }
                         </div>
                     </div>
                 </div>
@@ -184,7 +198,7 @@ const formatRowExtra = (order: IOrder) => {
 }
 
 const formatRowActions = (order: IOrder) => {
-    switch(order.status){
+    switch (order.status) {
         case EOrderStatus.Registered:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
@@ -273,7 +287,7 @@ const getAllByShopperId = (wf, mode, isFormatted: EFormat, shopperId, date?) => 
         value: date
     }
 
-    const filters = date ? 
+    const filters = date ?
         [byShopper, byRecent] :
         [byShopper]
 
@@ -286,7 +300,7 @@ const add = (wf, mode, order: IOrder) => {
 }
 
 const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
-    const { database: db } = wf    
+    const { database: db } = wf
     const responseOrders = await db.getAll(mode, 'orders', filters)
     if (responseOrders?.err) {
         const { err } = responseOrders
@@ -299,7 +313,7 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
 
     const quotations = await MQuotation.getAll(wf, mode, isFormatted)
 
-    if (quotations?.err){
+    if (quotations?.err) {
         const { err } = quotations
         logger(err)
         return { err }
@@ -311,14 +325,82 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
         return order
     })
 
-    return isFormatted === EFormat.Related ? 
+    return isFormatted === EFormat.Related ?
         ordersWithQuotation :
         ordersWithQuotation.map(format)
 }
 
 const format = (order: IOrder) => order
 
-export default{
+const sanitize = (order: IOrder) => {
+    const { product } = order as IProduct
+    
+    if (product) {
+        if (!isValidString(product.name))
+            return {
+                err: {
+                    field: EOrderFields.ProductName,
+                    desc: ESanitizeOrderErrors.ProductName
+                }
+            }
+
+        if (!Object.values(EProductCategory).includes(product.category))
+            return {
+                err: {
+                    field: EOrderFields.ProductCategory,
+                    desc: ESanitizeOrderErrors.ProductCategory
+                }
+            }
+
+        if (!isValidHttpUrl(product.url))
+            return {
+                err: {
+                    field: EOrderFields.ProductUrl,
+                    desc: ESanitizeOrderErrors.ProductUrl
+                }
+            }
+
+        if (!isNumeric(product.price) || parseFloat(product.price) <= 0)
+            return {
+                err: {
+                    field: EOrderFields.ProductPrice,
+                    desc: ESanitizeOrderErrors.ProductPrice
+                }
+            }
+
+        if (!isNumeric(product.units) || parseInt(product.units) <= 0)
+            return {
+                err: {
+                    field: EOrderFields.ProductUnits,
+                    desc: ESanitizeOrderErrors.ProductUnits
+                }
+            }
+
+        if (!isBoolean(product.isBoxIncluded))
+            return {
+                err: {
+                    field: EOrderFields.ProductIsBoxIncluded,
+                    desc: ESanitizeOrderErrors.ProductIsBoxIncluded
+                }
+            }
+
+        if (!ECoin[product.coin])
+            return {
+                err: {
+                    desc: ESanitizeOrderErrors.ProductCoin
+                }
+            }
+    }
+
+    if (!Object.values(EOrderStatus).includes(order.status))
+        return {
+            err: {
+                desc: ESanitizeOrderErrors.Status
+            }
+        }
+}
+
+export default {
     collection: 'orders',
     toRow,
     EOrderStatus,
@@ -329,4 +411,6 @@ export default{
     add,
 
     getAllByShopperId,
+
+    sanitize,
 }

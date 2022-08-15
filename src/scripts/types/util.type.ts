@@ -1,8 +1,17 @@
+export enum EOrderProductQty{
+    Min = 1,
+}
+
 export enum ECoin{
     PEN = {
         name: 'soles',
         symbol: 'S/',
-        code: 'PEN'
+        code: 'PEN',
+    },
+    USD = {
+        name: 'dólares',
+        symbol: '$',
+        code: 'USD',
     }
 }
 

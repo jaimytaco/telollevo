@@ -26,7 +26,6 @@ export const getStaticPaths = async () => {
 const { page } = Astro.params
 const { path } = Astro.props
 await registerNetworkDB(networkDB, CREDENTIALS)
-// const { content, err } = await AUI.getDynamicContent({ lib: wf, builders: app.routes, viewId: `/admin/${page}` })
 const { content, err } = await AUI.getViewContent(wf, app.routes, `/admin/${page}`)
 ---
 
