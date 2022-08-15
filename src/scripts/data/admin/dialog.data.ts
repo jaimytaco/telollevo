@@ -176,11 +176,11 @@ export const createOrder_dialog = `
             </header>
             <main>
                 <fieldset>
-                    <input type="radio" name="order-shopper" value="Myself" id="order-shopper_myself">
-                    <label for="order-shopper_myself" class="btn btn-f-width">${capitalizeString(EOrderShoppers.Myself)}</label>
+                    <input type="radio" name="${EOrderFields.Shopper}" value="${EOrderShoppers.Myself}" id="${EOrderFields.Shopper}_myself">
+                    <label for="${EOrderFields.Shopper}_myself" class="btn btn-f-width">${capitalizeString(EOrderShoppers.Myself)}</label>
 
-                    <input type="radio" name="order-shopper" value="Business" id="order-shopper_business" checked>
-                    <label for="order-shopper_business" class="btn btn-f-width">${capitalizeString(EOrderShoppers.Business)}</label>
+                    <input type="radio" name="${EOrderFields.Shopper}" value="${EOrderShoppers.Business}" id="${EOrderFields.Shopper}_business" checked>
+                    <label for="${EOrderFields.Shopper}_business" class="btn btn-f-width">${capitalizeString(EOrderShoppers.Business)}</label>
                 </fieldset>
             </main>
             <footer>

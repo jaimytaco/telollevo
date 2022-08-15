@@ -22,7 +22,7 @@ import { adminHeader } from '@helpers/ui.helper'
 
 
 const configCreateOrderDialog = async (wf, dialogId) => {
-    const { getDOMElement } = await import('@helpers/util.helper')
+    const { getDOMElement, delay } = await import('@helpers/util.helper')
     const { default: CForm } = await import('@components/form.component')
     const { ECoin, EShippingDestination } = await import('@types/util.type')
     const { EOrderStatus, EOrderShoppers, EOrderFields } = await import('@types/order.type')
@@ -60,7 +60,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         step1Form.requestSubmit()
     }
 
-    step1Form.onsubmit = (e) => {
+    step1Form.onsubmit = async (e) => {
         e.preventDefault()
 
         const name = (getDOMElement(step1Form,`#${EOrderFields.ProductName}`)).value
@@ -71,6 +71,9 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         const isBoxIncluded = (getDOMElement(step1Form, `[name="${EOrderFields.ProductIsBoxIncluded}"]:checked`)).value === 'yes'
         const coin = ECoin.USD.code
         const status = EOrderStatus.Registered
+
+        const userCredentials = await wf.auth.getCurrentUser()
+        const shopperId = userCredentials ? userCredentials.uid : null
         
         order.product = {
             name,
@@ -79,10 +82,11 @@ const configCreateOrderDialog = async (wf, dialogId) => {
             price,
             units,
             isBoxIncluded,
-            coin
+            coin,
         }
 
         order.status = status
+        order.shopperId = shopperId
 
         const sanitizeStatus = MOrder.sanitize(order)
         if (sanitizeStatus?.err){
@@ -190,7 +194,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     step3Form.onsubmit = (e) => {
         e.preventDefault()
 
-        const shippingDestination = (getDOMElement(step3Form, '[name="order-shipping-address"]:checked')).value
+        const shippingDestination = (getDOMElement(step3Form, `[name="${EOrderFields.ShippingDestination}"]:checked`)).value
         order.shippingDestination = shippingDestination
 
         const sanitizeStatus = MOrder.sanitize(order)
@@ -217,40 +221,67 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     }
 
 
-
-
-
-
-
-
-
-
+    // STEP-4
     const step4Form = getDOMElement(dialog, '#create-order-step-4_form')
+    const btnSubmitStep4 = getDOMElement(step4Form, 'button[type="submit"]')
     CForm.init(step4Form.id)
 
-    const step5Form = getDOMElement(dialog, '#create-order-confirmation-step-5_form')
-    CForm.init(step5Form.id)
-
+    btnSubmitStep4.onclick = (e) => {
+        e.preventDefault()
+        CForm.resetInvalid(step4Form.id)
+        const isFormValid = step4Form.checkValidity()
+        if (!isFormValid){
+            logger(`Form ${step4Form.id} is not HTML valid`)
+            const invalidFieldset = getDOMElement(step4Form, 'fieldset.fs-invalid')
+            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            return
+        }
+        step4Form.requestSubmit()
+    }
 
     step4Form.onsubmit = async (e) => {
         e.preventDefault()
 
-        const shopperKey = (getDOMElement(step4Form, '[name="order-shopper"]')).value
-        // TODO: validate order info in step-4
-        order.shopper = EOrderShoppers[shopperKey]
+        const shopper = (getDOMElement(step4Form, `[name="${EOrderFields.Shopper}"]`)).value
+        order.shopper = shopper
 
-        console.log('--- step 4 - order =', order)
+        const sanitizeStatus = MOrder.sanitize(order)
+        if (sanitizeStatus?.err){
+            const { field, desc } = sanitizeStatus.err
+            if (!field){
+                logger(`Sanitize error: ${desc} for order`, order)
+                return
+            }
 
-        await wf.database.add(wf.mode.Network, 'orders', order)
+            const invalidFieldset = getDOMElement(step4Form,`#${field}`)?.parentNode 
+            if (invalidFieldset){
+                CForm.handleInvalid('add', desc, invalidFieldset)
+                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
+                return
+            }
+        }
+
+        logger('create-order-dialog step-4 with order:', order)
+
+        const { data, err } = await MOrder.add(wf, wf.mode.Network, order)
+        await MOrder.add(wf, wf.mode.Offline, data)
+
+        // TODO: Turn loading animation on dialog
 
         step4Form.classList.remove('active')
         step5Form.classList.add('active')
     }
 
-    step5Form.onsubmit = (e) => {
+    const step5Form = getDOMElement(dialog, '#create-order-confirmation-step-5_form')
+
+    step5Form.onsubmit = async (e) => {
         e.preventDefault()
+        // TODO: Improve animation after create-order
         step5Form.classList.remove('active')
         CDialog.handle('create-order_dialog', 'remove')
+        await delay(1500)
+        location.reload()
     }
 }
 

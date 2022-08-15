@@ -13,8 +13,9 @@ export enum EOrderFields{
     ProductIsOneUnitPerProduct = 'product-has-more-units',
     Shipper = 'order-shipper',
     Comments = 'order-extra-comment',
-
     ShippingDestination = 'order-shipping-address',
+
+    Shopper = 'order-shopper',
 }
 
 export enum ESanitizeOrderErrors{
@@ -26,12 +27,16 @@ export enum ESanitizeOrderErrors{
     ProductIsBoxIncluded = 'Debe indicar si el producto necesita caja o no',
     ProductCoin = 'Debe usar una moneda válida',
     Status = 'Debe usar un estado de orden válido',
+
+    ShopperId = 'Usuario no autenticado',
+
     ProductWeightMore5kg = 'Debe indicar si el producto pesa más de 5kg',
     ProductIsTaller50cm = 'Debe indicar si el producto mide más de 50cm',
     ProductIsOneUnitPerProduct = 'Debe indicar si el producto contiene mas de una unidad',
     Shipper = 'Debe indicar por quien será enviado el producto',
-
     ShippingDestination = 'Debe usar un destino de envío válido',
+
+    Shopper = 'Debe usar un comprador válido',
 }
 
 export enum EOrderStatus{

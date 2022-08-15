@@ -14,6 +14,7 @@ import {
     EOrderFields,
     ESanitizeOrderErrors,
     EOrderShippers,
+    EOrderShoppers,
 } from '@types/order.type'
 
 import {
@@ -427,6 +428,13 @@ const sanitize = (order: IOrder) => {
                 desc: ESanitizeOrderErrors.Status
             }
         }
+    
+    if (order.shopperId && !isValidString(order.shopperId))
+        return {
+            err: {
+                desc: ESanitizeOrderErrors.ShopperId
+            }
+        }
 
     // Sanitize for step-2
     if (order.shipper && !Object.values(EOrderShippers).includes(order.shipper))
@@ -443,6 +451,15 @@ const sanitize = (order: IOrder) => {
             err: {
                 field: EOrderFields.ShippingDestination,
                 desc: ESanitizeOrderErrors.ShippingDestination
+            }
+        }
+
+    // Sanitize for step-4
+    if (order.shopper && !Object.values(EOrderShoppers).includes(order.shopper))
+        return {
+            err: {
+                field: EOrderFields.Shopper,
+                desc: ESanitizeOrderErrors.Shopper
             }
         }
 }
