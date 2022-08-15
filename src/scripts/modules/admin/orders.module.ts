@@ -262,6 +262,10 @@ const configCreateOrderDialog = async (wf, dialogId) => {
             }
         }
 
+        const now = new Date()
+        order.createdAt = now
+        order.updatedAt = now
+
         logger('create-order-dialog step-4 with order:', order)
 
         const { data, err } = await MOrder.add(wf, wf.mode.Network, order)
