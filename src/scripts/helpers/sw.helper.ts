@@ -55,6 +55,8 @@ export const scripts = [
     '/indexedDb.service.js',
     '/lib.worker.js',
     '/pwa.actor.js',
+    '/sw.worker.js',
+    '/database.worker.js'
 ]
 
 export const styles = [

@@ -66,18 +66,12 @@ export const offlineFirst = async (request, cacheName) => {
         return offlineResponse
     }
 
-    // const failResponse = await serveFromCache(new Request('/404'), cacheName)
-    // console.log('--- failResponseFromCache =', failResponse)
-    // failResponse.status = 404
-
-    // const failResponseFromCache = await serveFromCache(new Request('/404'), cacheName)
-    // const failResponseFromCacheText = failResponseFromCache?.err ? '404' : await failResponseFromCache.text()
-    // const failResponse = new Response(failResponseFromCacheText, {
-    //     headers: { 'Content-Type': 'text/html; charset=utf-8' },
-    //     status: 404
-    // })
-
-    const failResponse = new Response(null, { status: 404 })
+    const { response: failResponseFromCache } = await serveFromCache(new Request('/404'), cacheName)
+    const failResponseFromCacheText = failResponseFromCache ? await failResponseFromCache.text() : 'It is missing a 404 page in cache'
+    const failResponse = new Response(failResponseFromCacheText, {
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        status: 404
+    })
 
     try {
         const networkResponse = await fetch(request)
@@ -87,9 +81,11 @@ export const offlineFirst = async (request, cacheName) => {
         }
 
         logger(`Request couldn't be fetched from network for ${request.url}`)
+        console.log('--- failResponseFromCacheText =', failResponseFromCacheText)
         return failResponse
     } catch (err) {
         logger(`Error catched while fetching from network for ${request.url}`)
+        console.log('--- failResponseFromCacheText =', failResponseFromCacheText)
         return failResponse
     }
 }
