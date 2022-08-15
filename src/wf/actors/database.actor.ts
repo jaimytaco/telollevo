@@ -15,9 +15,9 @@ const setOfflineDB = (db: T) => OfflineDB = db
 
 const initApp = (db, credentials) => db.initApp(credentials)
 
-const register = async ({ mode, prefix, loaderKeys }): Promise<void> | Promise<IOfflineDbInit> => {
+const register = async ({ mode, prefix, models }): Promise<void> | Promise<IOfflineDbInit> => {
     if (mode === EDatabaseMode.Network) return NetworkDB.register()
-    if (mode === EDatabaseMode.Offline) return OfflineDB.register(prefix, loaderKeys)
+    if (mode === EDatabaseMode.Offline) return OfflineDB.register(prefix, models)
 }
 
 const getAll = (mode, collectionName, filters?) => {

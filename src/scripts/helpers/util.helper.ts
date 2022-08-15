@@ -1,7 +1,3 @@
-export const delay = (ms) => new Promise((resolve, reject) => {
-    setTimeout(() => resolve(), ms)
-})
-
 export const formatLocaleDate = (date) => date.toLocaleDateString ? date.toLocaleDateString('es-PE') : date
 
 export const capitalizeString = (str) => {
@@ -17,6 +13,8 @@ export const getDOMElement = (parent, query, mode: 'all' | undefined) => {
     if (!el) throw `'${query}' query not found in '${parent.id || parent.className}' parent element` 
     return mode ? [...el] : el
 }
+
+export const delay = (ms) => new Promise((resolve) => setTimeout(() => resolve(), ms))
 
 export const configCreateOrderDialog = async (wf, dialogId) => {
     const dialog = getDOMElement(document, `#${dialogId}`)

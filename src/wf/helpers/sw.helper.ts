@@ -66,6 +66,17 @@ export const offlineFirst = async (request, cacheName) => {
         return offlineResponse
     }
 
+    // const failResponse = await serveFromCache(new Request('/404'), cacheName)
+    // console.log('--- failResponseFromCache =', failResponse)
+    // failResponse.status = 404
+
+    // const failResponseFromCache = await serveFromCache(new Request('/404'), cacheName)
+    // const failResponseFromCacheText = failResponseFromCache?.err ? '404' : await failResponseFromCache.text()
+    // const failResponse = new Response(failResponseFromCacheText, {
+    //     headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    //     status: 404
+    // })
+
     const failResponse = new Response(null, { status: 404 })
 
     try {

@@ -110,11 +110,11 @@ const add = async (collectionName: string, doc: T) => {
 
 const update = add
 
-const register = async (prefix, loaderKeys): Promise<T> => {
+const register = async (prefix, models): Promise<T> => {
     dbPrefix = `${prefix}-idb`
     await clearPreviousDB()
     const isFirstLoad = !(await existDB(getDBName()))
-    localDbPromise = openDatabase(loaderKeys)
+    localDbPromise = openDatabase(models)
     const isOfflineFirst = typeof (await localDbPromise) !== 'undefined'
     return {
         isOfflineFirst,

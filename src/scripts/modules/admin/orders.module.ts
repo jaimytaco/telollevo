@@ -154,7 +154,31 @@ const builder = async (wf) => {
     }
 }
 
+const action = async (wf) => {
+    const { default: CDialog } = await import('@components/dialog.component')
+    const { default: CTable } = await import('@components/table.component')
+    const { default: CCard8 } = await import('@components/card8.component')
+    const { getDOMElement } = await import('@helpers/util.helper')
+
+    const {
+        configCreateOrderDialog,
+        configSelectQuotationInQuotedOrder,
+    } = await import('@helpers/util.helper')
+
+    // TODO: make component of table-extra-row
+    const extraRows = getDOMElement(document, '.t-r-extra', 'all')
+    const extraRowIds = extraRows.map((extraRow) => extraRow.id)
+    extraRowIds.forEach((extraRowId) => CTable.handleRowExtra(extraRowId))
+
+    CCard8.handleAll()
+
+    CDialog.init('create-order_dialog')
+    configCreateOrderDialog(wf, 'create-order_dialog')
+    configSelectQuotationInQuotedOrder(wf)
+}
+
 export default {
     loader,
-    builder
+    builder,
+    action
 }

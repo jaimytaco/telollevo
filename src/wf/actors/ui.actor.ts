@@ -16,19 +16,16 @@ const getViewIdByPathname = (builders: T, pathname: string) => {
     return null
 }
 
-const getDynamicContent = ({ lib, builders, pathname, viewId }) => {
-    if (!viewId) viewId = getViewIdByPathname(builders, pathname)
-    return getViewContent(lib, builders, viewId)
-    // try{
-    //     return getViewContent(lib, builders, viewId)
-    // }catch(err){
-    //     return { err }
-    // }
-}
+
+// TODO: Remove this method
+// const getDynamicContent = ({ lib, builders, pathname, viewId }) => {
+//     if (!viewId) viewId = getViewIdByPathname(builders, pathname)
+//     return getViewContent(lib, builders, viewId)
+// }
 
 export const AUI = {
     getUIBuilder,
     getViewContent,
     getViewIdByPathname,
-    getDynamicContent
+    // getDynamicContent
 }
