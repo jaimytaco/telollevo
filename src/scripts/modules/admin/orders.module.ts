@@ -30,6 +30,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
 
     const dialog = getDOMElement(document, `#${dialogId}`)
 
+
+    // STEP-1
     const step1Form = getDOMElement(dialog, '#create-order-step-1_form')
     const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
     CForm.init(step1Form.id)
@@ -105,6 +107,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         step2Form.classList.add('active')
     }
 
+
+    // STEP-2
     const step2Form = getDOMElement(dialog, '#create-order-step-2_form')
     const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
     CForm.init(step2Form.id)
@@ -141,11 +145,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         order.comments = comments
         order.shipper = shipper
 
-        console.log('--- order step-2 =', order)
-
         const sanitizeStatus = MOrder.sanitize(order)
-        console.log('--- sanitizeStatus =', sanitizeStatus
-        )
         if (sanitizeStatus?.err){
             const { field, desc } = sanitizeStatus.err
             if (!field){
@@ -169,13 +169,61 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     }
 
 
-
-
-
-
-    
+    // STEP-3
     const step3Form = getDOMElement(dialog, '#create-order-step-3_form')
+    const btnSubmitStep3 = getDOMElement(step3Form, 'button[type="submit"]')
     CForm.init(step3Form.id)
+
+    btnSubmitStep3.onclick = (e) => {
+        e.preventDefault()
+        CForm.resetInvalid(step3Form.id)
+        const isFormValid = step3Form.checkValidity()
+        if (!isFormValid){
+            logger(`Form ${step3Form.id} is not HTML valid`)
+            const invalidFieldset = getDOMElement(step3Form, 'fieldset.fs-invalid')
+            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            return
+        }
+        step3Form.requestSubmit()
+    }
+
+    step3Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        const shippingDestination = (getDOMElement(step3Form, '[name="order-shipping-address"]:checked')).value
+        order.shippingDestination = shippingDestination
+
+        const sanitizeStatus = MOrder.sanitize(order)
+        if (sanitizeStatus?.err){
+            const { field, desc } = sanitizeStatus.err
+            if (!field){
+                logger(`Sanitize error: ${desc} for order`, order)
+                return
+            }
+
+            const invalidFieldset = getDOMElement(step3Form,`#${field}`)?.parentNode 
+            if (invalidFieldset){
+                CForm.handleInvalid('add', desc, invalidFieldset)
+                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
+                return
+            }
+        }
+
+        logger('create-order-dialog step-3 with order:', order)
+
+        step3Form.classList.remove('active')
+        step4Form.classList.add('active')
+    }
+
+
+
+
+
+
+
+
+
 
     const step4Form = getDOMElement(dialog, '#create-order-step-4_form')
     CForm.init(step4Form.id)
@@ -183,19 +231,6 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     const step5Form = getDOMElement(dialog, '#create-order-confirmation-step-5_form')
     CForm.init(step5Form.id)
 
-
-    step3Form.onsubmit = (e) => {
-        e.preventDefault()
-
-        const shippingDestinationKey = (getDOMElement(step3Form, '[name="order-shipping-address"]:checked')).value
-        // TODO: validate order info in step-3
-        order.shippingDestination = EShippingDestination[shippingDestinationKey]
-
-        console.log('--- step 3 - order =', order)
-
-        step3Form.classList.remove('active')
-        step4Form.classList.add('active')
-    }
 
     step4Form.onsubmit = async (e) => {
         e.preventDefault()

@@ -147,14 +147,14 @@ export const createOrder_dialog = `
             </header>
             <main>
                 <fieldset>
-                    <input type="radio" name="order-shipping-address" value="Inplace_Miraflores" id="order-shipping-address_inplace-miraflores" checked>
-                    <label for="order-shipping-address_inplace-miraflores" class="btn btn-f-width">${capitalizeString(EShippingDestination.Inplace_Miraflores)}</label>
+                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Inplace_Miraflores}" id="${EOrderFields.ShippingDestination}_inplace-miraflores" checked required>
+                    <label for="${EOrderFields.ShippingDestination}_inplace-miraflores" class="btn btn-f-width">${capitalizeString(EShippingDestination.Inplace_Miraflores)}</label>
 
-                    <input type="radio" name="order-shipping-address" value="${EShippingDestination.Town}" id="order-shipping-address_town">
-                    <label for="order-shipping-address_town" class="btn btn-f-width">Envio ${EShippingDestination.Town}</label>
+                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Town}" id="${EOrderFields.ShippingDestination}_town" required>
+                    <label for="${EOrderFields.ShippingDestination}_town" class="btn btn-f-width">Envio ${EShippingDestination.Town}</label>
 
-                    <input type="radio" name="order-shipping-address" value="${EShippingDestination.Province}" id="order-shipping-address_province">
-                    <label for="order-shipping-address_province" class="btn btn-f-width">Envio ${EShippingDestination.Province}</label>
+                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Province}" id="${EOrderFields.ShippingDestination}_province" required>
+                    <label for="${EOrderFields.ShippingDestination}_province" class="btn btn-f-width">Envio ${EShippingDestination.Province}</label>
                 </fieldset>
             </main>
             <footer>

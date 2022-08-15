@@ -19,6 +19,7 @@ import {
 import {
     EFormat,
     ECoin,
+    EShippingDestination,
 } from '@types/util.type'
 
 import { IQuotation } from '@types/quotation.type'
@@ -433,6 +434,15 @@ const sanitize = (order: IOrder) => {
             err: {
                 field: EOrderFields.Shipper,
                 desc: ESanitizeOrderErrors.Shipper
+            }
+        }
+
+    // Sanitize for step-3
+    if (order.shippingDestination && !Object.values(EShippingDestination).includes(order.shippingDestination))
+        return {
+            err: {
+                field: EOrderFields.ShippingDestination,
+                desc: ESanitizeOrderErrors.ShippingDestination
             }
         }
 }

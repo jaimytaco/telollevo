@@ -8,12 +8,13 @@ export enum EOrderFields{
     ProductPrice = 'product-pu',
     ProductUnits = 'product-qty',
     ProductIsBoxIncluded = 'product-need-box',
-    
     ProductWeightMore5kg = 'product-weight-more-5k',
     ProductIsTaller50cm = 'product-is-taller-50cm',
     ProductIsOneUnitPerProduct = 'product-has-more-units',
     Shipper = 'order-shipper',
     Comments = 'order-extra-comment',
+
+    ShippingDestination = 'order-shipping-address',
 }
 
 export enum ESanitizeOrderErrors{
@@ -25,11 +26,12 @@ export enum ESanitizeOrderErrors{
     ProductIsBoxIncluded = 'Debe indicar si el producto necesita caja o no',
     ProductCoin = 'Debe usar una moneda válida',
     Status = 'Debe usar un estado de orden válido',
-
     ProductWeightMore5kg = 'Debe indicar si el producto pesa más de 5kg',
     ProductIsTaller50cm = 'Debe indicar si el producto mide más de 50cm',
     ProductIsOneUnitPerProduct = 'Debe indicar si el producto contiene mas de una unidad',
     Shipper = 'Debe indicar por quien será enviado el producto',
+
+    ShippingDestination = 'Debe usar un destino de envío válido',
 }
 
 export enum EOrderStatus{
