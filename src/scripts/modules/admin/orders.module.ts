@@ -20,28 +20,18 @@ import { capitalizeString } from '@helpers/util.helper'
 import CTable from '@components/table.component'
 import { adminHeader } from '@helpers/ui.helper'
 
-
 const configCreateOrderDialog = async (wf, dialogId) => {
     const { getDOMElement } = await import('@helpers/util.helper')
     const { default: CForm } = await import('@components/form.component')
-
+    const { ECoin, EShippingDestination } = await import('@types/util.type')
+    const { EOrderStatus, EOrderShoppers, EOrderFields } = await import('@types/order.type')
+    const { logger } = await import('@wf/helpers/browser.helper')
+    
     const dialog = getDOMElement(document, `#${dialogId}`)
 
     const step1Form = getDOMElement(dialog, '#create-order-step-1_form')
     const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
     CForm.init(step1Form.id)
-
-    const step2Form = getDOMElement(dialog, '#create-order-step-2_form')
-    CForm.init(step2Form.id)
-    
-    const step3Form = getDOMElement(dialog, '#create-order-step-3_form')
-    CForm.init(step3Form.id)
-
-    const step4Form = getDOMElement(dialog, '#create-order-step-4_form')
-    CForm.init(step4Form.id)
-
-    const step5Form = getDOMElement(dialog, '#create-order-confirmation-step-5_form')
-    CForm.init(step5Form.id)
     
     const createOrderBtns = getDOMElement(document, '[data-create-order-dialog_btn]', 'all')
     const { default: CDialog } = await import('@components/dialog.component')
@@ -51,11 +41,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         step1Form.classList.add('active')
     })
 
-    const { ECoin, EShippingDestination } = await import('@types/util.type')
-    const { EOrderStatus, EOrderShoppers, EOrderFields } = await import('@types/order.type')
-    const { logger } = await import('@wf/helpers/browser.helper')
-
-    // TODO: use order local object
+    // TODO: use order local object?
     const order = {}
 
     btnSubmitStep1.onclick = (e) => {
@@ -110,22 +96,36 @@ const configCreateOrderDialog = async (wf, dialogId) => {
             return
         }
 
-        console.log('--- step 1 - order =', order)
+        logger('create-order-dialog step-1 with order:', order)
 
         step1Form.classList.remove('active')
         step2Form.classList.add('active')
     }
 
+    const step2Form = getDOMElement(dialog, '#create-order-step-2_form')
+    const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
+    CForm.init(step2Form.id)
+
+    btnSubmitStep2.onclick = (e) => {
+        e.preventDefault()
+        CForm.resetInvalid(step2Form.id)
+        const isFormValid = step2Form.checkValidity()
+        if (!isFormValid){
+            logger(`Form ${step2Form.id} is not HTML valid`)
+            const invalidFieldset = getDOMElement(step2Form, 'fieldset.fs-invalid')
+            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            return
+        }
+    }
+
     step2Form.onsubmit = (e) => {
         e.preventDefault()
 
-        const weightMore5kg = (getDOMElement(step2Form, '[name="product-weight-more-5kg"]:checked')).value === 'yes'
-        const isTaller50cm = (getDOMElement(step2Form, '[name="product-is-taller-50cm"]:checked')).value === 'yes'
-        const isOneUnitPerProduct = (getDOMElement(step2Form, '[name="product-has-more-units"]:checked')).value === 'yes'
-        const shipper = (getDOMElement(step2Form, '[name="order-shipper"]')).value
-        const comments = (getDOMElement(step2Form, '#order-extra-comment')).value
-
-        // TODO: validate product info in step-2
+        const weightMore5kg = (getDOMElement(step2Form, `[name="${EOrderFields.ProductWeightMore5kg}"]:checked`)).value === 'yes'
+        const isTaller50cm = (getDOMElement(step2Form, `[name="${EOrderFields.ProductIsTaller50cm}"]:checked`)).value === 'yes'
+        const isOneUnitPerProduct = (getDOMElement(step2Form, `[name="${EOrderFields.ProductIsOneUnitPerProduct}"]:checked`)).value === 'yes'
+        const shipper = (getDOMElement(step2Form, `[name="${EOrderFields.Shipper}"]`)).value
+        const comments = (getDOMElement(step2Form, `#${EOrderFields.Comments}`)).value
 
         order.product = {
             ...order.product,
@@ -137,11 +137,46 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         order.comments = comments
         order.shipper = shipper
 
-        console.log('--- step 2 - order =', order)
+        console.log('--- order step-2 =', order)
+
+        const sanitizeStatus = MOrder.sanitize(order)
+        console.log('--- sanitizeStatus =', sanitizeStatus
+        )
+        if (sanitizeStatus?.err){
+            const { field, desc } = sanitizeStatus.err
+            if (!field){
+                logger(`Sanitize error: ${desc} for order`, order)
+                return
+            }
+
+            const invalidFieldset = getDOMElement(step2Form,`#${field}`).parentNode 
+            CForm.handleInvalid('add', desc, invalidFieldset)
+            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
+            return
+        }
+
+        logger('create-order-dialog step-2 with order:', order)
 
         step2Form.classList.remove('active')
         step3Form.classList.add('active')
     }
+
+
+
+
+
+
+    
+    const step3Form = getDOMElement(dialog, '#create-order-step-3_form')
+    CForm.init(step3Form.id)
+
+    const step4Form = getDOMElement(dialog, '#create-order-step-4_form')
+    CForm.init(step4Form.id)
+
+    const step5Form = getDOMElement(dialog, '#create-order-confirmation-step-5_form')
+    CForm.init(step5Form.id)
+
 
     step3Form.onsubmit = (e) => {
         e.preventDefault()

@@ -86,11 +86,11 @@ export const createOrder_dialog = `
             <main>
                 <fieldset>
                     <legend>¿Tu artículo pesa más de 5 kilos?</legend>
-                    <input type="radio" name="product-weight-more-5kg" value="yes" id="product-weight-more-5kg_yes">
-                    <label for="product-weight-more-5kg_yes" class="btn">Sí</label>
+                    <input type="radio" name="${EOrderFields.ProductWeightMore5kg}" value="yes" id="${EOrderFields.ProductWeightMore5kg}_yes" required>
+                    <label for="${EOrderFields.ProductWeightMore5kg}_yes" class="btn">Sí</label>
 
-                    <input type="radio" name="product-weight-more-5kg" value="no" id="product-weight-more-5kg_no" checked>
-                    <label for="product-weight-more-5kg_no" class="btn">No</label>
+                    <input type="radio" name="${EOrderFields.ProductWeightMore5kg}" value="no" id="${EOrderFields.ProductWeightMore5kg}_no" checked required>
+                    <label for="${EOrderFields.ProductWeightMore5kg}_no" class="btn">No</label>
                 </fieldset>
                 <fieldset>
                     <legend>
@@ -98,34 +98,34 @@ export const createOrder_dialog = `
                         <br>
                         <small>(de alguno de sus lados)</small>
                     </legend>
-                    <input type="radio" name="product-is-taller-50cm" value="yes" id="product-is-taller-50cm_yes">
-                    <label for="product-is-taller-50cm_yes" class="btn">Sí</label>
+                    <input type="radio" name="${EOrderFields.ProductIsTaller50cm}" value="yes" id="${EOrderFields.ProductIsTaller50cm}_yes" required>
+                    <label for="${EOrderFields.ProductIsTaller50cm}_yes" class="btn">Sí</label>
 
-                    <input type="radio" name="product-is-taller-50cm" value="no" id="product-is-taller-50cm_no" checked>
-                    <label for="product-is-taller-50cm_no" class="btn">No</label>
+                    <input type="radio" name="${EOrderFields.ProductIsTaller50cm}" value="no" id="${EOrderFields.ProductIsTaller50cm}_no" checked required>
+                    <label for="${EOrderFields.ProductIsTaller50cm}_no" class="btn">No</label>
                 </fieldset>
                 <fieldset>
                     <legend>
                         ¿Alguno de los links contiene más de una unidad? <br>
                         <small>Por ejemplo packs, cajas o bolsas con varias unidades adentro.</small>
                     </legend>
-                    <input type="radio" name="product-has-more-units" value="yes" id="product-has-more-units_yes">
-                    <label for="product-has-more-units_yes" class="btn">Sí</label>
+                    <input type="radio" name="${EOrderFields.ProductIsOneUnitPerProduct}" value="yes" id="${EOrderFields.ProductIsOneUnitPerProduct}_yes" required>
+                    <label for="${EOrderFields.ProductIsOneUnitPerProduct}_yes" class="btn">Sí</label>
 
-                    <input type="radio" name="product-has-more-units" value="no" id="product-has-more-units_no" checked>
-                    <label for="product-has-more-units_no" class="btn">No</label>
+                    <input type="radio" name="${EOrderFields.ProductIsOneUnitPerProduct}" value="no" id="${EOrderFields.ProductIsOneUnitPerProduct}_no" checked required>
+                    <label for="${EOrderFields.ProductIsOneUnitPerProduct}_no" class="btn">No</label>
                 </fieldset>
                 <fieldset>
                     <legend>¿Quién enviará tus compras al alojamiento del viajero?</legend>
-                    <input type="radio" name="order-shipper" value="${EOrderShippers.Relative}" id="order-shipper_relative">
-                    <label for="order-shipper_relative" class="btn">${capitalizeString(EOrderShippers.Relative)}</label>
+                    <input type="radio" name="${EOrderFields.Shipper}" value="${EOrderShippers.Relative}" id="${EOrderFields.Shipper}_relative" required>
+                    <label for="${EOrderFields.Shipper}_relative" class="btn">${capitalizeString(EOrderShippers.Relative)}</label>
 
-                    <input type="radio" name="order-shipper" value="${EOrderShippers.Store}" id="order-shipper_store" checked>
-                    <label for="order-shipper_store" class="btn">${capitalizeString(EOrderShippers.Store)}</label>
+                    <input type="radio" name="${EOrderFields.Shipper}" value="${EOrderShippers.Store}" id="${EOrderFields.Shipper}_store" checked required>
+                    <label for="${EOrderFields.Shipper}_store" class="btn">${capitalizeString(EOrderShippers.Store)}</label>
                 </fieldset>
                 <fieldset>
-                    <label for="order-extra-comment">Si deseas, puedes dejarle un comentario al viajero</label>
-                    <textarea id="order-extra-comment" placeholder="Ingresa un comentario para el viajero"></textarea>
+                    <label for="${EOrderFields.Comments}">Si deseas, puedes dejarle un comentario al viajero</label>
+                    <textarea id="${EOrderFields.Comments}" placeholder="Ingresa un comentario para el viajero"></textarea>
                 </fieldset>
             </main>
             <footer>

@@ -334,9 +334,10 @@ const format = (order: IOrder) => order
 
 const sanitize = (order: IOrder) => {
     const { product } = order as IProduct
-    
+
+    // Sanitize for step-1
     if (product) {
-        if (!isValidString(product.name))
+        if (product.name && !isValidString(product.name))
             return {
                 err: {
                     field: EOrderFields.ProductName,
@@ -344,7 +345,7 @@ const sanitize = (order: IOrder) => {
                 }
             }
 
-        if (!Object.values(EProductCategory).includes(product.category))
+        if (product.category && !Object.values(EProductCategory).includes(product.category))
             return {
                 err: {
                     field: EOrderFields.ProductCategory,
@@ -352,7 +353,7 @@ const sanitize = (order: IOrder) => {
                 }
             }
 
-        if (!isValidHttpUrl(product.url))
+        if (product.url && !isValidHttpUrl(product.url))
             return {
                 err: {
                     field: EOrderFields.ProductUrl,
@@ -360,7 +361,7 @@ const sanitize = (order: IOrder) => {
                 }
             }
 
-        if (!isNumeric(product.price) || parseFloat(product.price) <= 0)
+        if (product.price && !isNumeric(product.price) || parseFloat(product.price) <= 0)
             return {
                 err: {
                     field: EOrderFields.ProductPrice,
@@ -368,7 +369,7 @@ const sanitize = (order: IOrder) => {
                 }
             }
 
-        if (!isNumeric(product.units) || parseInt(product.units) <= 0)
+        if (product.units && !isNumeric(product.units) || parseInt(product.units) <= 0)
             return {
                 err: {
                     field: EOrderFields.ProductUnits,
@@ -376,7 +377,7 @@ const sanitize = (order: IOrder) => {
                 }
             }
 
-        if (!isBoolean(product.isBoxIncluded))
+        if (product.isBoxIncluded && !isBoolean(product.isBoxIncluded))
             return {
                 err: {
                     field: EOrderFields.ProductIsBoxIncluded,
@@ -384,7 +385,7 @@ const sanitize = (order: IOrder) => {
                 }
             }
 
-        if (!ECoin[product.coin])
+        if (product.coin && !ECoin[product.coin])
             return {
                 err: {
                     desc: ESanitizeOrderErrors.ProductCoin
@@ -392,12 +393,48 @@ const sanitize = (order: IOrder) => {
             }
     }
 
-    if (!Object.values(EOrderStatus).includes(order.status))
+    if (order.status && !Object.values(EOrderStatus).includes(order.status))
         return {
             err: {
                 desc: ESanitizeOrderErrors.Status
             }
         }
+
+
+    // // Sanitize for step-2
+    // if (product) {
+    //     if (!isBoolean(product.weightMore5kg))
+    //         return {
+    //             err: {
+    //                 field: EOrderFields.ProductWeightMore5kg,
+    //                 desc: ESanitizeOrderErrors.ProductWeightMore5kg
+    //             }
+    //         }
+
+    //     if (!isBoolean(product.isTaller50cm))
+    //         return {
+    //             err: {
+    //                 field: EOrderFields.ProductIsTaller50cm,
+    //                 desc: ESanitizeOrderErrors.ProductIsTaller50cm
+    //             }
+    //         }
+
+    //     if (!isBoolean(product.isOneUnitPerProduct))
+    //         return {
+    //             err: {
+    //                 field: EOrderFields.ProductIsOneUnitPerProduct,
+    //                 desc: ESanitizeOrderErrors.ProductIsOneUnitPerProduct
+    //             }
+    //         }
+    // }
+
+    // if (!isBoolean(order.shipper))
+    //     return {
+    //         err: {
+    //             field: EOrderFields.Shipper,
+    //             desc: ESanitizeOrderErrors.Shipper
+    //         }
+    //     }
 }
 
 export default {
