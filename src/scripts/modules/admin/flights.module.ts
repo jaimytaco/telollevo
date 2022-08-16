@@ -7,6 +7,11 @@ const builder = async () => {
     }
 }
 
+const loader = async () => {
+
+}
+
 export default{
-    builder
+    builder,
+    loader
 }

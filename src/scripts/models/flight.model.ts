@@ -3,6 +3,7 @@ import { EFormat } from '@types/util.type'
 import { capitalizeString, formatLocaleDate } from '@helpers/util.helper'
 
 import { logger } from '@wf/helpers/browser.helper'
+import { removeOfflineTimestamp } from '@wf/lib.worker'
 
 
 const formatRowExtra = (flight: IFlight) => {
@@ -138,6 +139,25 @@ const toRow = (flight: IFlight) => {
     }
 }
 
+const uninstall = async (wf) => {
+    const flights = await getAll(wf, wf.mode.Offline, EFormat.Raw)
+    const flightIds = flights.map((flight: IFlight) => flight.id)
+    return Promise.all([
+        flightIds.map((id) => remove(wf, wf.mode.Offline, id)),
+        removeOfflineTimestamp('flights')
+    ])
+}
+
+const remove = async (wf, mode, id) => {
+    const { database: db } = wf
+    const response = await db.remove(mode, 'flights', id)
+    if (response?.err) {
+        const { err } = response
+        logger(err)
+        return { err }
+    }
+}
+
 const getAllByIds = async (wf, mode, ids: string[], isFormatted: EFormat) => {
     return Promise.all(
         ids.map((id) => get(wf, mode, id, isFormatted))
@@ -200,6 +220,8 @@ export default{
     get,
     getAll,
     add,
+    remove,
 
     getAllByIds,
+    uninstall,
 }

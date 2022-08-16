@@ -69,8 +69,17 @@ const formatOperation = (a, b, op) => {
     if (op === EOperator.NotEqualTo) return a !== b
 }
 
+const remove = async (collectionName, key) => {
+    if (!localDbPromise) return { err: 'offline DB not opened' }
+    const tx = (await localDbPromise).transaction(collectionName, 'readwrite');
+    const store = tx.objectStore(collectionName);
+    store.delete(key);
+    // return tx.complete;
+    return tx.oncomplete
+}
+
 const getAll = async (collectionName, filters) => {
-    if (!localDbPromise) throw 'offline DB not opened'
+    if (!localDbPromise) return { err: 'offline DB not opened' }
     const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
     const docs = await query.getAll()
     const filterFns = !filters ? 
@@ -92,18 +101,17 @@ const getAll = async (collectionName, filters) => {
 }
 
 const get = async (collectionName, id) => {
-    if (!localDbPromise) throw 'offline DB not opened'
+    if (!localDbPromise) return { err: 'offline DB not opened' }
     const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
     const data = await query.get(id)
     return { data }
 }
 
 const add = async (collectionName: string, doc: T) => {
-    if (!localDbPromise) throw 'offline DB not opened'
+    if (!localDbPromise) return { err: 'offline DB not opened' }
     const tx = (await localDbPromise).transaction(collectionName, 'readwrite')
     const store = tx.objectStore(collectionName)
     store.put(doc)
-    // return tx.oncomplete
     await tx.oncomplete
     return { data: doc }
 }
@@ -135,5 +143,6 @@ export default {
     add,
     update,
     getAll,
-    get
+    get,
+    remove,
 }

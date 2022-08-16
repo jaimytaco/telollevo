@@ -1,4 +1,4 @@
-import { getDOMElement } from "../helpers/util.helper"
+import { getDOMElement } from '@helpers/util.helper'
 
 const handleAll = () => {
     const btns = getDOMElement(document, '[data-c-8_btn]', 'all')

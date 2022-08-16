@@ -20,6 +20,12 @@ import { capitalizeString } from '@helpers/util.helper'
 import CTable from '@components/table.component'
 import { adminHeader } from '@helpers/ui.helper'
 
+// const configSelectQuotationInQuotedOrder = async (wf) => {
+//     const selectQuotationBtns = getDOMElement(document, '[data-select-quotation_btn]', 'all')
+//     selectQuotationBtns?.forEach((selectQuotationBtn) => selectQuotationBtn.onclick = async () => {
+//         console.log('--- selectQuotationBtn =', selectQuotationBtn)
+//     })
+// }
 
 const configCreateOrderDialog = async (wf, dialogId) => {
     const { getDOMElement, delay } = await import('@helpers/util.helper')
@@ -441,7 +447,7 @@ const action = async (wf) => {
 
     CDialog.init('create-order_dialog')
     configCreateOrderDialog(wf, 'create-order_dialog')
-    configSelectQuotationInQuotedOrder(wf)
+    // configSelectQuotationInQuotedOrder(wf)
 }
 
 export default {

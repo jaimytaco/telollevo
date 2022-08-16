@@ -6,6 +6,7 @@ import {
     routes,
 } from '@helpers/sw.helper'
 
+import ModLogin from '@modules/login.module'
 import ModAdminOrders from '@modules/admin/orders.module'
 import ModAdminFlights from '@modules/admin/flights.module'
 
@@ -67,9 +68,19 @@ export const initApp = async () => {
     await registerAuthenticator(authenticator, CREDENTIALS)
 
     const actions = {
+        '/login': ModLogin.action,
         '/admin/orders': ModAdminOrders.action,
         // '/admin/flights': ModAdminFlights.action,
     }
 
-    if (actions[location.pathname]) await actions[location.pathname](wf)
+    const { pathname } = location
+    if (actions[pathname]){
+        if (app.routes[pathname]?.withAuth){
+            // TODO: Enable logout
+            const { default: ModAdminAuth } = await import('@modules/admin/auth.module')
+            ModAdminAuth.configSignOut(wf)
+        }
+        
+        await actions[pathname](wf)
+    }
 }

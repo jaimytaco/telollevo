@@ -27,25 +27,30 @@ const getAll = (mode, collectionName, filters?) => {
 }
 
 const add = (mode, collectionName: string, doc: T): Promise<T> => {
-    if (mode === EDatabaseMode.Network) return NetworkDB.add(collectionName, doc);
-    if (mode === EDatabaseMode.Offline) return OfflineDB.add(collectionName, doc);
+    if (mode === EDatabaseMode.Network) return NetworkDB.add(collectionName, doc)
+    if (mode === EDatabaseMode.Offline) return OfflineDB.add(collectionName, doc)
 }
 
 const update = (mode, collectionName: string, doc: T): Promise<T> => {
-    if (mode === EDatabaseMode.Network) return NetworkDB.update(collectionName, doc);
-    if (mode === EDatabaseMode.Offline) return OfflineDB.update(collectionName, doc);
+    if (mode === EDatabaseMode.Network) return NetworkDB.update(collectionName, doc)
+    if (mode === EDatabaseMode.Offline) return OfflineDB.update(collectionName, doc)
 }
 
 const get = (mode, collectionName, id) => {
     if (mode === EDatabaseMode.Network) return NetworkDB.get(collectionName, id)
-    if (mode === EDatabaseMode.Offline) return OfflineDB.get(collectionName, id);
+    if (mode === EDatabaseMode.Offline) return OfflineDB.get(collectionName, id)
+}
+
+const remove = (mode, collectionName, id) => {
+    if (mode === EDatabaseMode.Offline) return OfflineDB.remove(collectionName, id);
 }
 
 const ADatabaseMethods = {
     getAll,
     add,
     update,
-    get
+    get,
+    remove,
 }
 
 export const ADatabase = {

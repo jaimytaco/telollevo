@@ -37,7 +37,7 @@ export const getDOMElement = (parent, query, mode: 'all' | undefined) => {
         logger(`'${query}' query not found in '${parent.id || parent.className}' parent element`)
         return
     }
-    
+
     return mode ? [...el] : el
 }
 
@@ -216,24 +216,4 @@ export const configApproveFlight = async (wf) => {
         // TODO: reload
         location.reload() 
     })
-}
-
-export const configSelectQuotationInQuotedOrder = async (wf) => {
-    const selectQuotationBtns = getDOMElement(document, '[data-select-quotation_btn]', 'all')
-    selectQuotationBtns?.forEach((selectQuotationBtn) => selectQuotationBtn.onclick = async () => {
-        console.log('--- selectQuotationBtn =', selectQuotationBtn)
-    })
-}
-
-export const configLogin = async (wf) => {
-    const loginForm = getDOMElement(document, '#login-form')
-    loginForm.onsubmit = async (e) => {
-        e.preventDefault()
-        const email = (getDOMElement(loginForm, '#login-email')).value
-        const password = (getDOMElement(loginForm, '#login-password')).value
-        
-        const userCredential = await wf.auth.signInWithEmailAndPassword(email, password)
-        
-        // TODO: UI animations according to userCredential
-    }  
 }

@@ -144,3 +144,5 @@ export const updateOfflineTimestamp = (id, date: Date) => {
         at: date
     })
 }
+
+export const removeOfflineTimestamp = (id) => wf.database.remove(wf.mode.Offline, 'offline-timestamp', id)

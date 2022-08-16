@@ -28,9 +28,10 @@ import { EProductCategory } from '@types/product.type'
 import MQuotation from '@models/quotation.model'
 
 import { logger } from '@wf/helpers/browser.helper'
+import { removeOfflineTimestamp } from '@wf/lib.worker'
 
 
-const formatProductDetails = (order: IOrder) => {
+const toProductDetails = (order: IOrder) => {
     return `
         <div class="card-8 card-7-group" data-heading="Más detalles">
             <div class="card-7">
@@ -104,7 +105,7 @@ const formatProductDetails = (order: IOrder) => {
     `
 }
 
-const formatRowExtra = (order: IOrder) => {
+const toRowExtra = (order: IOrder) => {
     switch (order.status) {
         case EOrderStatus.Registered:
             return `
@@ -145,7 +146,7 @@ const formatRowExtra = (order: IOrder) => {
                                 ` : ''
                 }
                         </div>
-                        ${formatProductDetails(order)}
+                        ${toProductDetails(order)}
                     </div>
                 </div>
             `
@@ -200,7 +201,7 @@ const formatRowExtra = (order: IOrder) => {
     }
 }
 
-const formatRowActions = (order: IOrder) => {
+const toRowActions = (order: IOrder) => {
     switch (order.status) {
         case EOrderStatus.Registered:
             return `
@@ -270,8 +271,8 @@ const toRow = (order: IOrder) => {
             description: order.product.category
         }],
         icon: 'order.svg',
-        actions: formatRowActions(order),
-        extra: formatRowExtra(order),
+        actions: toRowActions(order),
+        extra: toRowExtra(order),
     }
 }
 
@@ -295,6 +296,25 @@ const getAllByShopperId = (wf, mode, isFormatted: EFormat, shopperId, date?) => 
         [byShopper]
 
     return getAll(wf, mode, isFormatted, filters)
+}
+
+const uninstall = async (wf) => {
+    const orders = await getAll(wf, wf.mode.Offline, EFormat.Raw)
+    const orderIds = orders.map((order: IOrder) => order.id)
+    return Promise.all([
+        orderIds.map((id) => remove(wf, wf.mode.Offline, id)),
+        removeOfflineTimestamp('orders')
+    ])
+}
+
+const remove = async (wf, mode, id) => {
+    const { database: db } = wf
+    const response = await db.remove(mode, 'orders', id)
+    if (response?.err) {
+        const { err } = response
+        logger(err)
+        return { err }
+    }
 }
 
 const add = (wf, mode, order: IOrder) => {
@@ -473,8 +493,10 @@ export default {
     format,
     getAll,
     add,
+    remove,
 
     getAllByShopperId,
 
     sanitize,
+    uninstall,
 }

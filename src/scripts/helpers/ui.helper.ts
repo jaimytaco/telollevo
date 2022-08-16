@@ -27,6 +27,15 @@ const adminDialogs = (page) => {
     }
 }
 
+enum EMenu{
+    Orders = {
+        page: "orders",
+        icon: "packages.svg",
+        nameSingular: "pedido",
+        namePlural: "pedidos"
+    }
+}
+
 export const adminHeader = (user, actions, currentPage, currentNamePlural) => {
     return `
         <header>
@@ -67,7 +76,7 @@ export const adminHeader = (user, actions, currentPage, currentNamePlural) => {
                             </span> -->
                             <ul class="sp-popup">
                                 <li>
-                                    <button class="btn">
+                                    <button class="btn" data-sign-out_btn>
                                         Cerrar sesión
                                     </button>
                                 </li>

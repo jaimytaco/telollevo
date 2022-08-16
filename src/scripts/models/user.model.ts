@@ -25,6 +25,7 @@ const getFullName = (user: IUser) => `${user.name} ${user.lastName}`
 
 const getAcronym = (user: IUser) => `${user.name.charAt(0)}${user.lastName.charAt(0)}`
 
+// TODO: install depending of user-type
 const install = async (wf, id) => {
     const lastUpdate = await getOfflineTimestamp('users')
     

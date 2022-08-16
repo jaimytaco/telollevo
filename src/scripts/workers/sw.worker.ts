@@ -32,6 +32,8 @@ import offlineDB from '@wf/services/indexedDb.service'
 import authenticator from '@wf/services/firebase.auth.service'
 
 import MUser from '@models/user.model'
+import MOrder from '@models/order.model'
+import MFlight from '@models/flight.model'
 
 let userCredential
 
@@ -64,7 +66,9 @@ const installHdlr = (e) => {
                 const user = await MUser.install(wf, userId)
                 await prefetchRoutes(app.routes)
             }else{
-                 // TODO: unregister user content in offline-DB
+                // TODO: unregister user content in offline-DB
+                MOrder.uninstall(wf)
+                MFlight.uninstall(wf)
             }
         })
 
@@ -99,7 +103,7 @@ const prefetchRequest = async (request) => {
 
     const route = routes[pathname]
     if (!route){
-        logger(`Route ${url} not found in app`)
+        logger(`Route ${url} not found in app to build`)
         return
     }
 
@@ -159,7 +163,7 @@ const fetchHdlr = (e) => {
             //     return Response.redirect('/404', 404)
             // }
 
-            const redirectForAuth = !userCredential && routes[pathname]?.withAuth
+            const redirectForAuth = !userCredential && app.routes[pathname]?.withAuth
             if (redirectForAuth){
                 logger('Redirecting to login because user is not authenticated')
                 // TODO: Clear cached routes that need authentication
@@ -189,7 +193,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 361
+export const SW_VERSION = 373
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000
