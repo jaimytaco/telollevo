@@ -176,12 +176,6 @@ const fetchHdlr = (e) => {
                 return Response.redirect(pathname.slice(0, -1))
             }
 
-            // const route = app.routes[pathname]
-            // if (!route){
-            //     logger('Redirecting to 404 page')
-            //     return Response.redirect('/404', 404)
-            // }
-
             const redirectForAuth = !userCredential && app.routes[pathname]?.withAuth
             if (redirectForAuth){
                 logger('Redirecting to login because user is not authenticated')
