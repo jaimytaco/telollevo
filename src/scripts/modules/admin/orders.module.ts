@@ -6,10 +6,13 @@ import MQuotation from '@models/quotation.model'
 import { IOrder } from '@types/order.type'
 import { EFormat } from '@types/util.type'
 import { IQuotation } from '@types/quotation.type'
+import { EUserType } from '@types/user.type'
+
 import {
     logger,
     isNode
 } from '@wf/helpers/browser.helper'
+
 import {
     getOfflineTimestamp,
     updateOfflineTimestamp
@@ -301,7 +304,10 @@ const loader = async (wf) => {
     const { uid: userId } = await auth.getCurrentUser()
     const done = 1
 
-    const orders = await MOrder.getAllByShopperId(wf, mode.Network, EFormat.Raw, userId, lastUpdate) as IOrder[]
+    const user = await MUser.get(wf, mode.Offline, userId, EFormat.Raw)
+    
+    // const orders = await MOrder.getAllByShopperId(wf, mode.Network, EFormat.Raw, userId, lastUpdate) as IOrder[]
+    const orders = await MOrder.getAllByUserAuthenticated(wf, mode.Network, EFormat.Raw, user, lastUpdate) as IOrder[]
 
     if (orders?.err) {
         const { err } = orders
