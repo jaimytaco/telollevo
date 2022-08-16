@@ -142,10 +142,12 @@ const toRow = (flight: IFlight) => {
 const uninstall = async (wf) => {
     const flights = await getAll(wf, wf.mode.Offline, EFormat.Raw)
     const flightIds = flights.map((flight: IFlight) => flight.id)
-    return Promise.all([
+    await Promise.all([
         flightIds.map((id) => remove(wf, wf.mode.Offline, id)),
         removeOfflineTimestamp('flights')
     ])
+
+    logger(`Flights uninstalled successfully!`)
 }
 
 const remove = async (wf, mode, id) => {
@@ -190,7 +192,6 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     const { database: db } = wf
     const responseFlight = await db.getAll(mode, 'flights', filters)
     if (responseFlight?.err) {
-        logger(responseFlight?.err)
         const { err } = responseFlight
         logger(err)
         return { err }

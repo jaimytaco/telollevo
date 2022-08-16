@@ -301,10 +301,12 @@ const getAllByShopperId = (wf, mode, isFormatted: EFormat, shopperId, date?) => 
 const uninstall = async (wf) => {
     const orders = await getAll(wf, wf.mode.Offline, EFormat.Raw)
     const orderIds = orders.map((order: IOrder) => order.id)
-    return Promise.all([
+    await Promise.all([
         orderIds.map((id) => remove(wf, wf.mode.Offline, id)),
         removeOfflineTimestamp('orders')
     ])
+
+    logger(`Orders uninstalled successfully!`)
 }
 
 const remove = async (wf, mode, id) => {

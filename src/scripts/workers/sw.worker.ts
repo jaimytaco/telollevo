@@ -34,15 +34,25 @@ import authenticator from '@wf/services/firebase.auth.service'
 import MUser from '@models/user.model'
 import MOrder from '@models/order.model'
 import MFlight from '@models/flight.model'
+import MQuotation from '@models/quotation.model'
 
 let userCredential
 
 const prefetchRoutes = (routes) => Promise.all(
     Object.keys(routes)
         .filter((pahtname) => pahtname.startsWith('/'))
-        .map((pahtname) => {
-            logger(`Prefetching for ${pahtname}`)
-            return prefetchRequest(new Request(pahtname))
+        .map((pathname) => {
+            logger(`Prefetching for ${pathname}`)
+            return prefetchRequest(new Request(pathname))
+        })
+)
+
+const unprefetchRoutes = (routes) => Promise.all(
+    Object.keys(routes)
+        .filter((pathname) => pathname.startsWith('/'))
+        .map((pathname) => {
+            logger(`Unprefetching for ${pathname}`)
+            return unprefetchRequest(new Request(pathname))
         })
 )
 
@@ -64,11 +74,15 @@ const installHdlr = (e) => {
             if (userCredential) {
                 const userId = userCredential.uid
                 const user = await MUser.install(wf, userId)
+
                 await prefetchRoutes(app.routes)
             }else{
-                // TODO: unregister user content in offline-DB
+                MUser.uninstall(wf)
                 MOrder.uninstall(wf)
                 MFlight.uninstall(wf)
+                MQuotation.uninstall(wf)
+
+                unprefetchRoutes(app.routes)
             }
         })
 
@@ -94,6 +108,11 @@ const activateHdlr = async (e) => {
     }
 
     e.waitUntil(fn())
+}
+
+const unprefetchRequest = async (request) => {
+    const cache = await caches.open(CACHE_NAME)
+    return cache.delete(request)
 }
 
 const prefetchRequest = async (request) => {
@@ -193,7 +212,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 373
+export const SW_VERSION = 380
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000

@@ -6,7 +6,8 @@ import { EFormat } from '@types/util.type'
 import { logger } from '@wf/helpers/browser.helper'
 import {
     getOfflineTimestamp,
-    updateOfflineTimestamp
+    updateOfflineTimestamp,
+    removeOfflineTimestamp,
 } from '@wf/lib.worker'
 
 interface IUser{
@@ -17,6 +18,27 @@ interface IUser{
     createdAt: Date,
     updatedAt: Date,
     type: EUserType
+}
+
+const uninstall = async (wf) => {
+    const users = await getAll(wf, wf.mode.Offline, EFormat.Raw)
+    const userIds = users.map((user: IFlight) => user.id)
+    await Promise.all([
+        userIds.map((id) => remove(wf, wf.mode.Offline, id)),
+        removeOfflineTimestamp('users')
+    ])
+
+    logger(`Users uninstalled successfully!`)
+}
+
+const remove = async (wf, mode, id) => {
+    const { database: db } = wf
+    const response = await db.remove(mode, 'users', id)
+    if (response?.err) {
+        const { err } = response
+        logger(err)
+        return { err }
+    }
 }
 
 const getType = (user: IUserType) => `${user.type}`
@@ -55,16 +77,37 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
     return mode === EFormat.Pretty ? format(user) : user
 }
 
+const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
+    const { database: db } = wf
+    const responseUser = await db.getAll(mode, 'users', filters)
+    if (responseUser?.err) {
+        const { err } = responseUser
+        logger(err)
+        return { err }
+    }
+
+    const users = responseUser.data as IUser[]
+
+    if (isFormatted === EFormat.Raw) return users
+
+    return isFormatted === EFormat.Related ?
+        users :
+        users.map(format)
+}
+
 const format = (user: IUser) => user
 
 export default{
     collection: 'users',
     
     format,
+    getAll,
     get,
     add,
+    remove,
 
     install,
+    uninstall,
     getAcronym,
     getFullName,
     getType,

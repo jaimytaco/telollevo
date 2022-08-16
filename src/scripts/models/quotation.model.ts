@@ -5,7 +5,29 @@ import MFlight from '@models/flight.model'
 import { ECoin } from '@types/util.type'
 
 import { logger } from '@wf/helpers/browser.helper'
+import { removeOfflineTimestamp } from '@wf/lib.worker'
 
+
+const uninstall = async (wf) => {
+    const quotations = await getAll(wf, wf.mode.Offline, EFormat.Raw)
+    const quotationIds = quotations.map((quotation: IQuotation) => quotation.id)
+    await Promise.all([
+        quotationIds.map((id) => remove(wf, wf.mode.Offline, id)),
+        removeOfflineTimestamp('quotations')
+    ])
+
+    logger(`Quotations uninstalled successfully!`)
+}
+
+const remove = async (wf, mode, id) => {
+    const { database: db } = wf
+    const response = await db.remove(mode, 'quotations', id)
+    if (response?.err) {
+        const { err } = response
+        logger(err)
+        return { err }
+    }
+}
 
 const getAllByOrderId = async (wf, mode, isFormatted: EFormat, orderId) => {
     const { operator } = wf
@@ -60,6 +82,8 @@ export default{
     format,
     getAll,
     add,
+    remove,
 
     getAllByOrderId,
+    uninstall,
 }
