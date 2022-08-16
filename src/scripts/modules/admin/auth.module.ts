@@ -3,6 +3,14 @@ import {
     delay, 
 } from '@helpers/util.helper'
 
+import { logger } from '@wf/helpers/browser.helper'
+
+import { EUserType } from '@types/user.type'
+import MUser from '@models/user.model'
+
+import { EFormat } from '@types/util.type'
+
+
 const configSignIn = async (wf) => {
     const loginForm = getDOMElement(document, '#login-form')
     if (loginForm)
@@ -13,12 +21,21 @@ const configSignIn = async (wf) => {
             if (!emailInput || !passwordInput) return
 
             const userCredential = await wf.auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value)
-            
-            // TODO: UI animations according to userCredential
+            console.log('--- userCredential =', userCredential)
+            if (userCredential?.err){
+                logger(userCredential.err)
+                // TODO: undo UI animation
+                return
+            }
 
-            // TODO: redirect to admin page?
+            const user = await MUser.get(wf, wf.mode.Network, userCredential.user.uid, EFormat.Raw)
+
+            // TODO: UI animations 
+
             await delay(1500)
-            location.href = '/admin/orders'
+
+            if (user.type === EUserType.Shopper) location.href = '/admin/orders'
+            if (user.type === EUserType.Traveler) location.href = '/admin/flights'
         }  
 }
 
