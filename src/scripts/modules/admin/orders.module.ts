@@ -306,7 +306,6 @@ const loader = async (wf) => {
 
     const user = await MUser.get(wf, mode.Offline, userId, EFormat.Raw)
     
-    // const orders = await MOrder.getAllByShopperId(wf, mode.Network, EFormat.Raw, userId, lastUpdate) as IOrder[]
     const orders = await MOrder.getAllByUserAuthenticated(wf, mode.Network, EFormat.Raw, user, lastUpdate) as IOrder[]
 
     if (orders?.err) {

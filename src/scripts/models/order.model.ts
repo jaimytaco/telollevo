@@ -319,6 +319,12 @@ const getAllByShopperId = (wf, mode, isFormatted: EFormat, shopperId, date?) => 
     return getAll(wf, mode, isFormatted, filters)
 }
 
+const getAllByIds = async (wf, mode, ids: string[], isFormatted: EFormat) => {
+    return Promise.all(
+        ids.map((id) => get(wf, mode, id, isFormatted))
+    )
+}
+
 const uninstall = async (wf) => {
     const orders = await getAll(wf, wf.mode.Offline, EFormat.Raw)
     const orderIds = orders.map((order: IOrder) => order.id)
@@ -374,6 +380,23 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     return isFormatted === EFormat.Related ?
         ordersWithQuotation :
         ordersWithQuotation.map(format)
+}
+
+const get = async (wf, mode, id, isFormatted: EFormat) => {
+    const { database: db } = wf
+    const responseOrder = await db.get(mode, 'orders', id)
+    if (responseOrder?.err) {
+        const { err } = responseOrder
+        logger(err)
+        return { err }
+    }
+
+    const order = responseOrder.data as IOrder
+    if (isFormatted === EFormat.Raw) return order
+    
+    return isFormatted === EFormat.Related ?
+        order :
+        format(order)
 }
 
 const format = (order: IOrder) => order
@@ -518,6 +541,7 @@ export default {
     add,
     remove,
 
+    getAllByIds,
     getAllByShopperId,
     getAllByUserAuthenticated,
 

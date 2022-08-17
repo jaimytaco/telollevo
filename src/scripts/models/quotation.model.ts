@@ -29,6 +29,20 @@ const remove = async (wf, mode, id) => {
     }
 }
 
+const getAllByFlightId = async (wf, mode, isFormatted: EFormat, flightId) => {
+    const { operator } = wf
+
+    const byFlight = {
+        field: 'flightId',
+        operator: operator.EqualTo,
+        value: flightId
+    }
+
+    const filters = [byFlight]
+
+    return getAll(wf, mode, isFormatted, filters)
+}
+
 const getAllByOrderId = async (wf, mode, isFormatted: EFormat, orderId) => {
     const { operator } = wf
 
@@ -85,5 +99,6 @@ export default{
     remove,
 
     getAllByOrderId,
+    getAllByFlightId,
     uninstall,
 }

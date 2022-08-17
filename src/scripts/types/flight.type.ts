@@ -51,6 +51,10 @@ export interface IFlight{
     airline: string,
     from: ECountry,
     to: ECountry,
-    quotations: IQuotation[],
-    orderIds: string[]
+    travelerId: string,
+    createdAt: Date,
+    updatedAt: Date,
+
+    quotations?: IQuotation[],
+    orderIds?: string[],
 }

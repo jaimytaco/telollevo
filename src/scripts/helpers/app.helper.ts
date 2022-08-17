@@ -27,11 +27,18 @@ export const app = {
             ...styles,
             ...routes,
         ],
-        '/admin/orders': {
-            code: 'admin-orders',
-            pattern: '/admin/orders{/}?',
-            builder: ModAdminOrders.builder,
-            loader: ModAdminOrders.loader,
+        // '/admin/orders': {
+        //     code: 'admin-orders',
+        //     pattern: '/admin/orders{/}?',
+        //     builder: ModAdminOrders.builder,
+        //     loader: ModAdminOrders.loader,
+        //     withAuth: true,
+        // },
+        '/admin/flights': {
+            code: 'admin-flights',
+            pattern: '/admin/flights{/}?',
+            builder: ModAdminFlights.builder,
+            loader: ModAdminFlights.loader,
             withAuth: true,
         }
     },
@@ -70,7 +77,7 @@ export const initApp = async () => {
     const actions = {
         '/login': ModLogin.action,
         '/admin/orders': ModAdminOrders.action,
-        // '/admin/flights': ModAdminFlights.action,
+        '/admin/flights': ModAdminFlights.action,
     }
 
     const { pathname } = location
