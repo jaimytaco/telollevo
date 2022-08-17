@@ -71,8 +71,10 @@ button:active{
     background: var(--black-color);
     color: var(--white-color);
     aspect-ratio: 1 / 1;
+    min-block-size: 36px;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .btn.btn-primary{

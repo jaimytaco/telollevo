@@ -12,22 +12,20 @@ import MQuotation from '@models/quotation.model'
 import { IOrder } from '@types/order.type'
 import MOrder from '@models/order.model'
 
+import { createFlight_dialog } from '@data/admin/dialog.data'
+import CTable from '@components/table.component'
+import { adminHeader } from '@helpers/ui.helper'
+
 import {
     getOfflineTimestamp,
     updateOfflineTimestamp
 } from '@wf/lib.worker'
 
-import { logger } from '@wf/helpers/browser.helper'
+import { 
+    logger,
+    isNode
+} from '@wf/helpers/browser.helper'
 
-
-const builder = async () => {
-    return {
-        head: { 
-            title: '', 
-            meta: '' },
-        body: ''
-    }
-}
 
 const loader = async (wf) => {
     const { mode, auth } = wf
@@ -99,6 +97,67 @@ const loader = async (wf) => {
     await updateOfflineTimestamp('orders', new Date())
 
     return { done }
+}
+
+const builder = async (wf) => {
+    const emptyContent = {
+        head: {
+            title: '',
+            meta: ''
+        },
+        body: `${createFlight_dialog}`
+    }
+
+    if (isNode())
+        return emptyContent
+
+    const userCredential = await wf.auth.getCurrentUser()
+    if (!userCredential) {
+        logger('Builder for admin-flights needs user authentication')
+        return emptyContent
+    }
+
+    const user = await MUser.get(wf, wf.mode.Offline, userCredential.uid, EFormat.Raw) as IUser
+
+    const flights = await MFlight.getAll(wf, wf.mode.Offline, EFormat.Pretty)
+    if (flights?.err) {
+        logger(flights.err)
+        return { err: flights.err }
+    }
+
+    const rows = flights.map(MFlight.toRow)
+
+    // TODO
+    const filters = []
+    const sorters = []
+
+    const body = `
+        ${adminHeader(
+            user,
+            `
+                <div class="n-t-actions-2">
+                    <button class="btn btn-secondary btn-sm" data-create-flight-dialog_btn>
+                        <picture>
+                            <img src="/img/icon/plus-light.svg" width="14" height="14">
+                        </picture>
+                        <span>Registrar vuelo</span>
+                    </button>
+                </div>
+            `, 'flights', 'vuelos')
+        }
+        <main>
+            ${CTable.render('Vuelos', rows, filters, sorters)}
+        </main>
+        ${createFlight_dialog}
+    `
+
+    return {
+        head: { 
+            title: `${wf.app.name} | Vuelos`, 
+            meta: '' 
+        },
+        body
+    }
 }
 
 const action = () => {}
