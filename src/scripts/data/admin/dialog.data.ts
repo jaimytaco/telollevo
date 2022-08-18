@@ -4,7 +4,13 @@ import { EShippingDestination, ECountry, ECoin, EOrderProductQty } from '@types/
 
 import { capitalizeString } from '@helpers/util.helper'
 
-import { EHousingType, EFlightFields, EPlaceFields, EHousingFields } from '@types/flight.type'
+import { 
+    EHousingType, 
+    EFlightFields, 
+    EPlaceFields, 
+    EHousingFields,
+    EReceiverFields 
+} from '@types/flight.type'
 
 
 export const createOrder_dialog = `
@@ -307,8 +313,8 @@ export const createFlight_dialog = `
                     <input type="text" id="${EPlaceFields.Zipcode}" placeholder="Ingresa un código postal" required>
                 </fieldset>
                 <fieldset>
-                    <input type="checkbox" id="is-responsible-for">
-                    <label for="is-responsible-for">
+                    <input type="checkbox" id="${EFlightFields.IsResponsibleFor}" required>
+                    <label for="${EFlightFields.IsResponsibleFor}">
                         Yo soy responsable por los productos, por ende
                         cualquier inconveniente ocasionado por un error
                         en mis fechas, dirección y/o cambios o 
@@ -317,8 +323,8 @@ export const createFlight_dialog = `
                     </label>
                 </fieldset>
                 <fieldset>
-                    <input type="checkbox" id="are-receive-order-dates-ok">
-                    <label for="are-receive-order-dates-ok">
+                    <input type="checkbox" id="${EFlightFields.AreReceiveOrderDatesOk}" required>
+                    <label for="${EFlightFields.AreReceiveOrderDatesOk}">
                         Me comprometo a revisar muy bien las fechas     
                         que coloqué en el formulario, ya que cualquier 
                         error le generará problemas al comprador.
@@ -346,12 +352,12 @@ export const createFlight_dialog = `
             </header>
             <main>
                 <fieldset>
-                    <label for="receiver-name">Nombre de quién recibe los productos</label>
-                    <input type="text" id="receiver-name" placeholder="Ingresa un nombre completo">
+                    <label for="${EReceiverFields.Name}">Nombre de quién recibe los productos</label>
+                    <input type="text" id="${EReceiverFields.Name}" placeholder="Ingresa un nombre completo" required>
                 </fieldset>
                 <fieldset>
-                    <label for="receiver-phone">Teléfono de quién recibe los productos</label>
-                    <input type="text" id="receiver-phone" placeholder="Ingresa un teléfono">
+                    <label for="${EReceiverFields.Phone}">Teléfono de quién recibe los productos</label>
+                    <input type="text" id="${EReceiverFields.Phone}" placeholder="Ingresa un teléfono" required>
                 </fieldset>
             </main>
             <footer>

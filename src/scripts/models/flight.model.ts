@@ -10,6 +10,9 @@ import {
 
     EHousingFields,
     ESanitizeHousingErrors,
+
+    EReceiverFields,
+    ESanitizeReceiverErrors,
 } from '@types/flight.type'
 
 import { 
@@ -370,6 +373,39 @@ const sanitize = (flight: IFlight) => {
             err: {
                 field: EHousingFields.Address,
                 desc: ESanitizeHousingErrors.Address
+            }
+        }
+
+    if (flight?.isResponsibleFor && !isBoolean(flight.isResponsibleFor))
+        return {
+            err: {
+                field: EFlightFields.IsResponsibleFor,
+                desc: ESanitizeFlightErrors.IsResponsibleFor
+            }
+        }
+
+    if (flight?.areReceiveOrderDatesOk && !isBoolean(flight.areReceiveOrderDatesOk))
+        return {
+            err: {
+                field: EFlightFields.AreReceiveOrderDatesOk,
+                desc: ESanitizeFlightErrors.AreReceiveOrderDatesOk
+            }
+        }
+
+    // Sanitize for step-3
+    if (flight?.receiver?.name && !isValidString(flight.receiver.name))
+        return {
+            err: {
+                field: EReceiverFields.Name,
+                desc: ESanitizeReceiverErrors.Name
+            }
+        }
+
+    if (flight?.receiver?.phone && !isValidString(flight.receiver.phone))
+        return {
+            err: {
+                field: EReceiverFields.Phone,
+                desc: ESanitizeReceiverErrors.Phone
             }
         }
 }

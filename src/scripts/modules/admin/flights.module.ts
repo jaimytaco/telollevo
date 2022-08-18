@@ -30,7 +30,7 @@ import {
 const configCreateFlightDialog = async (wf, dialogId) => {
     const { getDOMElement, delay } = await import('@helpers/util.helper')
     const { default: CForm } = await import('@components/form.component')
-    const { EFlightFields, EPlaceFields, EHousingFields } = await import('@types/flight.type')
+    const { EFlightFields, EPlaceFields, EHousingFields, EReceiverFields } = await import('@types/flight.type')
     
     const dialog = getDOMElement(document, `#${dialogId}`)
     if (!dialog) return
@@ -149,11 +149,11 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         if (!zipcodeInput) return
         const zipcode = zipcodeInput.value
 
-        const isResponsibleForInput = getDOMElement(step2Form, '#is-responsible-for')
+        const isResponsibleForInput = getDOMElement(step2Form, `#${EFlightFields.IsResponsibleFor}`)
         if (!isResponsibleForInput) return
         const isResponsibleFor = isResponsibleForInput.checked
 
-        const areReceiveOrderDatesOkInput = getDOMElement(step2Form, '#are-receive-order-dates-ok')
+        const areReceiveOrderDatesOkInput = getDOMElement(step2Form, `#${EFlightFields.AreReceiveOrderDatesOk}`)
         if (!areReceiveOrderDatesOkInput) return
         const areReceiveOrderDatesOk = areReceiveOrderDatesOkInput.checked
 
@@ -186,11 +186,48 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     }
 
 
-
-
-
-
+    // STEP-3
     const step3Form = getDOMElement(dialog, '#create-flight-step-3_form')
+    if (!step3Form) return
+    const btnSubmitStep3 = getDOMElement(step3Form, 'button[type="submit"]')
+    if (!btnSubmitStep3) return
+    CForm.init(step3Form.id)
+
+    btnSubmitStep3.onclick = (e) => {
+        e.preventDefault()
+        CForm.validateBeforeSubmit(step3Form)
+    }
+
+    step3Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        const nameInput = getDOMElement(step3Form, `#${EReceiverFields.Name}`)
+        if (!nameInput) return
+        const name = nameInput.value
+
+        const phoneInput = getDOMElement(step3Form, `#${EReceiverFields.Phone}`)
+        if (!phoneInput) return
+        const phone = phoneInput.value
+
+        const receiver = { name, phone }
+
+        flight.receiver = receiver
+
+        const validateStatus = CForm.validateOnSubmit(step3Form, MFlight.sanitize, flight)
+        if (validateStatus?.err) return
+
+        logger('create-flight-dialog step-3 with flight:', flight)
+
+        step3Form.classList.remove('active')
+        step4Form.classList.add('active')
+    }
+
+
+
+
+    
+
+
     const step4Form = getDOMElement(dialog, '#create-flight-step-4_form')
     const step5Form = getDOMElement(dialog, '#create-flight-step-5_form')
     const step6Form = getDOMElement(dialog, '#create-flight-confirmation-step-6_form')
@@ -202,25 +239,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
 
     
 
-    
 
-    step3Form.onsubmit = (e) => {
-        e.preventDefault()
-
-        const name = (getDOMElement(step3Form, '#receiver-name')).value
-        const phone = (getDOMElement(step3Form, '#receiver-phone')).value
-
-        const receiver = { name, phone }
-
-        flight.receiver = receiver
-
-        // TODO: validate flight info step-3
-
-        console.log('--- step 3 - flight =', flight)
-
-        step3Form.classList.remove('active')
-        step4Form.classList.add('active')
-    }
 
     step4Form.onsubmit = (e) => {
         e.preventDefault()

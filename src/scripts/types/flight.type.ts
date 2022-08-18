@@ -53,6 +53,16 @@ export interface IHousing{
     // hotelName?: string
 }
 
+export enum EReceiverFields{
+    Name = 'receiver-name',
+    Phone = 'receiver-phone'
+}
+
+export enum ESanitizeReceiverErrors{
+    Name = 'Debe indicar el nombre del receptor',
+    Phone = 'Debe indicar el teléfono del receptor'
+}
+
 export interface IReceiver{
     name: string,
     phone: string
@@ -61,12 +71,16 @@ export interface IReceiver{
 export enum EFlightFields{
     ReceiveOrdersSince = 'receive-orders-since',
     ReceiveOrdersUntil = 'receive-orders-until',
+    IsResponsibleFor = 'is-responsible-for',
+    AreReceiveOrderDatesOk = 'are-receive-order-dates-ok',
 }
 
 export enum ESanitizeFlightErrors{
     ReceiveOrdersSince = 'Debe indicar una fecha válida',
     ReceiveOrdersUntil = 'Debe indicar una fecha válida',
     ReceiveOrdersUntilLower = 'La fecha debe ser mayor a la anterior',
+    IsResponsibleFor = 'Debe indicar que el viajero se hace responsable de los productos',
+    AreReceiveOrderDatesOk = 'Debe indicar que el viajero se compromete a revisar bien las fechas registradas'
 }
 
 export enum EFlightStatus{
