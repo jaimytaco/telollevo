@@ -16,26 +16,6 @@ import {
     logger
 } from '@wf/helpers/browser.helper'
 
-const adminDialogs = (page) => {
-    switch (page){
-        case 'admin-orders':
-            return `${createOrder_dialog}`
-        case 'admin-flights':
-            return `${createFlight_dialog}`
-        default:
-            return ''
-    }
-}
-
-enum EMenu{
-    Orders = {
-        page: "orders",
-        icon: "packages.svg",
-        nameSingular: "pedido",
-        namePlural: "pedidos"
-    }
-}
-
 export const adminHeader = (user, actions, currentPage, currentNamePlural) => {
     return `
         <header>
@@ -104,59 +84,4 @@ export const adminHeader = (user, actions, currentPage, currentNamePlural) => {
             </nav>
         </header>
     `
-}
-
-export const adminFlights = async (wf) => {
-    try{
-        if (isNode()) return {
-            head: { 
-                title: '', 
-                meta: '' 
-            },
-            body: `${adminDialogs('admin-flights')}`
-        }
-
-        // TODO: get orders from local DB
-        const flights = await MFlight.getAll(wf, wf.mode.Network, 'format')
-
-        const rows = flights.map(MFlight.toRow)
-
-        // TODO: complete filters and sorters for admin-flights
-        const filters = []
-        const sorters = []
-
-        const tableHTML = CTable.render('Vuelos', rows, filters, sorters)
-
-        const title = `${app.name} | Vuelos`
-        const meta = `
-            <meta name="description" content="DESCRIPTION">
-            <meta property="og:url" content="OG_URL">
-            <meta property="og:type" content="OG_TYPE">
-        `
-        const body = `
-            ${
-                adminHeader(`
-                    <div class="n-t-actions-2">
-                        <button class="btn btn-secondary btn-sm" data-create-flight-dialog_btn>
-                            <picture>
-                                <img src="/img/icon/plus-light.svg" width="14" height="14">
-                            </picture>
-                            <span>Registrar vuelo</span>
-                        </button>
-                    </div>
-                `, 'flights', 'vuelos')
-            }
-            <main>
-                ${tableHTML}
-            </main>
-            ${adminDialogs('admin-flights')}
-        `
-
-        return {
-            head: { title, meta },
-            body
-        }
-    } catch(err){
-        logger(err)
-    }
 }

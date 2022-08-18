@@ -31,6 +31,17 @@ export interface IReceiver{
     phone: string
 }
 
+export enum EFlightFields{
+    ReceiveOrdersSince = 'receive-orders-since',
+    ReceiveOrdersUntil = 'receive-orders-until',
+}
+
+export enum ESanitizeFlightErrors{
+    ReceiveOrdersSince = 'Debe indicar una fecha válida',
+    ReceiveOrdersUntil = 'Debe indicar una fecha válida',
+    ReceiveOrdersUntilLower = 'La fecha debe ser mayor a la anterior',
+}
+
 export enum EFlightStatus{
     Registered = 'registrado',
     Visible = 'visible',
@@ -47,6 +58,7 @@ export interface IFlight{
     receiver: IReceiver,
     shippingDestination: EShippingDestination,
     deliverOrderAt: Date,
+    confirmDeliverOrder48h: boolean,
     code: string,
     airline: string,
     from: ECountry,

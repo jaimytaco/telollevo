@@ -27,6 +27,215 @@ import {
 } from '@wf/helpers/browser.helper'
 
 
+const configCreateFlightDialog = async (wf, dialogId) => {
+    const { getDOMElement, delay } = await import('@helpers/util.helper')
+    const { default: CForm } = await import('@components/form.component')
+    
+    const dialog = getDOMElement(document, `#${dialogId}`)
+    if (!dialog) return
+
+    // STEP-1
+    const step1Form = getDOMElement(dialog, '#create-flight-step-1_form')
+    if (!step1Form) return
+    const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
+    if (!btnSubmitStep1) return
+    CForm.init(step1Form.id)
+
+    const createFlightBtns = getDOMElement(document, '[data-create-flight-dialog_btn]', 'all')
+    const { default: CDialog } = await import('@components/dialog.component')
+
+    createFlightBtns?.forEach((createFlightBtn) => createFlightBtn.onclick = () => {
+        CDialog.handle('create-flight_dialog', 'add')
+        step1Form.classList.add('active')
+    })
+
+    // TODO: use flight local object
+    const flight = {}
+
+    btnSubmitStep1.onclick = (e) => {
+        e.preventDefault()
+        CForm.resetInvalid(step1Form.id)
+        const isFormValid = step1Form.checkValidity()
+        if (!isFormValid){
+            logger(`Form ${step1Form.id} is not HTML valid`)
+            const invalidFieldset = getDOMElement(step1Form, 'fieldset.fs-invalid')
+            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            return
+        }
+        step1Form.requestSubmit()
+    }
+
+    step1Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        const status = EFlightStatus.Registered
+
+        const receiveOrdersSinceInput = getDOMElement(step1Form, '#receive-orders-since')
+        if (!receiveOrdersSinceInput) return
+        const receiveOrdersSince = receiveOrdersSinceInput.value
+        
+        const receiveOrdersUntilInput = getDOMElement(step1Form, '#receive-orders-until')
+        if (!receiveOrdersUntilInput) return
+        const receiveOrdersUntil = receiveOrdersUntilInput.value
+
+        flight.status = status
+        flight.receiveOrdersSince = new Date(`${receiveOrdersSince} 00:00:00`)
+        flight.receiveOrdersUntil = new Date(`${receiveOrdersUntil} 00:00:00`)
+
+        const sanitizeStatus = MFlight.sanitize(flight)
+        if (sanitizeStatus?.err){
+            const { field, desc } = sanitizeStatus.err
+            if (!field){
+                logger(`Sanitize error: ${desc} for flight`, flight)
+                return
+            }
+
+            const invalidFieldset = getDOMElement(step1Form,`#${field}`)?.parentNode 
+            if (invalidFieldset){
+                CForm.handleInvalid('add', desc, invalidFieldset)
+                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for flight`, flight)
+                return
+            }
+        }
+
+        logger('create-flight-dialog step-1 with flight:', flight)
+
+        step1Form.classList.remove('active')
+        step2Form.classList.add('active')
+    }
+
+
+
+
+
+
+    const step2Form = getDOMElement(dialog, '#create-flight-step-2_form')
+    const step3Form = getDOMElement(dialog, '#create-flight-step-3_form')
+    const step4Form = getDOMElement(dialog, '#create-flight-step-4_form')
+    const step5Form = getDOMElement(dialog, '#create-flight-step-5_form')
+    const step6Form = getDOMElement(dialog, '#create-flight-confirmation-step-6_form')
+    
+    
+
+    const { ECountry, EShippingDestination } = await import('@types/util.type')
+    const { EFlightStatus, EHousingType } = await import('@types/flight.type')
+
+    
+
+    step2Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        const type = (getDOMElement(step2Form, '[name="housing-type"]:checked'))?.value
+        const address = (getDOMElement(step2Form, '#address')).value
+        const addressMore = (getDOMElement(step2Form, '#address-more')).value
+        const district = (getDOMElement(step2Form, '#district')).value
+        const country = (getDOMElement(step2Form, '[list="country"]')).value
+        const state = (getDOMElement(step2Form, '[list="state"]')).value
+        const city = (getDOMElement(step2Form, '[list="city"]')).value
+        const zipcode = (getDOMElement(step2Form, '#zipcode')).value
+        const isResponsibleFor = (getDOMElement(step2Form, '#is-responsible-for')).checked
+        const areReceiveOrderDatesOk = (getDOMElement(step2Form, '#are-receive-order-dates-ok')).checked
+
+        // TODO: validate flight info step-2
+
+        const place = {
+            district,
+            country: ECountry[country],
+            state,
+            city,
+            zipcode
+        }
+
+        const housing = {
+            type: EHousingType[type],
+            address,
+            addressMore,
+            place
+        }
+
+        flight.housing = housing
+        flight.isResponsibleFor = isResponsibleFor
+        flight.areReceiveOrderDatesOk = areReceiveOrderDatesOk
+        
+        // TODO: validate flight info step-2
+
+        console.log('--- step 2 - flight =', flight)
+
+        step2Form.classList.remove('active')
+        step3Form.classList.add('active')
+    }
+
+    step3Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        const name = (getDOMElement(step3Form, '#receiver-name')).value
+        const phone = (getDOMElement(step3Form, '#receiver-phone')).value
+
+        const receiver = { name, phone }
+
+        flight.receiver = receiver
+
+        // TODO: validate flight info step-3
+
+        console.log('--- step 3 - flight =', flight)
+
+        step3Form.classList.remove('active')
+        step4Form.classList.add('active')
+    }
+
+    step4Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        const shippingDestination = (getDOMElement(step4Form, '[list="shipping-destination"]')).value
+        const deliverOrderAt = (getDOMElement(step4Form, '#deliver-order-at')).value
+
+        flight.shippingDestination = shippingDestination
+        flight.deliverOrderAt = new Date(`${deliverOrderAt} 00:00:00`)
+
+        // TODO: validate flight info step-4
+
+        console.log('--- step 4 - flight =', flight)
+
+        step4Form.classList.remove('active')
+        step5Form.classList.add('active')
+    }
+
+    step5Form.onsubmit = async (e) => {
+        e.preventDefault()
+
+        const code = (getDOMElement(step5Form, '#code')).value
+        const airline = (getDOMElement(step5Form, '#airline')).value
+        const from = (getDOMElement(step5Form, '[list="from"]')).value
+        const to = (getDOMElement(step5Form, '[list="to"]')).value
+
+        flight.code = code
+        flight.airline = airline
+        flight.from = from
+        flight.to = to
+
+        // TODO: validate flight info step-5
+
+        const x = await wf.database.add(wf.mode.Network, 'flights', flight)
+        console.log('--- x =', x)
+
+        console.log('--- step 5 - flight =', flight)
+
+        step5Form.classList.remove('active')
+        step6Form.classList.add('active')
+    }
+
+    step6Form.onsubmit = async (e) => {
+        e.preventDefault()
+        step6Form.classList.remove('active')
+        CDialog.handle('create-flight_dialog', 'remove')
+
+        // TODO: reload
+        await delay(1500)
+        location.reload()
+    }
+}
+
 const loader = async (wf) => {
     const { mode, auth } = wf
     const lastUpdate = await getOfflineTimestamp('flights')
@@ -160,7 +369,24 @@ const builder = async (wf) => {
     }
 }
 
-const action = () => {}
+const action = async (wf) => {
+    const { default: CDialog } = await import('@components/dialog.component')
+    const { default: CTable } = await import('@components/table.component')
+    const { default: CCard8 } = await import('@components/card8.component')
+    const { getDOMElement } = await import('@helpers/util.helper')
+
+
+    // TODO: make component of table-extra-row
+    const extraRows = getDOMElement(document, '.t-r-extra', 'all')
+    const extraRowIds = extraRows.map((extraRow) => extraRow.id)
+    extraRowIds.forEach((extraRowId) => CTable.handleRowExtra(extraRowId))
+
+    CCard8.handleAll()
+
+    CDialog.init('create-flight_dialog')
+    // configApproveFlight(wf)
+    configCreateFlightDialog(wf, 'create-flight_dialog')
+}
 
 export default{
     builder,

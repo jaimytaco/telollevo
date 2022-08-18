@@ -393,6 +393,13 @@ export const createFlight_dialog = `
                     <label for="deliver-order-at">¿Qué día entregarás los productos al equipo de Te lo Llevo?</label>
                     <input type="date" placeholder="DD/MM/AAAA" id="deliver-order-at">
                 </fieldset>
+                <fieldset>
+                    <input type="checkbox" id="confirm-deliver-order-48h">
+                    <label for="confirm-deliver-order-48h">
+                        Me comprometo a entregar el pedido, como máximo, 
+                        después de 48 horas de haber llegado a mi destino.
+                    </label>
+                </fieldset>
             </main>
             <footer>
                 <button class="btn btn-primary btn-submit" type="submit">Continuar</button>

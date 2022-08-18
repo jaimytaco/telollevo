@@ -1,4 +1,17 @@
-import { IFlight, EFlightStatus } from '@types/flight.type'
+import {
+    isNumeric,
+    isBoolean,
+    isValidString,
+    isValidDate,
+} from '@helpers/util.helper'
+
+import { 
+    IFlight, 
+    EFlightStatus,
+    EFlightFields,
+    ESanitizeFlightErrors,
+} from '@types/flight.type'
+
 import { EFormat } from '@types/util.type'
 import { capitalizeString, formatLocaleDate } from '@helpers/util.helper'
 
@@ -256,6 +269,40 @@ const format = (flight: IFlight) => {
     return flight
 }
 
+const sanitize = (flight: IFlight) => {
+    // Sanitize for step-1
+    if (flight.status && !Object.values(EFlightStatus).includes(flight.status))
+        return {
+            err: {
+                desc: ESanitizeFlightErrors.Status
+            }
+        }
+    
+    if (flight.receiveOrdersSince && !isValidDate(flight.receiveOrdersSince))
+        return {
+            err: {
+                field: EFlightFields.ReceiveOrdersSince,
+                desc: ESanitizeFlightErrors.ReceiveOrdersSince
+            }
+        }
+
+    if (flight.receiveOrdersUntil && !isValidDate(flight.receiveOrdersUntil))
+        return {
+            err: {
+                field: EFlightFields.ReceiveOrdersUntil,
+                desc: ESanitizeFlightErrors.ReceiveOrdersUntil
+            }
+        }
+
+    if (flight.receiveOrdersSince >= flight.receiveOrdersUntil)
+        return {
+            err: {
+                field: EFlightFields.ReceiveOrdersUntil,
+                desc: ESanitizeFlightErrors.ReceiveOrdersUntilLower
+            }
+        }
+}
+
 export default{
     collection: 'flights',
     toRow,
@@ -270,4 +317,6 @@ export default{
     uninstall,
     getAllByTravelerId,
     getAllByUserAuthenticated,
+
+    sanitize,
 }

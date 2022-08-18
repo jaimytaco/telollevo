@@ -27,13 +27,13 @@ export const app = {
             ...styles,
             ...routes,
         ],
-        // '/admin/orders': {
-        //     code: 'admin-orders',
-        //     pattern: '/admin/orders{/}?',
-        //     builder: ModAdminOrders.builder,
-        //     loader: ModAdminOrders.loader,
-        //     withAuth: true,
-        // },
+        '/admin/orders': {
+            code: 'admin-orders',
+            pattern: '/admin/orders{/}?',
+            builder: ModAdminOrders.builder,
+            loader: ModAdminOrders.loader,
+            withAuth: true,
+        },
         '/admin/flights': {
             code: 'admin-flights',
             pattern: '/admin/flights{/}?',
