@@ -223,12 +223,56 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     }
 
 
+    // STEP-4
+    const step4Form = getDOMElement(dialog, '#create-flight-step-4_form')
+    if (!step4Form) return
+    const btnSubmitStep4 = getDOMElement(step4Form, 'button[type="submit"]')
+    if (!btnSubmitStep4) return
+    CForm.init(step4Form.id)
+
+    btnSubmitStep4.onclick = (e) => {
+        e.preventDefault()
+        CForm.validateBeforeSubmit(step4Form)
+    }
+
+    step4Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        const shippingDestinationInput = getDOMElement(step4Form, `[list="${EFlightFields.ShippingDestination}"]`)
+        if (!shippingDestinationInput) return
+        const shippingDestination = shippingDestinationInput.value
+
+        const deliverOrderAtInput = getDOMElement(step4Form, `#${EFlightFields.DeliverOrderAt}`)
+        if (!deliverOrderAtInput) return
+        const deliverOrderAt = deliverOrderAtInput.value
+
+        const confirmDeliverOrder48hInput = getDOMElement(step4Form, `#${EFlightFields.ConfirmDeliverOrder48h}`)
+        if (!confirmDeliverOrder48hInput) return
+        const confirmDeliverOrder48h = confirmDeliverOrder48hInput.checked
+
+        flight.shippingDestination = shippingDestination
+        flight.deliverOrderAt = new Date(`${deliverOrderAt} 00:00:00`)
+        flight.confirmDeliverOrder48h = confirmDeliverOrder48h
+
+        const validateStatus = CForm.validateOnSubmit(step4Form, MFlight.sanitize, flight)
+        if (validateStatus?.err) return
+
+        logger('create-flight-dialog step-4 with flight:', flight)
+
+        step4Form.classList.remove('active')
+        step5Form.classList.add('active')
+    }
+
+
 
 
     
 
 
-    const step4Form = getDOMElement(dialog, '#create-flight-step-4_form')
+
+
+
+
     const step5Form = getDOMElement(dialog, '#create-flight-step-5_form')
     const step6Form = getDOMElement(dialog, '#create-flight-confirmation-step-6_form')
     
@@ -241,22 +285,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
 
 
 
-    step4Form.onsubmit = (e) => {
-        e.preventDefault()
-
-        const shippingDestination = (getDOMElement(step4Form, '[list="shipping-destination"]')).value
-        const deliverOrderAt = (getDOMElement(step4Form, '#deliver-order-at')).value
-
-        flight.shippingDestination = shippingDestination
-        flight.deliverOrderAt = new Date(`${deliverOrderAt} 00:00:00`)
-
-        // TODO: validate flight info step-4
-
-        console.log('--- step 4 - flight =', flight)
-
-        step4Form.classList.remove('active')
-        step5Form.classList.add('active')
-    }
+    
 
     step5Form.onsubmit = async (e) => {
         e.preventDefault()

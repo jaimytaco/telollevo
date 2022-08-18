@@ -408,6 +408,33 @@ const sanitize = (flight: IFlight) => {
                 desc: ESanitizeReceiverErrors.Phone
             }
         }
+
+    // Sanitize for step-3
+    if (flight?.shippingDestination && !Object.values(EShippingDestination).map((sd) => capitalizeString(sd)).includes(flight.shippingDestination))
+        return {
+            err: {
+                field: EFlightFields.ShippingDestination,
+                desc: ESanitizeFlightErrors.ShippingDestination
+            }
+        }
+
+    if (flight?.deliverOrderAt && !isValidDate(flight.deliverOrderAt))
+        return {
+            err: {
+                field: EFlightFields.DeliverOrderAt,
+                desc: ESanitizeFlightErrors.DeliverOrderAt
+            }
+        }
+
+    if (flight?.confirmDeliverOrder48h && !isBoolean(flight.confirmDeliverOrder48h))
+        return {
+            err: {
+                field: EFlightFields.ConfirmDeliverOrder48h,
+                desc: ESanitizeFlightErrors.ConfirmDeliverOrder48h
+            }
+        }
+
+    // Sanitize for step-4
 }
 
 export default{

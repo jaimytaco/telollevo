@@ -379,19 +379,19 @@ export const createFlight_dialog = `
             </header>  
             <main>   
                 <fieldset>
-                    <label for="shipping-destination">¿En cuál de nuestros locales entregarás los productos?</label>
-                    <input list="shipping-destination" placeholder="Selecciona un local">
-                    <datalist id="shipping-destination">
+                    <label for="${EFlightFields.ShippingDestination}">¿En cuál de nuestros locales entregarás los productos?</label>
+                    <input list="${EFlightFields.ShippingDestination}" placeholder="Selecciona un local" required>
+                    <datalist id="${EFlightFields.ShippingDestination}">
                         <option value="${capitalizeString(EShippingDestination.Inplace_Miraflores)}"></option>
                     </datalist>
                 </fieldset>
                 <fieldset>
-                    <label for="deliver-order-at">¿Qué día entregarás los productos al equipo de Te lo Llevo?</label>
-                    <input type="date" placeholder="DD/MM/AAAA" id="deliver-order-at">
+                    <label for="${EFlightFields.DeliverOrderAt}">¿Qué día entregarás los productos al equipo de Te lo Llevo?</label>
+                    <input type="date" placeholder="DD/MM/AAAA" id="${EFlightFields.DeliverOrderAt}" required>
                 </fieldset>
                 <fieldset>
-                    <input type="checkbox" id="confirm-deliver-order-48h">
-                    <label for="confirm-deliver-order-48h">
+                    <input type="checkbox" id="${EFlightFields.ConfirmDeliverOrder48h}" required>
+                    <label for="${EFlightFields.ConfirmDeliverOrder48h}">
                         Me comprometo a entregar el pedido, como máximo, 
                         después de 48 horas de haber llegado a mi destino.
                     </label>
