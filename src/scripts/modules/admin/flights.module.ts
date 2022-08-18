@@ -1,6 +1,13 @@
 import { EFormat } from '@types/util.type'
 
-import { IFlight } from '@types/flight.type'
+import { 
+    IFlight,
+    EFlightStatus, 
+    EFlightFields, 
+    EPlaceFields, 
+    EHousingFields, 
+    EReceiverFields,
+} from '@types/flight.type'
 import MFlight from '@models/flight.model'
 
 import { IUser } from '@types/user.type'
@@ -30,7 +37,6 @@ import {
 const configCreateFlightDialog = async (wf, dialogId) => {
     const { getDOMElement, delay } = await import('@helpers/util.helper')
     const { default: CForm } = await import('@components/form.component')
-    const { EFlightFields, EPlaceFields, EHousingFields, EReceiverFields } = await import('@types/flight.type')
     
     const dialog = getDOMElement(document, `#${dialogId}`)
     if (!dialog) return
@@ -58,10 +64,8 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         CForm.validateBeforeSubmit(step1Form)
     }
 
-    step1Form.onsubmit = (e) => {
+    step1Form.onsubmit = async (e) => {
         e.preventDefault()
-
-        const status = EFlightStatus.Registered
 
         const receiveOrdersSinceInput = getDOMElement(step1Form, `#${EFlightFields.ReceiveOrdersSince}`)
         if (!receiveOrdersSinceInput) return
@@ -71,26 +75,14 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         if (!receiveOrdersUntilInput) return
         const receiveOrdersUntil = receiveOrdersUntilInput.value
 
-        flight.status = status
         flight.receiveOrdersSince = new Date(`${receiveOrdersSince} 00:00:00`)
         flight.receiveOrdersUntil = new Date(`${receiveOrdersUntil} 00:00:00`)
+        flight.status = EFlightStatus.Registered
 
-        // const sanitizeStatus = MFlight.sanitize(flight)
-        // if (sanitizeStatus?.err){
-        //     const { field, desc } = sanitizeStatus.err
-        //     if (!field){
-        //         logger(`Sanitize error: ${desc} for flight`, flight)
-        //         return
-        //     }
+        const userCredentials = await wf.auth.getCurrentUser()
+        const travelerId = userCredentials ? userCredentials.uid : null
+        flight.travelerId = travelerId
 
-        //     const invalidFieldset = getDOMElement(step1Form,`#${field}`)?.parentNode 
-        //     if (invalidFieldset){
-        //         CForm.handleInvalid('add', desc, invalidFieldset)
-        //         invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        //         logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for flight`, flight)
-        //         return
-        //     }
-        // }
         const validateStatus = CForm.validateOnSubmit(step1Form, MFlight.sanitize, flight)
         if (validateStatus?.err) return
         
@@ -264,59 +256,74 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     }
 
 
-
-
-    
-
-
-
-
-
-
+    // STEP-5
     const step5Form = getDOMElement(dialog, '#create-flight-step-5_form')
-    const step6Form = getDOMElement(dialog, '#create-flight-confirmation-step-6_form')
-    
-    
+    if (!step5Form) return
+    const btnSubmitStep5 = getDOMElement(step5Form, 'button[type="submit"]')
+    if (!btnSubmitStep5) return
+    CForm.init(step5Form.id)
 
-    const { ECountry, EShippingDestination } = await import('@types/util.type')
-    const { EFlightStatus, EHousingType } = await import('@types/flight.type')
-
-    
-
-
-
-    
+    btnSubmitStep5.onclick = (e) => {
+        e.preventDefault()
+        CForm.validateBeforeSubmit(step5Form)
+    }
 
     step5Form.onsubmit = async (e) => {
         e.preventDefault()
 
-        const code = (getDOMElement(step5Form, '#code')).value
-        const airline = (getDOMElement(step5Form, '#airline')).value
-        const from = (getDOMElement(step5Form, '[list="from"]')).value
-        const to = (getDOMElement(step5Form, '[list="to"]')).value
+        const codeInput = getDOMElement(step5Form, `#${EFlightFields.Code}`)
+        if (!codeInput) return
+        const code = codeInput.value
+
+        const airlineInput = getDOMElement(step5Form, `#${EFlightFields.Airline}`)
+        if (!airlineInput) return
+        const airline = airlineInput.value
+
+        const fromInput = getDOMElement(step5Form, `[list="${EFlightFields.From}"]`)
+        if (!fromInput) return
+        const from = fromInput.value
+
+        const toInput = getDOMElement(step5Form, `[list="${EFlightFields.To}"]`)
+        if (!toInput) return
+        const to = toInput.value
 
         flight.code = code
         flight.airline = airline
         flight.from = from
         flight.to = to
 
-        // TODO: validate flight info step-5
+        const validateStatus = CForm.validateOnSubmit(step5Form, MFlight.sanitize, flight)
+        if (validateStatus?.err) return
 
-        const x = await wf.database.add(wf.mode.Network, 'flights', flight)
-        console.log('--- x =', x)
+        const now = new Date()
+        flight.createdAt = now
+        flight.updatedAt = now
 
-        console.log('--- step 5 - flight =', flight)
+        logger('create-flight-dialog step-5 with flight:', flight)
+
+        const responseFlight = await MFlight.add(wf, wf.mode.Network, flight)
+        if (responseFlight?.err){
+            logger(responseFlight.err)
+            // TODO: show network error in UI
+            return
+        }
+        await MFlight.add(wf, wf.mode.Offline, responseFlight.data)
+
+        // TODO: Turn loading animation on dialog
 
         step5Form.classList.remove('active')
         step6Form.classList.add('active')
     }
 
+
+    // STEP-6
+    const step6Form = getDOMElement(dialog, '#create-flight-confirmation-step-6_form')
+    if (!step6Form) return
     step6Form.onsubmit = async (e) => {
         e.preventDefault()
+        // TODO: Improve animation after create-flight
         step6Form.classList.remove('active')
         CDialog.handle('create-flight_dialog', 'remove')
-
-        // TODO: reload
         await delay(1500)
         location.reload()
     }

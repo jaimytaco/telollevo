@@ -23,7 +23,8 @@ export enum EShippingDestination{
 
 export enum ECountry{
     Peru = 'Peru',
-    Ecuador = 'Ecuador'
+    Ecuador = 'Ecuador',
+    Colombia = 'Colombia',
 }
 
 export enum EFormat{

@@ -288,6 +288,13 @@ const format = (flight: IFlight) => {
 
 const sanitize = (flight: IFlight) => {
     // Sanitize for step-1
+    if (flight.travelerId && !isValidString(flight.travelerId))
+        return {
+            err: {
+                desc: ESanitizeFlightErrors.TravelerId
+            }
+        }
+
     if (flight.status && !Object.values(EFlightStatus).includes(flight.status))
         return {
             err: {
@@ -409,7 +416,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    // Sanitize for step-3
+    // Sanitize for step-4
     if (flight?.shippingDestination && !Object.values(EShippingDestination).map((sd) => capitalizeString(sd)).includes(flight.shippingDestination))
         return {
             err: {
@@ -434,7 +441,38 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    // Sanitize for step-4
+    // Sanitize for step-5
+    if (flight?.code && !isValidString(flight.code))
+        return {
+            err: {
+                field: EFlightFields.Code,
+                desc: ESanitizeFlightErrors.Code
+            }
+        }
+
+    if (flight?.airline && !isValidString(flight.airline))
+        return {
+            err: {
+                field: EFlightFields.Airline,
+                desc: ESanitizeFlightErrors.Airline
+            }
+        }
+
+    if (flight?.from && !Object.values(ECountry).filter((value) => value !== ECountry.Peru).includes(flight.from))
+        return {
+            err: {
+                field: EFlightFields.From,
+                desc: ESanitizeFlightErrors.From
+            }
+        }
+
+    if (flight?.to && ECountry.Peru !== flight.to)
+        return {
+            err: {
+                field: EFlightFields.To,
+                desc: ESanitizeFlightErrors.To
+            }
+        }
 }
 
 export default{

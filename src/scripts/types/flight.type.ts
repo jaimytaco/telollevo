@@ -76,9 +76,14 @@ export enum EFlightFields{
     ShippingDestination = 'shipping-destination',
     DeliverOrderAt = 'deliver-order-at',
     ConfirmDeliverOrder48h = 'confirm-deliver-order-48h',
+    Code = 'code',
+    Airline = 'airline',
+    From = 'from',
+    To = 'to',
 }
 
 export enum ESanitizeFlightErrors{
+    TravelerId = 'Usuario no autenticado',
     ReceiveOrdersSince = 'Debe indicar una fecha válida',
     ReceiveOrdersUntil = 'Debe indicar una fecha válida',
     ReceiveOrdersUntilLower = 'La fecha debe ser mayor a la anterior',
@@ -86,7 +91,11 @@ export enum ESanitizeFlightErrors{
     AreReceiveOrderDatesOk = 'Debe indicar que el viajero se compromete a revisar bien las fechas registradas',
     ShippingDestination = 'Debe indicar un punto de entrega válido',
     DeliverOrderAt = 'Debe indicar una fecha válida',
-    ConfirmDeliverOrder48h = 'Debe confirmar si el pedido será entregado, como máximo, 48 horas después de llegar al destino'
+    ConfirmDeliverOrder48h = 'Debe confirmar si el pedido será entregado, como máximo, 48 horas después de llegar al destino',
+    Code = 'Debe indicar el código de vuelo',
+    Airline = 'Debe indicar la aerolínea de vuelo',
+    From = 'Debe indicar un país origen válido',
+    To = 'Debe indicar un país destino válido',
 }
 
 export enum EFlightStatus{

@@ -416,33 +416,30 @@ export const createFlight_dialog = `
             </header>  
             <main>
                 <fieldset>
-                    <label for="code">Código de reserva del vuelo</label>
-                    <input type="text" id="code" placeholder="Ingresa su código de reserva">
+                    <label for="${EFlightFields.Code}">Código de reserva del vuelo</label>
+                    <input type="text" id="${EFlightFields.Code}" placeholder="Ingresa su código de reserva" required>
                 </fieldset>
                 <fieldset>
-                    <label for="airline">Aerolínea</label>
-                    <input type="text" id="airline" placeholder="Ingresa la aerolínea encargada de su vuelo">
+                    <label for="${EFlightFields.Airline}">Aerolínea</label>
+                    <input type="text" id="${EFlightFields.Airline}" placeholder="Ingresa la aerolínea encargada de su vuelo" required>
                 </fieldset>
                 <fieldset>
-                    <label for="from">País origen</label>
-                    <input list="from" placeholder="Selecciona un país">
-                    <datalist id="from">
+                    <label for="${EFlightFields.From}">País origen</label>
+                    <input list="${EFlightFields.From}" placeholder="Selecciona un país" required>
+                    <datalist id="${EFlightFields.From}">
                         ${
                             Object.values(ECountry)
+                                .filter((value) => value !== ECountry.Peru)
                                 .map((value) => `<option value="${value}"></option>`)
                                 .join('')
                         }
                     </datalist>
                 </fieldset>
                 <fieldset>
-                    <label for="to">País destino</label>
-                    <input list="to" placeholder="Selecciona un país">
-                    <datalist id="to">
-                        ${
-                            Object.values(ECountry)
-                                .map((value) => `<option value="${value}"></option>`)
-                                .join('')
-                        }
+                    <label for="${EFlightFields.To}">País destino</label>
+                    <input list="${EFlightFields.To}" placeholder="Selecciona un país" required>
+                    <datalist id="${EFlightFields.To}">
+                        <option value="${ECountry.Peru}"></option>
                     </datalist>
                 </fieldset>
             </main>
