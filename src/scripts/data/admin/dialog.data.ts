@@ -4,7 +4,7 @@ import { EShippingDestination, ECountry, ECoin, EOrderProductQty } from '@types/
 
 import { capitalizeString } from '@helpers/util.helper'
 
-import { EHousingType } from '@types/flight.type'
+import { EHousingType, EFlightFields, EPlaceFields, EHousingFields } from '@types/flight.type'
 
 
 export const createOrder_dialog = `
@@ -224,12 +224,12 @@ export const createFlight_dialog = `
             </header>
             <main>
                 <fieldset>
-                    <label for="receive-orders-since">¿Desde cuando puedes recibir productos?</label>
-                    <input type="date" placeholder="DD/MM/AAAA" id="receive-orders-since">
+                    <label for="${EFlightFields.ReceiveOrdersSince}">¿Desde cuando puedes recibir productos?</label>
+                    <input type="date" placeholder="DD/MM/AAAA" id="${EFlightFields.ReceiveOrdersSince}" required>
                 </fieldset>
                 <fieldset>
-                    <label for="receive-orders-until">¿Hasta cuando puedes recibir los productos?</label>
-                    <input type="date" placeholder="DD/MM/AAAA" id="receive-orders-until">
+                    <label for="${EFlightFields.ReceiveOrdersUntil}">¿Hasta cuando puedes recibir los productos?</label>
+                    <input type="date" placeholder="DD/MM/AAAA" id="${EFlightFields.ReceiveOrdersUntil}" required>
                 </fieldset>
             </main>
             <footer>
@@ -252,41 +252,41 @@ export const createFlight_dialog = `
             <main>
                 <fieldset>
                     <legend>Tipo de alojamiento</legend>
-                    <input type="radio" name="housing-type" value="RentedApartment" id="housing-type_rented-apartment">
-                    <label for="housing-type_rented-apartment" class="btn btn-h-width">${capitalizeString(EHousingType.RentedApartment)}</label>
+                    <input type="radio" name="${EHousingFields.Type}" value="RentedApartment" id="${EHousingFields.Type}_rented-apartment" required>
+                    <label for="${EHousingFields.Type}_rented-apartment" class="btn btn-h-width">${capitalizeString(EHousingType.RentedApartment)}</label>
 
-                    <input type="radio" name="housing-type" value="Hotel" id="housing-type_hotel">
-                    <label for="housing-type_hotel" class="btn btn-h-width">${capitalizeString(EHousingType.Hotel)}</label>
+                    <input type="radio" name="${EHousingFields.Type}" value="Hotel" id="${EHousingFields.Type}_hotel" required>
+                    <label for="${EHousingFields.Type}_hotel" class="btn btn-h-width">${capitalizeString(EHousingType.Hotel)}</label>
 
-                    <input type="radio" name="housing-type" value="FriendsApartment" id="housing-type_friends-apartment">
-                    <label for="housing-type_friends-apartment" class="btn btn-h-width">${capitalizeString(EHousingType.FriendsApartment)}</label>
+                    <input type="radio" name="${EHousingFields.Type}" value="FriendsApartment" id="${EHousingFields.Type}_friends-apartment" required>
+                    <label for="${EHousingFields.Type}_friends-apartment" class="btn btn-h-width">${capitalizeString(EHousingType.FriendsApartment)}</label>
 
-                    <input type="radio" name="housing-type" value="Store" id="housing-type_store">
-                    <label for="housing-type_store" class="btn btn-h-width">${capitalizeString(EHousingType.Store)}</label>
+                    <input type="radio" name="${EHousingFields.Type}" value="Store" id="${EHousingFields.Type}_store" required>
+                    <label for="${EHousingFields.Type}_store" class="btn btn-h-width">${capitalizeString(EHousingType.Store)}</label>
 
-                    <input type="radio" name="housing-type" value="Home" id="housing-type_home">
-                    <label for="housing-type_home" class="btn btn-h-width">${capitalizeString(EHousingType.Home)}</label>
+                    <input type="radio" name="${EHousingFields.Type}" value="Home" id="${EHousingFields.Type}_home" required>
+                    <label for="${EHousingFields.Type}_home" class="btn btn-h-width">${capitalizeString(EHousingType.Home)}</label>
                 </fieldset>
                 <fieldset>
-                    <label for="address">Dirección</label>
-                    <input type="text" id="address" placeholder="Ingresa una dirección">
+                    <label for="${EHousingFields.Address}">Dirección</label>
+                    <input type="text" id="${EHousingFields.Address}" placeholder="Ingresa una dirección" required>
                 </fieldset>
                 <fieldset>
-                    <label for="address-more">
+                    <label for="${EHousingFields.AddressMore}">
                         Departamento/piso/suite/edificio
                         <br>
                         <small>(opcional)</small>
                     </label>
-                    <input type="text" id="address-more" placeholder="Ingresa un departamento/piso/suite/edificio">
+                    <input type="text" id="${EHousingFields.AddressMore}" placeholder="Ingresa un departamento/piso/suite/edificio">
                 </fieldset>
                 <fieldset>
-                    <label for="district">Consuma/distrito/barrio/pueblo</label>
-                    <input type="text" id="district" placeholder="Ingresa una consuma/distrito/barrio/pueblo">
+                    <label for="${EPlaceFields.District}">Consuma/distrito/barrio/pueblo</label>
+                    <input type="text" id="${EPlaceFields.District}" placeholder="Ingresa una consuma/distrito/barrio/pueblo" required>
                 </fieldset>
                 <fieldset class="fs-sm">
-                    <label for="country">País</label>
-                    <input list="country" placeholder="Selecciona un país">
-                    <datalist id="country">
+                    <label for="${EPlaceFields.Country}">País</label>
+                    <input list="${EPlaceFields.Country}" placeholder="Selecciona un país" required>
+                    <datalist id="${EPlaceFields.Country}">
                         ${
                             Object.values(ECountry)
                                 .map((value) => `<option value="${value}"></option>`)
@@ -295,26 +295,16 @@ export const createFlight_dialog = `
                     </datalist>
                 </fieldset>
                 <fieldset class="fs-sm">
-                    <label for="state">Estado/región</label>
-                    <input list="state" placeholder="Selecciona un estado/región">
-                    <datalist id="state">
-                        <option value="Estado #1"></option>
-                        <option value="Estado #2"></option>
-                        <option value="Estado #3"></option>
-                    </datalist>
+                    <label for="${EPlaceFields.State}">Estado/región</label>
+                    <input type="text" id="${EPlaceFields.State}" placeholder="Selecciona un estado/región" required>
                 </fieldset>
                 <fieldset class="fs-sm">
-                    <label for="city">Ciudad</label>
-                    <input list="city" placeholder="Selecciona una ciudad">
-                    <datalist id="city">
-                        <option value="Ciudad #1">Ciudad #1</option>
-                        <option value="Ciudad #2">Ciudad #2</option>
-                        <option value="Ciudad #3">Ciudad #3</option>
-                    </datalist>
+                    <label for="${EPlaceFields.City}">Ciudad</label>
+                    <input type="text" id="${EPlaceFields.City}" placeholder="Selecciona una ciudad" required>
                 </fieldset>
                 <fieldset class="fs-sm">
-                    <label for="zipcode">Código postal</label>
-                    <input type="text" id="zipcode" placeholder="Ingresa un código postal">
+                    <label for="${EPlaceFields.Zipcode}">Código postal</label>
+                    <input type="text" id="${EPlaceFields.Zipcode}" placeholder="Ingresa un código postal" required>
                 </fieldset>
                 <fieldset>
                     <input type="checkbox" id="is-responsible-for">

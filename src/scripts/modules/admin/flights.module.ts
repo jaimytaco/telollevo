@@ -30,6 +30,7 @@ import {
 const configCreateFlightDialog = async (wf, dialogId) => {
     const { getDOMElement, delay } = await import('@helpers/util.helper')
     const { default: CForm } = await import('@components/form.component')
+    const { EFlightFields, EPlaceFields, EHousingFields } = await import('@types/flight.type')
     
     const dialog = getDOMElement(document, `#${dialogId}`)
     if (!dialog) return
@@ -54,15 +55,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
 
     btnSubmitStep1.onclick = (e) => {
         e.preventDefault()
-        CForm.resetInvalid(step1Form.id)
-        const isFormValid = step1Form.checkValidity()
-        if (!isFormValid){
-            logger(`Form ${step1Form.id} is not HTML valid`)
-            const invalidFieldset = getDOMElement(step1Form, 'fieldset.fs-invalid')
-            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-            return
-        }
-        step1Form.requestSubmit()
+        CForm.validateBeforeSubmit(step1Form)
     }
 
     step1Form.onsubmit = (e) => {
@@ -70,11 +63,11 @@ const configCreateFlightDialog = async (wf, dialogId) => {
 
         const status = EFlightStatus.Registered
 
-        const receiveOrdersSinceInput = getDOMElement(step1Form, '#receive-orders-since')
+        const receiveOrdersSinceInput = getDOMElement(step1Form, `#${EFlightFields.ReceiveOrdersSince}`)
         if (!receiveOrdersSinceInput) return
         const receiveOrdersSince = receiveOrdersSinceInput.value
         
-        const receiveOrdersUntilInput = getDOMElement(step1Form, '#receive-orders-until')
+        const receiveOrdersUntilInput = getDOMElement(step1Form, `#${EFlightFields.ReceiveOrdersUntil}`)
         if (!receiveOrdersUntilInput) return
         const receiveOrdersUntil = receiveOrdersUntilInput.value
 
@@ -82,22 +75,25 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.receiveOrdersSince = new Date(`${receiveOrdersSince} 00:00:00`)
         flight.receiveOrdersUntil = new Date(`${receiveOrdersUntil} 00:00:00`)
 
-        const sanitizeStatus = MFlight.sanitize(flight)
-        if (sanitizeStatus?.err){
-            const { field, desc } = sanitizeStatus.err
-            if (!field){
-                logger(`Sanitize error: ${desc} for flight`, flight)
-                return
-            }
+        // const sanitizeStatus = MFlight.sanitize(flight)
+        // if (sanitizeStatus?.err){
+        //     const { field, desc } = sanitizeStatus.err
+        //     if (!field){
+        //         logger(`Sanitize error: ${desc} for flight`, flight)
+        //         return
+        //     }
 
-            const invalidFieldset = getDOMElement(step1Form,`#${field}`)?.parentNode 
-            if (invalidFieldset){
-                CForm.handleInvalid('add', desc, invalidFieldset)
-                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for flight`, flight)
-                return
-            }
-        }
+        //     const invalidFieldset = getDOMElement(step1Form,`#${field}`)?.parentNode 
+        //     if (invalidFieldset){
+        //         CForm.handleInvalid('add', desc, invalidFieldset)
+        //         invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        //         logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for flight`, flight)
+        //         return
+        //     }
+        // }
+        const validateStatus = CForm.validateOnSubmit(step1Form, MFlight.sanitize, flight)
+        if (validateStatus?.err) return
+        
 
         logger('create-flight-dialog step-1 with flight:', flight)
 
@@ -106,11 +102,94 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     }
 
 
-
-
-
-
+    // STEP-2
     const step2Form = getDOMElement(dialog, '#create-flight-step-2_form')
+    if (!step2Form) return
+    const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
+    if (!btnSubmitStep2) return
+    CForm.init(step2Form.id)
+
+    btnSubmitStep2.onclick = (e) => {
+        e.preventDefault()
+        CForm.validateBeforeSubmit(step2Form)
+    }
+
+    step2Form.onsubmit = (e) => {
+        e.preventDefault()
+
+        const typeInput = getDOMElement(step2Form, `[name="${EHousingFields.Type}"]`)
+        if (!typeInput) return
+        const type = typeInput.checked
+
+        const addressInput = getDOMElement(step2Form, `#${EHousingFields.Address}`)
+        if (!addressInput) return
+        const address = addressInput.value
+
+        const addressMoreInput = getDOMElement(step2Form, `#${EHousingFields.AddressMore}`)
+        if (!addressMoreInput) return 
+        const addressMore = addressMoreInput.value
+
+        const districtInput = getDOMElement(step2Form, `#${EPlaceFields.District}`)
+        if (!districtInput) return
+        const district = districtInput.value
+
+        const countryInput = getDOMElement(step2Form, `[list="${EPlaceFields.Country}"]`)
+        if (!countryInput) return
+        const country = countryInput.value
+
+        const stateInput = getDOMElement(step2Form, `#${EPlaceFields.State}`)
+        if (!stateInput) return
+        const state = stateInput.value
+
+        const cityInput = getDOMElement(step2Form, `#${EPlaceFields.City}`)
+        if (!cityInput) return
+        const city = cityInput.value
+
+        const zipcodeInput = getDOMElement(step2Form, `#${EPlaceFields.Zipcode}`)
+        if (!zipcodeInput) return
+        const zipcode = zipcodeInput.value
+
+        const isResponsibleForInput = getDOMElement(step2Form, '#is-responsible-for')
+        if (!isResponsibleForInput) return
+        const isResponsibleFor = isResponsibleForInput.checked
+
+        const areReceiveOrderDatesOkInput = getDOMElement(step2Form, '#are-receive-order-dates-ok')
+        if (!areReceiveOrderDatesOkInput) return
+        const areReceiveOrderDatesOk = areReceiveOrderDatesOkInput.checked
+
+        const place = {
+            district,
+            country,
+            state,
+            city,
+            zipcode
+        }
+
+        const housing = {
+            type,
+            address,
+            addressMore,
+            place
+        }
+
+        flight.housing = housing
+        flight.isResponsibleFor = isResponsibleFor
+        flight.areReceiveOrderDatesOk = areReceiveOrderDatesOk
+        
+        const validateStatus = CForm.validateOnSubmit(step2Form, MFlight.sanitize, flight)
+        if (validateStatus?.err) return
+
+        logger('create-flight-dialog step-2 with flight:', flight)
+
+        step2Form.classList.remove('active')
+        step3Form.classList.add('active')
+    }
+
+
+
+
+
+
     const step3Form = getDOMElement(dialog, '#create-flight-step-3_form')
     const step4Form = getDOMElement(dialog, '#create-flight-step-4_form')
     const step5Form = getDOMElement(dialog, '#create-flight-step-5_form')
@@ -123,48 +202,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
 
     
 
-    step2Form.onsubmit = (e) => {
-        e.preventDefault()
-
-        const type = (getDOMElement(step2Form, '[name="housing-type"]:checked'))?.value
-        const address = (getDOMElement(step2Form, '#address')).value
-        const addressMore = (getDOMElement(step2Form, '#address-more')).value
-        const district = (getDOMElement(step2Form, '#district')).value
-        const country = (getDOMElement(step2Form, '[list="country"]')).value
-        const state = (getDOMElement(step2Form, '[list="state"]')).value
-        const city = (getDOMElement(step2Form, '[list="city"]')).value
-        const zipcode = (getDOMElement(step2Form, '#zipcode')).value
-        const isResponsibleFor = (getDOMElement(step2Form, '#is-responsible-for')).checked
-        const areReceiveOrderDatesOk = (getDOMElement(step2Form, '#are-receive-order-dates-ok')).checked
-
-        // TODO: validate flight info step-2
-
-        const place = {
-            district,
-            country: ECountry[country],
-            state,
-            city,
-            zipcode
-        }
-
-        const housing = {
-            type: EHousingType[type],
-            address,
-            addressMore,
-            place
-        }
-
-        flight.housing = housing
-        flight.isResponsibleFor = isResponsibleFor
-        flight.areReceiveOrderDatesOk = areReceiveOrderDatesOk
-        
-        // TODO: validate flight info step-2
-
-        console.log('--- step 2 - flight =', flight)
-
-        step2Form.classList.remove('active')
-        step3Form.classList.add('active')
-    }
+    
 
     step3Form.onsubmit = (e) => {
         e.preventDefault()

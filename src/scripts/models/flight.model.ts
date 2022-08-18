@@ -1,24 +1,38 @@
-import {
+import { 
+    IFlight, 
+    EFlightStatus,
+
+    EFlightFields,
+    ESanitizeFlightErrors,
+
+    EPlaceFields,
+    ESanitizePlaceErrors,
+
+    EHousingFields,
+    ESanitizeHousingErrors,
+} from '@types/flight.type'
+
+import { 
+    EFormat,
+    ECountry, 
+    EShippingDestination  
+} from '@types/util.type'
+
+import { 
+    capitalizeString, 
+    formatLocaleDate,
     isNumeric,
     isBoolean,
     isValidString,
     isValidDate,
 } from '@helpers/util.helper'
 
-import { 
-    IFlight, 
-    EFlightStatus,
-    EFlightFields,
-    ESanitizeFlightErrors,
-} from '@types/flight.type'
-
-import { EFormat } from '@types/util.type'
-import { capitalizeString, formatLocaleDate } from '@helpers/util.helper'
-
 import { logger } from '@wf/helpers/browser.helper'
 import { removeOfflineTimestamp } from '@wf/lib.worker'
 
 import { EUserType } from '@types/user.type'
+
+import { EHousingType } from '@types/flight.type'
 
 
 const formatRowExtra = (flight: IFlight) => {
@@ -299,6 +313,63 @@ const sanitize = (flight: IFlight) => {
             err: {
                 field: EFlightFields.ReceiveOrdersUntil,
                 desc: ESanitizeFlightErrors.ReceiveOrdersUntilLower
+            }
+        }
+    
+    // Sanitize for step-2
+    if (flight?.housing?.place?.district && !isValidString(flight.housing.place.district))
+        return {
+            err: {
+                field: EPlaceFields.District,
+                desc: ESanitizePlaceErrors.District,
+            }
+        }
+    
+    if (flight?.housing?.place?.country && !Object.values(ECountry).includes(flight.housing.place.country))
+        return {
+            err: {
+                field: EPlaceFields.Country,
+                desc: ESanitizePlaceErrors.Country,
+            }
+        }
+
+    if (flight?.housing?.place?.state && !isValidString(flight.housing.place.state))
+        return {
+            err: {
+                field: EPlaceFields.State,
+                desc: ESanitizePlaceErrors.State,
+            }
+        }
+
+    if (flight?.housing?.place?.city && !isValidString(flight.housing.place.city))
+        return {
+            err: {
+                field: EPlaceFields.City,
+                desc: ESanitizePlaceErrors.City,
+            }
+        }
+
+    if (flight?.housing?.place?.zipcode && !isValidString(flight.housing.place.zipcode))
+        return {
+            err: {
+                field: EPlaceFields.Zipcode,
+                desc: ESanitizePlaceErrors.Zipcode,
+            }
+        }
+
+    if (flight?.housing?.type && !Object.keys(EHousingType).includes(flight.housing.type))
+        return {
+            err: {
+                field: EHousingFields.Type,
+                desc: ESanitizeHousingErrors.Type
+            }
+        }
+
+    if (flight?.housing?.address && !isValidString(flight.housing.address))
+        return {
+            err: {
+                field: EHousingFields.Address,
+                desc: ESanitizeHousingErrors.Address
             }
         }
 }

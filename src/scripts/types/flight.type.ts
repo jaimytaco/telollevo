@@ -10,6 +10,33 @@ export enum EHousingType{
     Home = 'departamento o casa donde vivo'
 }
 
+export enum EHousingFields{
+    Type = 'housing-type',
+    Address = 'address',
+    AddressMore = 'address-more',
+}
+
+export enum ESanitizeHousingErrors{
+    Type = 'Debe indicar un tipo de alojamiento válido',
+    Address = 'Debe indicar una dirección',
+}
+
+export enum EPlaceFields{
+    District = 'district',
+    Country = 'country',
+    State = 'state',
+    City = 'city',
+    Zipcode = 'zipcode'
+}
+
+export enum ESanitizePlaceErrors{
+    District = 'Debe indicar un distrito',
+    Country = 'Debe indicar un país válido',
+    State = 'Debe indicar un estado/región válido',
+    City = 'Debe indicar una ciudad válida',
+    Zipcode = 'Debe indicar un zipcode',
+}
+
 export interface IPlace{
     district: string,
     country: ECountry,
@@ -23,7 +50,7 @@ export interface IHousing{
     address: string,
     addressMore: string,
     place: IPlace,
-    hotelName?: string
+    // hotelName?: string
 }
 
 export interface IReceiver{

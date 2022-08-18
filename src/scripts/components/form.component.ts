@@ -1,4 +1,38 @@
 import { getDOMElement } from '@helpers/util.helper'
+import { logger } from '@wf/helpers/browser.helper'
+
+const validateOnSubmit = (form, sanitizeFn, el) => {
+    const sanitizeStatus = sanitizeFn(el)
+    if (sanitizeStatus?.err) {
+        const { field, desc } = sanitizeStatus.err
+        if (!field) {
+            const err = `Sanitize error: ${desc} for`
+            logger(err, el)
+            return { err: `${err} ${el}` }
+        }
+
+        const invalidFieldset = getDOMElement(form, `#${field}`)?.parentNode
+        if (invalidFieldset) {
+            handleInvalid('add', desc, invalidFieldset)
+            invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            const err = `Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for`
+            logger(err, el)
+            return { err: `${err}: ${el}` }
+        }
+    }
+}
+
+const validateBeforeSubmit = (form) => {
+    resetInvalid(form.id)
+    const isFormValid = form.checkValidity()
+    if (!isFormValid) {
+        logger(`Form ${form.id} is not HTML valid`)
+        const invalidFieldset = getDOMElement(form, 'fieldset.fs-invalid')
+        if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        return
+    }
+    form.requestSubmit()
+}
 
 const resetInvalid = (id) => {
     const form = getDOMElement(document, `#${id}`)
@@ -34,4 +68,6 @@ export default {
     init,
     handleInvalid,
     resetInvalid,
+    validateBeforeSubmit,
+    validateOnSubmit,
 }
