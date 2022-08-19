@@ -1,12 +1,24 @@
-import MUser from '@models/user.model'
 import MFlight from '@models/flight.model'
+
+import { 
+    IOrder,
+    EOrderStatus, 
+    EOrderShoppers, 
+    EOrderFields 
+} from '@types/order.type'
 import MOrder from '@models/order.model'
+
+import { 
+    EFormat,
+    ECoin, 
+    EShippingDestination 
+} from '@types/util.type'
+
+import { IQuotation } from '@types/quotation.type'
 import MQuotation from '@models/quotation.model'
 
-import { IOrder } from '@types/order.type'
-import { EFormat } from '@types/util.type'
-import { IQuotation } from '@types/quotation.type'
 import { EUserType } from '@types/user.type'
+import MUser from '@models/user.model'
 
 import {
     logger,
@@ -19,7 +31,11 @@ import {
 } from '@wf/lib.worker'
 
 import { createOrder_dialog } from '@data/admin/dialog.data'
-import { capitalizeString } from '@helpers/util.helper'
+import { 
+    capitalizeString,
+    getDOMElement, 
+    delay, 
+} from '@helpers/util.helper'
 import CTable from '@components/table.component'
 import { adminHeader } from '@helpers/ui.helper'
 
@@ -31,18 +47,16 @@ import { adminHeader } from '@helpers/ui.helper'
 // }
 
 const configCreateOrderDialog = async (wf, dialogId) => {
-    const { getDOMElement, delay } = await import('@helpers/util.helper')
     const { default: CForm } = await import('@components/form.component')
-    const { ECoin, EShippingDestination } = await import('@types/util.type')
-    const { EOrderStatus, EOrderShoppers, EOrderFields } = await import('@types/order.type')
-    const { logger } = await import('@wf/helpers/browser.helper')
 
     const dialog = getDOMElement(document, `#${dialogId}`)
-
+    if (!dialog) return
 
     // STEP-1
     const step1Form = getDOMElement(dialog, '#create-order-step-1_form')
+    if (!step1Form) return
     const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
+    if (!btnSubmitStep1) return
     CForm.init(step1Form.id)
     
     const createOrderBtns = getDOMElement(document, '[data-create-order-dialog_btn]', 'all')
@@ -58,26 +72,36 @@ const configCreateOrderDialog = async (wf, dialogId) => {
 
     btnSubmitStep1.onclick = (e) => {
         e.preventDefault()
-        CForm.resetInvalid(step1Form.id)
-        const isFormValid = step1Form.checkValidity()
-        if (!isFormValid){
-            logger(`Form ${step1Form.id} is not HTML valid`)
-            const invalidFieldset = getDOMElement(step1Form, 'fieldset.fs-invalid')
-            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-            return
-        }
-        step1Form.requestSubmit()
+        CForm.validateBeforeSubmit(step1Form)
     }
 
     step1Form.onsubmit = async (e) => {
         e.preventDefault()
 
-        const name = (getDOMElement(step1Form,`#${EOrderFields.ProductName}`)).value
-        const category = (getDOMElement(step1Form, `[list="${EOrderFields.ProductCategory}"]`)).value
-        const url = (getDOMElement(step1Form, `#${EOrderFields.ProductUrl}`)).value
-        const price = parseFloat((getDOMElement(step1Form, `#${EOrderFields.ProductPrice}`)).value)
-        const units = parseInt((getDOMElement(step1Form, `#${EOrderFields.ProductUnits}`)).value)
-        const isBoxIncluded = (getDOMElement(step1Form, `[name="${EOrderFields.ProductIsBoxIncluded}"]:checked`)).value === 'yes'
+        const nameInput = getDOMElement(step1Form,`#${EOrderFields.ProductName}`)
+        if (!nameInput) return
+        const name = nameInput.value
+        
+        const categoryInput = getDOMElement(step1Form, `[list="${EOrderFields.ProductCategory}"]`)
+        if (!categoryInput) return
+        const category = categoryInput.value
+
+        const urlInput = getDOMElement(step1Form, `#${EOrderFields.ProductUrl}`)
+        if (!urlInput) return
+        const url = urlInput.value
+
+        const priceInput = getDOMElement(step1Form, `#${EOrderFields.ProductPrice}`)
+        if (!priceInput) return
+        const price = parseFloat(priceInput.value)
+
+        const unitsInput = getDOMElement(step1Form, `#${EOrderFields.ProductUnits}`)
+        if (!unitsInput) return
+        const units = parseInt(unitsInput.value)
+
+        const isBoxIncludedInputChecked = getDOMElement(step1Form, `[name="${EOrderFields.ProductIsBoxIncluded}"]:checked`)
+        const isBoxIncluded = isBoxIncludedInputChecked ? isBoxIncludedInputChecked.value === 'yes' : null
+        
+        // TODO: Define somewhere what is the current coin
         const coin = ECoin.USD.code
         const status = EOrderStatus.Registered
 
@@ -97,22 +121,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         order.status = status
         order.shopperId = shopperId
 
-        const sanitizeStatus = MOrder.sanitize(order)
-        if (sanitizeStatus?.err){
-            const { field, desc } = sanitizeStatus.err
-            if (!field){
-                logger(`Sanitize error: ${desc} for order`, order)
-                return
-            }
-
-            const invalidFieldset = getDOMElement(step1Form,`#${field}`)?.parentNode 
-            if (invalidFieldset){
-                CForm.handleInvalid('add', desc, invalidFieldset)
-                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
-                return
-            }
-        }
+        const validateStatus = CForm.validateOnSubmit(step1Form, MOrder.sanitize, order)
+        if (validateStatus?.err) return
 
         logger('create-order-dialog step-1 with order:', order)
 
@@ -123,30 +133,38 @@ const configCreateOrderDialog = async (wf, dialogId) => {
 
     // STEP-2
     const step2Form = getDOMElement(dialog, '#create-order-step-2_form')
+    if (!step2Form) return
     const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
+    if (!btnSubmitStep2) return
     CForm.init(step2Form.id)
 
     btnSubmitStep2.onclick = (e) => {
         e.preventDefault()
-        CForm.resetInvalid(step2Form.id)
-        const isFormValid = step2Form.checkValidity()
-        if (!isFormValid){
-            logger(`Form ${step2Form.id} is not HTML valid`)
-            const invalidFieldset = getDOMElement(step2Form, 'fieldset.fs-invalid')
-            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-            return
-        }
-        step2Form.requestSubmit()
+        CForm.validateBeforeSubmit(step2Form)
     }
 
     step2Form.onsubmit = (e) => {
         e.preventDefault()
 
-        const weightMore5kg = (getDOMElement(step2Form, `[name="${EOrderFields.ProductWeightMore5kg}"]:checked`)).value === 'yes'
-        const isTaller50cm = (getDOMElement(step2Form, `[name="${EOrderFields.ProductIsTaller50cm}"]:checked`)).value === 'yes'
-        const isOneUnitPerProduct = (getDOMElement(step2Form, `[name="${EOrderFields.ProductIsOneUnitPerProduct}"]:checked`)).value === 'yes'
-        const shipper = (getDOMElement(step2Form, `[name="${EOrderFields.Shipper}"]`)).value
-        const comments = (getDOMElement(step2Form, `#${EOrderFields.Comments}`)).value
+        const weightMore5kgInput = getDOMElement(step2Form, `[name="${EOrderFields.ProductWeightMore5kg}"]:checked`)
+        if (!weightMore5kgInput) return
+        const weightMore5kg = weightMore5kgInput.value === 'yes'
+
+        const isTaller50cmInput = getDOMElement(step2Form, `[name="${EOrderFields.ProductIsTaller50cm}"]:checked`)
+        if (!isTaller50cmInput) return
+        const isTaller50cm = isTaller50cmInput.value === 'yes'
+
+        const isOneUnitPerProductInput = getDOMElement(step2Form, `[name="${EOrderFields.ProductIsOneUnitPerProduct}"]:checked`)
+        if (!isOneUnitPerProductInput) return
+        const isOneUnitPerProduct = isOneUnitPerProductInput.value === 'yes'
+
+        const shipperInput = getDOMElement(step2Form, `[name="${EOrderFields.Shipper}"]`)
+        if (!shipperInput) return
+        const shipper = shipperInput.value
+
+        const commentsInput = getDOMElement(step2Form, `#${EOrderFields.Comments}`)
+        if (!commentsInput) return
+        const comments = commentsInput.value
 
         order.product = {
             ...order.product,
@@ -157,23 +175,9 @@ const configCreateOrderDialog = async (wf, dialogId) => {
 
         order.comments = comments
         order.shipper = shipper
-
-        const sanitizeStatus = MOrder.sanitize(order)
-        if (sanitizeStatus?.err){
-            const { field, desc } = sanitizeStatus.err
-            if (!field){
-                logger(`Sanitize error: ${desc} for order`, order)
-                return
-            }
-
-            const invalidFieldset = getDOMElement(step2Form,`#${field}`)?.parentNode 
-            if (invalidFieldset){
-                CForm.handleInvalid('add', desc, invalidFieldset)
-                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
-                return
-            }
-        }
+        
+        const validateStatus = CForm.validateOnSubmit(step2Form, MOrder.sanitize, order)
+        if (validateStatus?.err) return
 
         logger('create-order-dialog step-2 with order:', order)
 
@@ -184,20 +188,14 @@ const configCreateOrderDialog = async (wf, dialogId) => {
 
     // STEP-3
     const step3Form = getDOMElement(dialog, '#create-order-step-3_form')
+    if (!step3Form) return
     const btnSubmitStep3 = getDOMElement(step3Form, 'button[type="submit"]')
+    if (!btnSubmitStep3) return
     CForm.init(step3Form.id)
 
     btnSubmitStep3.onclick = (e) => {
         e.preventDefault()
-        CForm.resetInvalid(step3Form.id)
-        const isFormValid = step3Form.checkValidity()
-        if (!isFormValid){
-            logger(`Form ${step3Form.id} is not HTML valid`)
-            const invalidFieldset = getDOMElement(step3Form, 'fieldset.fs-invalid')
-            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-            return
-        }
-        step3Form.requestSubmit()
+        CForm.validateBeforeSubmit(step3Form)
     }
 
     step3Form.onsubmit = (e) => {
@@ -206,22 +204,24 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         const shippingDestination = (getDOMElement(step3Form, `[name="${EOrderFields.ShippingDestination}"]:checked`)).value
         order.shippingDestination = shippingDestination
 
-        const sanitizeStatus = MOrder.sanitize(order)
-        if (sanitizeStatus?.err){
-            const { field, desc } = sanitizeStatus.err
-            if (!field){
-                logger(`Sanitize error: ${desc} for order`, order)
-                return
-            }
+        // const sanitizeStatus = MOrder.sanitize(order)
+        // if (sanitizeStatus?.err){
+        //     const { field, desc } = sanitizeStatus.err
+        //     if (!field){
+        //         logger(`Sanitize error: ${desc} for order`, order)
+        //         return
+        //     }
 
-            const invalidFieldset = getDOMElement(step3Form,`#${field}`)?.parentNode 
-            if (invalidFieldset){
-                CForm.handleInvalid('add', desc, invalidFieldset)
-                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
-                return
-            }
-        }
+        //     const invalidFieldset = getDOMElement(step3Form,`#${field}`)?.parentNode 
+        //     if (invalidFieldset){
+        //         CForm.handleInvalid('add', desc, invalidFieldset)
+        //         invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        //         logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
+        //         return
+        //     }
+        // }
+        const validateStatus = CForm.validateOnSubmit(step3Form, MOrder.sanitize, order)
+        if (validateStatus?.err) return
 
         logger('create-order-dialog step-3 with order:', order)
 
@@ -232,20 +232,14 @@ const configCreateOrderDialog = async (wf, dialogId) => {
 
     // STEP-4
     const step4Form = getDOMElement(dialog, '#create-order-step-4_form')
+    if (!step4Form) return
     const btnSubmitStep4 = getDOMElement(step4Form, 'button[type="submit"]')
+    if (!btnSubmitStep4) return
     CForm.init(step4Form.id)
 
     btnSubmitStep4.onclick = (e) => {
         e.preventDefault()
-        CForm.resetInvalid(step4Form.id)
-        const isFormValid = step4Form.checkValidity()
-        if (!isFormValid){
-            logger(`Form ${step4Form.id} is not HTML valid`)
-            const invalidFieldset = getDOMElement(step4Form, 'fieldset.fs-invalid')
-            if (invalidFieldset) invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-            return
-        }
-        step4Form.requestSubmit()
+        CForm.validateBeforeSubmit(step4Form)
     }
 
     step4Form.onsubmit = async (e) => {
@@ -254,22 +248,24 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         const shopper = (getDOMElement(step4Form, `[name="${EOrderFields.Shopper}"]`)).value
         order.shopper = shopper
 
-        const sanitizeStatus = MOrder.sanitize(order)
-        if (sanitizeStatus?.err){
-            const { field, desc } = sanitizeStatus.err
-            if (!field){
-                logger(`Sanitize error: ${desc} for order`, order)
-                return
-            }
+        // const sanitizeStatus = MOrder.sanitize(order)
+        // if (sanitizeStatus?.err){
+        //     const { field, desc } = sanitizeStatus.err
+        //     if (!field){
+        //         logger(`Sanitize error: ${desc} for order`, order)
+        //         return
+        //     }
 
-            const invalidFieldset = getDOMElement(step4Form,`#${field}`)?.parentNode 
-            if (invalidFieldset){
-                CForm.handleInvalid('add', desc, invalidFieldset)
-                invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-                logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
-                return
-            }
-        }
+        //     const invalidFieldset = getDOMElement(step4Form,`#${field}`)?.parentNode 
+        //     if (invalidFieldset){
+        //         CForm.handleInvalid('add', desc, invalidFieldset)
+        //         invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        //         logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
+        //         return
+        //     }
+        // }
+        const validateStatus = CForm.validateOnSubmit(step4Form, MOrder.sanitize, order)
+        if (validateStatus?.err) return
 
         const now = new Date()
         order.createdAt = now

@@ -11,7 +11,7 @@ const validateOnSubmit = (form, sanitizeFn, el) => {
             return { err: `${err} ${el}` }
         }
 
-        const invalidFieldset = getDOMElement(form, `#${field}`)?.parentNode
+        const invalidFieldset = getDOMElement(form, `#${field}`)?.parentNode || getDOMElement(form, `[name="${field}"]`)?.parentNode
         if (invalidFieldset) {
             handleInvalid('add', desc, invalidFieldset)
             invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })

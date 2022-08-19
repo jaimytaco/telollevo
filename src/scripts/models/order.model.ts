@@ -4,6 +4,7 @@ import {
     isNumeric,
     isBoolean,
     isValidString,
+    hasParameter,
 } from '@helpers/util.helper'
 
 import {
@@ -279,20 +280,20 @@ const toRow = (order: IOrder) => {
 }
 
 const getAllByUserAuthenticated = async (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
-    if (user.type === EUserType.Shopper){
+    if (user.type === EUserType.Shopper) {
         return getAllByShopperId(wf, mode, isFormatted, user.id, date)
     }
 
     // TODO: query orders according to user-type
-    if (user.type === EUserType.Traveler){
+    if (user.type === EUserType.Traveler) {
         return []
     }
 
-    if (user.type === EUserType.Multiple){
+    if (user.type === EUserType.Multiple) {
         return []
     }
 
-    if (user.type === EUserType.Admin){
+    if (user.type === EUserType.Admin) {
         return []
     }
 }
@@ -393,7 +394,7 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
 
     const order = responseOrder.data as IOrder
     if (isFormatted === EFormat.Raw) return order
-    
+
     return isFormatted === EFormat.Related ?
         order :
         format(order)
@@ -402,100 +403,96 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
 const format = (order: IOrder) => order
 
 const sanitize = (order: IOrder) => {
-    const { product } = order as IProduct
-
-    if (product) {
-        // Sanitize for step-1
-        if (product.name && !isValidString(product.name))
-            return {
-                err: {
-                    field: EOrderFields.ProductName,
-                    desc: ESanitizeOrderErrors.ProductName
-                }
+    // Sanitize for step-1
+    if (hasParameter(order?.product, 'name') && !isValidString(order.product.name))
+        return {
+            err: {
+                field: EOrderFields.ProductName,
+                desc: ESanitizeOrderErrors.ProductName
             }
+        }
 
-        if (product.category && !Object.values(EProductCategory).includes(product.category))
-            return {
-                err: {
-                    field: EOrderFields.ProductCategory,
-                    desc: ESanitizeOrderErrors.ProductCategory
-                }
+    if (hasParameter(order?.product, 'category') && !Object.values(EProductCategory).includes(order.product.category))
+        return {
+            err: {
+                field: EOrderFields.ProductCategory,
+                desc: ESanitizeOrderErrors.ProductCategory
             }
+        }
 
-        if (product.url && !isValidHttpUrl(product.url))
-            return {
-                err: {
-                    field: EOrderFields.ProductUrl,
-                    desc: ESanitizeOrderErrors.ProductUrl
-                }
+    if (hasParameter(order?.product, 'url') && !isValidHttpUrl(order.product.url))
+        return {
+            err: {
+                field: EOrderFields.ProductUrl,
+                desc: ESanitizeOrderErrors.ProductUrl
             }
+        }
 
-        if (product.price && !isNumeric(product.price) || parseFloat(product.price) <= 0)
-            return {
-                err: {
-                    field: EOrderFields.ProductPrice,
-                    desc: ESanitizeOrderErrors.ProductPrice
-                }
+    if (hasParameter(order?.product, 'price') && !isNumeric(order.product.price) || parseFloat(order.product.price) <= 0)
+        return {
+            err: {
+                field: EOrderFields.ProductPrice,
+                desc: ESanitizeOrderErrors.ProductPrice
             }
+        }
 
-        if (product.units && !isNumeric(product.units) || parseInt(product.units) <= 0)
-            return {
-                err: {
-                    field: EOrderFields.ProductUnits,
-                    desc: ESanitizeOrderErrors.ProductUnits
-                }
+    if (hasParameter(order?.product, 'units') && !isNumeric(order.product.units) || parseInt(order.product.units) <= 0)
+        return {
+            err: {
+                field: EOrderFields.ProductUnits,
+                desc: ESanitizeOrderErrors.ProductUnits
             }
+        }
+    
+    if (hasParameter(order?.product, 'isBoxIncluded') && !isBoolean(order.product.isBoxIncluded))
+        return {
+            err: {
+                field: EOrderFields.ProductIsBoxIncluded,
+                desc: ESanitizeOrderErrors.ProductIsBoxIncluded
+            }
+        }
 
-        if (product.isBoxIncluded && !isBoolean(product.isBoxIncluded))
-            return {
-                err: {
-                    field: EOrderFields.ProductIsBoxIncluded,
-                    desc: ESanitizeOrderErrors.ProductIsBoxIncluded
-                }
+    if (hasParameter(order?.product, 'coin') && !ECoin[order.product.coin])
+        return {
+            err: {
+                desc: ESanitizeOrderErrors.ProductCoin
             }
+        }
 
-        if (product.coin && !ECoin[product.coin])
-            return {
-                err: {
-                    desc: ESanitizeOrderErrors.ProductCoin
-                }
+    // Sanitize for step-2
+    if (hasParameter(order?.product, 'weightMore5kg') && !isBoolean(order.product.weightMore5kg))
+        return {
+            err: {
+                field: EOrderFields.ProductWeightMore5kg,
+                desc: ESanitizeOrderErrors.ProductWeightMore5kg
             }
+        }
 
-        // Sanitize for step-2
-        if (!isBoolean(product.weightMore5kg))
-            return {
-                err: {
-                    field: EOrderFields.ProductWeightMore5kg,
-                    desc: ESanitizeOrderErrors.ProductWeightMore5kg
-                }
+    if (hasParameter(order?.product, 'isTaller50cm') && !isBoolean(order.product.isTaller50cm))
+        return {
+            err: {
+                field: EOrderFields.ProductIsTaller50cm,
+                desc: ESanitizeOrderErrors.ProductIsTaller50cm
             }
+        }
 
-        if (product.isTaller50cm && !isBoolean(product.isTaller50cm))
-            return {
-                err: {
-                    field: EOrderFields.ProductIsTaller50cm,
-                    desc: ESanitizeOrderErrors.ProductIsTaller50cm
-                }
+    if (hasParameter(order?.product, 'isOneUnitPerProduct') && !isBoolean(order.product.isOneUnitPerProduct))
+        return {
+            err: {
+                field: EOrderFields.ProductIsOneUnitPerProduct,
+                desc: ESanitizeOrderErrors.ProductIsOneUnitPerProduct
             }
-
-        if (product.isOneUnitPerProduct && !isBoolean(product.isOneUnitPerProduct))
-            return {
-                err: {
-                    field: EOrderFields.ProductIsOneUnitPerProduct,
-                    desc: ESanitizeOrderErrors.ProductIsOneUnitPerProduct
-                }
-            }
-    }
+        }
 
     // Sanitize for step-1
-    if (order.status && !Object.values(EOrderStatus).includes(order.status))
+    if (hasParameter(order, 'status') && !Object.values(EOrderStatus).includes(order.status))
         return {
             err: {
                 desc: ESanitizeOrderErrors.Status
             }
         }
-    
-    if (order.shopperId && !isValidString(order.shopperId))
+
+    if (hasParameter(order, 'shopperId') && !isValidString(order.shopperId))
         return {
             err: {
                 desc: ESanitizeOrderErrors.ShopperId
@@ -503,7 +500,7 @@ const sanitize = (order: IOrder) => {
         }
 
     // Sanitize for step-2
-    if (order.shipper && !Object.values(EOrderShippers).includes(order.shipper))
+    if (hasParameter(order, 'shipper') && !Object.values(EOrderShippers).includes(order.shipper))
         return {
             err: {
                 field: EOrderFields.Shipper,
@@ -512,7 +509,7 @@ const sanitize = (order: IOrder) => {
         }
 
     // Sanitize for step-3
-    if (order.shippingDestination && !Object.values(EShippingDestination).includes(order.shippingDestination))
+    if (hasParameter(order, 'shippingDestination') && !Object.values(EShippingDestination).includes(order.shippingDestination))
         return {
             err: {
                 field: EOrderFields.ShippingDestination,
@@ -521,7 +518,7 @@ const sanitize = (order: IOrder) => {
         }
 
     // Sanitize for step-4
-    if (order.shopper && !Object.values(EOrderShoppers).includes(order.shopper))
+    if (hasParameter(order, 'shopper') && !Object.values(EOrderShoppers).includes(order.shopper))
         return {
             err: {
                 field: EOrderFields.Shopper,

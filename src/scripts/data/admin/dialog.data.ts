@@ -47,13 +47,21 @@ export const createOrder_dialog = `
                         }
                     </datalist>
                 </fieldset>
+                <fieldset>
+                    <legend>¿Necesitas la caja del producto?</legend>
+                    <input type="radio" name="${EOrderFields.ProductIsBoxIncluded}" value="yes" id="${EOrderFields.ProductIsBoxIncluded}_yes" required>
+                    <label for="${EOrderFields.ProductIsBoxIncluded}_yes" class="btn">Sí</label>
+
+                    <input type="radio" name="${EOrderFields.ProductIsBoxIncluded}" value="no" id="${EOrderFields.ProductIsBoxIncluded}_no" checked required>
+                    <label for="${EOrderFields.ProductIsBoxIncluded}_no" class="btn">No</label>
+                </fieldset>
                 <fieldset class="fs-sm">
                     <label for="${EOrderFields.ProductPrice}">
                         Valor unitario
                         <br>
                         <small>(en ${ECoin.USD.code})</small>
                     </label>
-                    <input type="number" placeholder="0.00" id="${EOrderFields.ProductPrice}" required>
+                    <input type="number" placeholder="0.00" step="0.01" id="${EOrderFields.ProductPrice}" required>
                 </fieldset>
                 <fieldset class="fs-sm">
                     <label for="product-qty">
@@ -62,14 +70,6 @@ export const createOrder_dialog = `
                         <small>(mínimo ${EOrderProductQty.Min} unidad)</small>
                     </label>
                     <input type="number" placeholder="0" id="product-qty" min=${EOrderProductQty.Min} required>
-                </fieldset>
-                <fieldset>
-                    <legend>¿Necesitas la caja del producto?</legend>
-                    <input type="radio" name="${EOrderFields.ProductIsBoxIncluded}" value="yes" id="${EOrderFields.ProductIsBoxIncluded}_yes" required>
-                    <label for="${EOrderFields.ProductIsBoxIncluded}_yes" class="btn">Sí</label>
-
-                    <input type="radio" name="${EOrderFields.ProductIsBoxIncluded}" value="no" id="${EOrderFields.ProductIsBoxIncluded}_no" checked required>
-                    <label for="${EOrderFields.ProductIsBoxIncluded}_no" class="btn">No</label>
                 </fieldset>
             </main>
             <footer>
@@ -258,19 +258,19 @@ export const createFlight_dialog = `
             <main>
                 <fieldset>
                     <legend>Tipo de alojamiento</legend>
-                    <input type="radio" name="${EHousingFields.Type}" value="RentedApartment" id="${EHousingFields.Type}_rented-apartment" required>
+                    <input type="radio" name="${EHousingFields.Type}" value="${EHousingType.RentedApartment}" id="${EHousingFields.Type}_rented-apartment" required>
                     <label for="${EHousingFields.Type}_rented-apartment" class="btn btn-h-width">${capitalizeString(EHousingType.RentedApartment)}</label>
 
-                    <input type="radio" name="${EHousingFields.Type}" value="Hotel" id="${EHousingFields.Type}_hotel" required>
+                    <input type="radio" name="${EHousingFields.Type}" value="${EHousingType.Hotel}" id="${EHousingFields.Type}_hotel" required>
                     <label for="${EHousingFields.Type}_hotel" class="btn btn-h-width">${capitalizeString(EHousingType.Hotel)}</label>
 
-                    <input type="radio" name="${EHousingFields.Type}" value="FriendsApartment" id="${EHousingFields.Type}_friends-apartment" required>
+                    <input type="radio" name="${EHousingFields.Type}" value="${EHousingType.FriendsApartment}" id="${EHousingFields.Type}_friends-apartment" required>
                     <label for="${EHousingFields.Type}_friends-apartment" class="btn btn-h-width">${capitalizeString(EHousingType.FriendsApartment)}</label>
 
-                    <input type="radio" name="${EHousingFields.Type}" value="Store" id="${EHousingFields.Type}_store" required>
+                    <input type="radio" name="${EHousingFields.Type}" value="${EHousingType.Store}" id="${EHousingFields.Type}_store" required>
                     <label for="${EHousingFields.Type}_store" class="btn btn-h-width">${capitalizeString(EHousingType.Store)}</label>
 
-                    <input type="radio" name="${EHousingFields.Type}" value="Home" id="${EHousingFields.Type}_home" required>
+                    <input type="radio" name="${EHousingFields.Type}" value="${EHousingType.Home}" id="${EHousingFields.Type}_home" required>
                     <label for="${EHousingFields.Type}_home" class="btn btn-h-width">${capitalizeString(EHousingType.Home)}</label>
                 </fieldset>
                 <fieldset>

@@ -81,11 +81,9 @@ export const offlineFirst = async (request, cacheName) => {
         }
 
         logger(`Request couldn't be fetched from network for ${request.url}`)
-        console.log('--- failResponseFromCacheText =', failResponseFromCacheText)
         return failResponse
     } catch (err) {
         logger(`Error catched while fetching from network for ${request.url}`)
-        console.log('--- failResponseFromCacheText =', failResponseFromCacheText)
         return failResponse
     }
 }

@@ -21,7 +21,6 @@ const configSignIn = async (wf) => {
             if (!emailInput || !passwordInput) return
 
             const userCredential = await wf.auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value)
-            console.log('--- userCredential =', userCredential)
             if (userCredential?.err){
                 logger(userCredential.err)
                 // TODO: undo UI animation

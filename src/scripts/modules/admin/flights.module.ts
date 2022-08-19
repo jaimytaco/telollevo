@@ -33,9 +33,13 @@ import {
     isNode
 } from '@wf/helpers/browser.helper'
 
+import { 
+    getDOMElement, 
+    delay, 
+} from '@helpers/util.helper'
+
 
 const configCreateFlightDialog = async (wf, dialogId) => {
-    const { getDOMElement, delay } = await import('@helpers/util.helper')
     const { default: CForm } = await import('@components/form.component')
     
     const dialog = getDOMElement(document, `#${dialogId}`)
@@ -85,7 +89,6 @@ const configCreateFlightDialog = async (wf, dialogId) => {
 
         const validateStatus = CForm.validateOnSubmit(step1Form, MFlight.sanitize, flight)
         if (validateStatus?.err) return
-        
 
         logger('create-flight-dialog step-1 with flight:', flight)
 
@@ -109,9 +112,9 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     step2Form.onsubmit = (e) => {
         e.preventDefault()
 
-        const typeInput = getDOMElement(step2Form, `[name="${EHousingFields.Type}"]`)
-        if (!typeInput) return
-        const type = typeInput.checked
+        const typeInputChecked = getDOMElement(step2Form, `[name="${EHousingFields.Type}"]:checked`)
+        if (!typeInputChecked) return
+        const type = typeInputChecked.value
 
         const addressInput = getDOMElement(step2Form, `#${EHousingFields.Address}`)
         if (!addressInput) return

@@ -56,7 +56,9 @@ export const scripts = [
     '/lib.worker.js',
     '/pwa.actor.js',
     '/sw.worker.js',
-    '/database.worker.js'
+    '/database.worker.js',
+    '/auth.module.js',
+    '/form.component.js',
 ]
 
 export const styles = [

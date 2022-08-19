@@ -54,7 +54,7 @@ const install = async (wf, id) => {
     const user = await get(wf, wf.mode.Network, id, EFormat.Raw)
     await add(wf, wf.mode.Offline, user)
     
-    logger(`User installed successfully!`, user)
+    logger(`User installed successfully!`)
 
     await updateOfflineTimestamp('users', new Date())
 }

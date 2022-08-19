@@ -1,10 +1,12 @@
 import { logger } from '@wf/helpers/browser.helper'
 
+export const hasParameter = (o, key) => !!o && Object.keys(o).includes(key)
+
 export const isValidDate = (d) => d.toString() !== 'Invalid Date'
 
 export const isValidString = (s) => s && typeof s === 'string' && s.length > 0
 
-export const isBoolean = (boolean) => typeof boolean === 'boolean'
+export const isBoolean = (b) => typeof b === 'boolean'
 
 // Taken from https://stackoverflow.com/questions/175739/how-can-i-check-if-a-string-is-a-valid-number
 export const isNumeric = (num) => (typeof(num) === 'number' || typeof(num) === 'string' && num.trim() !== '') && !isNaN(num as number)

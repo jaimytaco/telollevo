@@ -28,6 +28,7 @@ import {
     isBoolean,
     isValidString,
     isValidDate,
+    hasParameter,
 } from '@helpers/util.helper'
 
 import { logger } from '@wf/helpers/browser.helper'
@@ -288,21 +289,21 @@ const format = (flight: IFlight) => {
 
 const sanitize = (flight: IFlight) => {
     // Sanitize for step-1
-    if (flight.travelerId && !isValidString(flight.travelerId))
+    if (hasParameter(flight, 'travelerId') && !isValidString(flight.travelerId))
         return {
             err: {
                 desc: ESanitizeFlightErrors.TravelerId
             }
         }
 
-    if (flight.status && !Object.values(EFlightStatus).includes(flight.status))
+    if (hasParameter(flight, 'status') && !Object.values(EFlightStatus).includes(flight.status))
         return {
             err: {
                 desc: ESanitizeFlightErrors.Status
             }
         }
     
-    if (flight.receiveOrdersSince && !isValidDate(flight.receiveOrdersSince))
+    if (hasParameter(flight, 'receiveOrdersSince') && !isValidDate(flight.receiveOrdersSince))
         return {
             err: {
                 field: EFlightFields.ReceiveOrdersSince,
@@ -310,7 +311,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight.receiveOrdersUntil && !isValidDate(flight.receiveOrdersUntil))
+    if (hasParameter(flight, 'receiveOrdersUntil') && !isValidDate(flight.receiveOrdersUntil))
         return {
             err: {
                 field: EFlightFields.ReceiveOrdersUntil,
@@ -318,7 +319,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight.receiveOrdersSince >= flight.receiveOrdersUntil)
+    if (hasParameter(flight, 'receiveOrdersSince') && hasParameter(flight, 'receiveOrdersUntil') && flight.receiveOrdersSince >= flight.receiveOrdersUntil)
         return {
             err: {
                 field: EFlightFields.ReceiveOrdersUntil,
@@ -327,7 +328,7 @@ const sanitize = (flight: IFlight) => {
         }
     
     // Sanitize for step-2
-    if (flight?.housing?.place?.district && !isValidString(flight.housing.place.district))
+    if (hasParameter(flight?.housing?.place, 'district') && !isValidString(flight.housing.place.district))
         return {
             err: {
                 field: EPlaceFields.District,
@@ -335,7 +336,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
     
-    if (flight?.housing?.place?.country && !Object.values(ECountry).includes(flight.housing.place.country))
+    if (hasParameter(flight?.housing?.place, 'country') && !Object.values(ECountry).includes(flight.housing.place.country))
         return {
             err: {
                 field: EPlaceFields.Country,
@@ -343,7 +344,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.housing?.place?.state && !isValidString(flight.housing.place.state))
+    if (hasParameter(flight?.housing?.place, 'state') && !isValidString(flight.housing.place.state))
         return {
             err: {
                 field: EPlaceFields.State,
@@ -351,7 +352,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.housing?.place?.city && !isValidString(flight.housing.place.city))
+    if (hasParameter(flight?.housing?.place, 'city') && !isValidString(flight.housing.place.city))
         return {
             err: {
                 field: EPlaceFields.City,
@@ -359,7 +360,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.housing?.place?.zipcode && !isValidString(flight.housing.place.zipcode))
+    if (hasParameter(flight?.housing?.place, 'zipcode') && !isValidString(flight.housing.place.zipcode))
         return {
             err: {
                 field: EPlaceFields.Zipcode,
@@ -367,7 +368,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.housing?.type && !Object.keys(EHousingType).includes(flight.housing.type))
+    if (hasParameter(flight?.housing, 'type') && !Object.values(EHousingType).includes(flight.housing.type))
         return {
             err: {
                 field: EHousingFields.Type,
@@ -375,7 +376,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.housing?.address && !isValidString(flight.housing.address))
+    if (hasParameter(flight?.housing, 'address') && !isValidString(flight.housing.address))
         return {
             err: {
                 field: EHousingFields.Address,
@@ -383,7 +384,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.isResponsibleFor && !isBoolean(flight.isResponsibleFor))
+    if (hasParameter(flight, 'isResponsibleFor') && !isBoolean(flight.isResponsibleFor))
         return {
             err: {
                 field: EFlightFields.IsResponsibleFor,
@@ -391,7 +392,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.areReceiveOrderDatesOk && !isBoolean(flight.areReceiveOrderDatesOk))
+    if (hasParameter(flight, 'areReceiveOrderDatesOk') && !isBoolean(flight.areReceiveOrderDatesOk))
         return {
             err: {
                 field: EFlightFields.AreReceiveOrderDatesOk,
@@ -400,7 +401,7 @@ const sanitize = (flight: IFlight) => {
         }
 
     // Sanitize for step-3
-    if (flight?.receiver?.name && !isValidString(flight.receiver.name))
+    if (hasParameter(flight?.receiver, 'name') && !isValidString(flight.receiver.name))
         return {
             err: {
                 field: EReceiverFields.Name,
@@ -408,7 +409,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.receiver?.phone && !isValidString(flight.receiver.phone))
+    if (hasParameter(flight?.receiver, 'phone') && !isValidString(flight.receiver.phone))
         return {
             err: {
                 field: EReceiverFields.Phone,
@@ -417,7 +418,7 @@ const sanitize = (flight: IFlight) => {
         }
 
     // Sanitize for step-4
-    if (flight?.shippingDestination && !Object.values(EShippingDestination).map((sd) => capitalizeString(sd)).includes(flight.shippingDestination))
+    if (hasParameter(flight, 'shippingDestination') && !Object.values(EShippingDestination).map((sd) => capitalizeString(sd)).includes(flight.shippingDestination))
         return {
             err: {
                 field: EFlightFields.ShippingDestination,
@@ -425,7 +426,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.deliverOrderAt && !isValidDate(flight.deliverOrderAt))
+    if (hasParameter(flight, 'deliverOrderAt') && !isValidDate(flight.deliverOrderAt))
         return {
             err: {
                 field: EFlightFields.DeliverOrderAt,
@@ -433,7 +434,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.confirmDeliverOrder48h && !isBoolean(flight.confirmDeliverOrder48h))
+    if (hasParameter(flight, 'confirmDeliverOrder48h') && !isBoolean(flight.confirmDeliverOrder48h))
         return {
             err: {
                 field: EFlightFields.ConfirmDeliverOrder48h,
@@ -442,7 +443,7 @@ const sanitize = (flight: IFlight) => {
         }
 
     // Sanitize for step-5
-    if (flight?.code && !isValidString(flight.code))
+    if (hasParameter(flight, 'code') && !isValidString(flight.code))
         return {
             err: {
                 field: EFlightFields.Code,
@@ -450,7 +451,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.airline && !isValidString(flight.airline))
+    if (hasParameter(flight, 'airline') && !isValidString(flight.airline))
         return {
             err: {
                 field: EFlightFields.Airline,
@@ -458,7 +459,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.from && !Object.values(ECountry).filter((value) => value !== ECountry.Peru).includes(flight.from))
+    if (hasParameter(flight, 'from') && !Object.values(ECountry).filter((value) => value !== ECountry.Peru).includes(flight.from))
         return {
             err: {
                 field: EFlightFields.From,
@@ -466,7 +467,7 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (flight?.to && ECountry.Peru !== flight.to)
+    if (hasParameter(flight, 'to') && ECountry.Peru !== flight.to)
         return {
             err: {
                 field: EFlightFields.To,

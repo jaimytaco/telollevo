@@ -167,46 +167,54 @@ const prefetchRequest = async (request) => {
 }
 
 const fetchHdlr = (e) => {
-    const fn = async () => {
-        if (isDocumentRequest(e.request)) {
-            const url = new URL(e.request.url)
+    const fn = async (request, destination) => {
+        if (destination === 'document') {
+            const url = new URL(request.url)
             const { pathname } = url
             if (pathname.endsWith('/')){
                 logger('Redirecting to same pathname without /')
                 return Response.redirect(pathname.slice(0, -1))
             }
 
-            const redirectForAuth = !userCredential && app.routes[pathname]?.withAuth
+            const currentUserCredential = await wf.auth.getCurrentUser()
+            logger(`Verifing user authentication:${currentUserCredential ? '' : ' None'}`, currentUserCredential)
+            // const redirectForAuth = !userCredential && app.routes[pathname]?.withAuth
+            const redirectForAuth = !currentUserCredential && app.routes[pathname]?.withAuth
+            
             if (redirectForAuth){
                 logger('Redirecting to login because user is not authenticated')
                 // TODO: Clear cached routes that need authentication
                 return Response.redirect('/login')
             }
 
-            const prefetchRequestPromise = prefetchRequest(e.request)
+            const prefetchRequestPromise = prefetchRequest(request)
             
             const prefetchStatus = await Promise.any([
                 prefetchRequestPromise,
                 (async (ms, url) => {
                     await delay(ms)
-                    return { err: `Fetch for ${url} took more than ${ms}ms. Content updated will be ready for next fetch` }
+                    return { err: `Fetch for ${request.url} took more than ${ms}ms. Content updated will be ready for next fetch` }
                 })(MAX_FETCH_MS, url)
             ])
 
-            prefetchStatus?.err ? logger(prefetchStatus.err) : logger(`Fetch for ${url} is up to date!`)
+            prefetchStatus?.err ? logger(prefetchStatus.err) : logger(`Fetch for ${request.url} is up to date!`)
         }
 
-        return offlineFirst(e.request, CACHE_NAME)
+        return offlineFirst(request, CACHE_NAME)
     }
 
-    if (isRequestHandledBySW(e.request)) e.respondWith(fn())
+    if (isRequestHandledBySW(e.request)){
+        const url = new URL(e.request.url)
+        const request = new Request(url.pathname)
+        e.respondWith(fn(request, e.request.destination))
+    }
 }
 
 addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 449
+export const SW_VERSION = 480
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000
