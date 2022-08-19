@@ -1,6 +1,7 @@
 ---
 import AdminLayout from '@layouts/AdminLayout.astro';
-import paths from '@data/admin/path.data.json'
+// import paths from '@data/admin/path.data.json'
+import { EMenu } from '@types/util.type'
 import networkDB from '@wf/services/firebase.firestore.service'
 import { AUI } from '@wf/actors/ui.actor'
 import { app } from '@helpers/app.helper'
@@ -11,20 +12,27 @@ import {
 } from '@wf/lib.worker'
 
 export const getStaticPaths = async () => {
-    return paths
-        .map((path) => ({
+    // return paths
+    //     .map((path) => ({
+    //         params: {
+    //             page: path.page
+    //         },
+    //         props: {
+    //             path,
+    //             viewId: `admin-${path.page}`
+    //         }
+    //     }))
+
+    return Object.values(EMenu)
+        .map((menu) => ({
             params: {
-                page: path.page
+                page: menu.page
             },
-            props: {
-                path,
-                viewId: `admin-${path.page}`
-            }
         }))
 }
 
 const { page } = Astro.params
-const { path } = Astro.props
+// const { path } = Astro.props
 await registerNetworkDB(networkDB, CREDENTIALS)
 const { content, err } = await AUI.getViewContent(wf, app.routes, `/admin/${page}`)
 ---

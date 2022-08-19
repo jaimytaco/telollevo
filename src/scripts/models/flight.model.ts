@@ -221,7 +221,7 @@ const uninstall = async (wf) => {
         removeOfflineTimestamp('flights')
     ])
 
-    logger(`Flights uninstalled successfully!`)
+    logger(`Flights uninstalled successfully`)
 }
 
 const remove = async (wf, mode, id) => {

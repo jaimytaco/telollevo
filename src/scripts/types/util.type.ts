@@ -32,3 +32,16 @@ export enum EFormat{
     Related = 'related',
     Pretty = 'pretty'
 }
+
+export enum EMenu{
+    Orders = {
+        page: 'orders',
+        icon: 'packages.svg',
+        name: 'pedido',
+    },
+    Flights = {
+        page: 'flights',
+        icon: 'airplane.svg',
+        name: 'vuelo',
+    }
+}

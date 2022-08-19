@@ -3,10 +3,13 @@ import { capitalizeString } from '@helpers/util.helper'
 
 import { createOrder_dialog, createFlight_dialog } from '@data/admin/dialog.data'
 
-import paths from '@data/admin/path.data.json' // TODO: Check if this is necessary
+// import paths from '@data/admin/path.data.json' // TODO: Check if this is necessary
 
+import { IUser, EUserType } from '@types/user.type'
 import MUser from '@models/user.model'
+
 import MOrder from '@models/order.model'
+
 import MFlight from '@models/flight.model'
  
 import CTable from '@components/table.component'
@@ -16,7 +19,27 @@ import {
     logger
 } from '@wf/helpers/browser.helper'
 
-export const adminHeader = (user, actions, currentPage, currentNamePlural) => {
+const adminMenu = (user: IUser, actions, currentPage) => `
+    <nav class="n-top-2">
+        <menu class="m-nav">
+            ${
+                MUser.getMenuByUser(user)
+                    .map((menu) => `
+                        <a href="/admin/${menu.page}" class="btn btn-nav${menu.page === currentPage ? ' active' : ''}">
+                            <picture>
+                                <img src="/img/icon/${menu.icon}" width="22" height="22">
+                            </picture>
+                            <span>${menu.name}s</span>
+                        </a>
+                    `)
+                    .join('')
+            }
+        </menu>
+        ${actions}
+    </nav>
+`
+
+export const adminHeader = (user: IUser, actions, currentPage, currentNamePlural) => {
     return `
         <header>
             <nav class="n-top-1">
@@ -65,23 +88,7 @@ export const adminHeader = (user, actions, currentPage, currentNamePlural) => {
                     </div>
                 </div>
             </nav>
-            <nav class="n-top-2">
-                <menu class="m-nav">
-                    ${
-                        paths
-                            .map((path) => `
-                                <a href="/admin/${path.page}" class="btn btn-nav${path.page === currentPage ? ' active' : ''}">
-                                    <picture>
-                                        <img src="/img/icon/${path.icon}" width="22" height="22">
-                                    </picture>
-                                    <span>${path.namePlural}</span>
-                                </a>
-                            `)
-                            .join('')
-                    }
-                </menu>
-                ${actions}
-            </nav>
+            ${adminMenu(user, actions, currentPage)}
         </header>
     `
 }

@@ -33,7 +33,7 @@ const configSignIn = async (wf) => {
 
             await delay(1500)
 
-            if (user.type === EUserType.Shopper) location.href = '/admin/orders'
+            if ([EUserType.Admin, EUserType.Shopper, EUserType.Multiple].includes(user.type)) location.href = '/admin/orders'
             if (user.type === EUserType.Traveler) location.href = '/admin/flights'
         }  
 }

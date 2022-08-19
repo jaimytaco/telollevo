@@ -16,7 +16,7 @@ const uninstall = async (wf) => {
         removeOfflineTimestamp('quotations')
     ])
 
-    logger(`Quotations uninstalled successfully!`)
+    logger(`Quotations uninstalled successfully`)
 }
 
 const remove = async (wf, mode, id) => {
