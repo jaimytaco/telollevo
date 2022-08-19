@@ -173,22 +173,14 @@ const toRow = (flight: IFlight) => {
 }
 
 const getAllByUserAuthenticated = async (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
-    if (user.type === EUserType.Traveler){
+    if ([EUserType.Multiple, EUserType.Admin].includes(user.type))
+        return getAll(wf, mode, isFormatted)
+
+    if (user.type === EUserType.Traveler)
         return getAllByTravelerId(wf, mode, isFormatted, user.id, date)
-    }
 
-    // TODO: query orders according to user-type
-    if (user.type === EUserType.Shopper){
+    if (user.type === EUserType.Shopper)
         return []
-    }
-
-    if (user.type === EUserType.Multiple){
-        return []
-    }
-
-    if (user.type === EUserType.Admin){
-        return []
-    }
 }
 
 const getAllByTravelerId = (wf, mode, isFormatted: EFormat, travelerId, date?) => {
