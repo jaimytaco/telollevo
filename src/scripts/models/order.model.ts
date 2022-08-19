@@ -280,22 +280,11 @@ const toRow = (order: IOrder) => {
 }
 
 const getAllByUserAuthenticated = async (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
-    if (user.type === EUserType.Shopper) {
+    if ([EUserType.Traveler, EUserType.Multiple, EUserType.Admin].includes(user.type))
+        return getAll(wf, mode, isFormatted)
+    
+    if (user.type === EUserType.Shopper)
         return getAllByShopperId(wf, mode, isFormatted, user.id, date)
-    }
-
-    // TODO: query orders according to user-type
-    if (user.type === EUserType.Traveler) {
-        return []
-    }
-
-    if (user.type === EUserType.Multiple) {
-        return []
-    }
-
-    if (user.type === EUserType.Admin) {
-        return []
-    }
 }
 
 const getAllByShopperId = (wf, mode, isFormatted: EFormat, shopperId, date?) => {
