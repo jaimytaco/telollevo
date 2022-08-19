@@ -1,7 +1,6 @@
 import { ECountry, EShippingDestination } from '@types/util.type'
 import { IQuotation } from '@types/quotation.type'
 
-
 export enum EHousingType{
     RentedApartment = 'departamento o casa arrendada',
     Hotel = 'hotel',

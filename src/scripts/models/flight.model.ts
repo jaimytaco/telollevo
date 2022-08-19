@@ -1,6 +1,7 @@
 import { 
     IFlight, 
     EFlightStatus,
+    EHousingType,
 
     EFlightFields,
     ESanitizeFlightErrors,
@@ -14,6 +15,11 @@ import {
     EReceiverFields,
     ESanitizeReceiverErrors,
 } from '@types/flight.type'
+
+import { 
+    IUser,
+    EUserType, 
+} from '@types/user.type'
 
 import { 
     EFormat,
@@ -34,12 +40,12 @@ import {
 import { logger } from '@wf/helpers/browser.helper'
 import { removeOfflineTimestamp } from '@wf/lib.worker'
 
-import { EUserType } from '@types/user.type'
+const getAlert = (user: IUser, flight: IFlight) => {
+    if (user.type === EUserType.Admin && flight.status === EFlightStatus.Registered)
+        return 'Este vuelo cuenta con al menos una cotización, valídalo para que sea visible para el comprador.'
+}
 
-import { EHousingType } from '@types/flight.type'
-
-
-const formatRowExtra = (flight: IFlight) => {
+const toRowExtra = (user: IUser, flight: IFlight) => {
     return `
         <div id="te-${flight.id}" class="t-r-extra">
             <div class="card-4">
@@ -47,7 +53,7 @@ const formatRowExtra = (flight: IFlight) => {
                     <picture>
                         <img src="/img/icon/alert-secondary.svg" widtht="20" height="20">
                     </picture>
-                    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <p>${getAlert(user, flight)}</p>
                 </div>
                 <div class="card-6">
                     <h6>Detalles del vuelo</h6>
@@ -91,19 +97,24 @@ const formatRowExtra = (flight: IFlight) => {
     `
 }
 
-const formatRowActions = (flight: IFlight) => {
+const toRowActions = (user: IUser, flight: IFlight) => {
     switch(flight.status){
         case EFlightStatus.Registered:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
-                    <button class="btn btn-primary" data-visible-flight_btn="${flight.id}">
-                        <span>Aprobar vuelo</span>
-                    </button>
-                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
-                        <picture>
-                            <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
-                        </picture>
-                    </button>
+                    ${
+                        user.type === EUserType.Admin ?
+                            `
+                            <button class="btn btn-primary" data-visible-flight_btn="${flight.id}">
+                                <span>Aprobar vuelo</span>
+                            </button>
+                            <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
+                                <picture>
+                                    <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
+                                </picture>
+                            </button>
+                            ` : ''
+                    }
                 </div>
                 <div class="t-r-actions t-r-actions-mobile">
                     <div class="split-btn">
@@ -115,9 +126,15 @@ const formatRowActions = (flight: IFlight) => {
                                 <li>
                                     <button class="btn" data-show-table-extra_id="te-${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
                                 </li> 
-                                <li>
-                                    <button class="btn  data-visible-flight_btn="${flight.id}">Aprobar vuelo</button>
-                                </li> 
+                                ${
+                                    user.type === EUserType.Admin ?
+                                        `
+                                        <li>
+                                            <button class="btn  data-visible-flight_btn="${flight.id}">Aprobar vuelo</button>
+                                        </li> 
+                                        ` : ''
+                                }
+                                
                             </ul>
                         </span>
                     </div>
@@ -158,7 +175,7 @@ const formatRowActions = (flight: IFlight) => {
     }
 }
 
-const toRow = (flight: IFlight) => {
+const toRow = (user: IUser, flight: IFlight) => {
     return {
         id: flight.id,
         tags: [capitalizeString(flight.status)],
@@ -167,8 +184,8 @@ const toRow = (flight: IFlight) => {
             description: `Fabián Delgado<br>DNI 88223302`
         }],
         icon: 'flight.svg',
-        actions: formatRowActions(flight),
-        extra: formatRowExtra(flight),
+        actions: toRowActions(user, flight),
+        extra: toRowExtra(user, flight),
     }
 }
 

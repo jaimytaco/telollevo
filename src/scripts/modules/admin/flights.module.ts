@@ -424,13 +424,13 @@ const builder = async (wf) => {
 
     const user = await MUser.get(wf, wf.mode.Offline, userCredential.uid, EFormat.Raw) as IUser
 
-    const flights = await MFlight.getAll(wf, wf.mode.Offline, EFormat.Pretty)
+    const flights = await MFlight.getAll(wf, wf.mode.Offline, EFormat.Pretty) as IFlight[]
     if (flights?.err) {
         logger(flights.err)
         return { err: flights.err }
     }
 
-    const rows = flights.map(MFlight.toRow)
+    const rows = flights.map((flight) => MFlight.toRow(user, flight))
 
     // TODO
     const filters = []
