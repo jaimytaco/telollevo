@@ -13,7 +13,8 @@ import {
     getDocs,
     getDoc,
     addDoc,
-    updateDoc
+    updateDoc,
+    runTransaction,
 } from 'firebase/firestore/lite'
 // } from 'firebase/firestore'
 
@@ -90,18 +91,6 @@ const update = async (collectionName, docData) => {
     }
 }
 
-// TODO: Untested
-const updateWithTransaction = async (collectionName, docData, callback) => {
-    const { id, ...data } = docData
-    const docRef = doc(firestore, collectionName, id)
-    try {
-        const dataUpdated = await runTransaction(firestore, (transaction) => callback(transaction, docRef, formatDocForFirebase(data)))
-        return { data: dataUpdated }
-    } catch (err) {
-        return { err }
-    }
-}
-
 const add = async (collectionName, docData) => {
     const { id, ...data } = docData
     try {
@@ -112,6 +101,42 @@ const add = async (collectionName, docData) => {
                 ...data
             }
         }
+    } catch (err) {
+        return { err }
+    }
+}
+
+// TODO: Untested
+const updateWithTransaction = async (collectionName, docData, callback) => {
+    const { id, ...data } = docData
+    const docRef = doc(firestore, collectionName, id)
+    const dataFormatted = formatDocForFirebase(data)
+    try {
+        const dataUpdated = await runTransaction(firestore, (transaction) => callback(transaction, docRef, dataFormatted))
+        return { data: dataUpdated }
+    } catch (err) {
+        return { err }
+    }
+}
+
+// TODO: Untested
+const addWithTransaction = async (collectionName, docData, callback) => {
+    const { id, ...data } = docData
+    const docRef = doc(collection(firestore, collectionName))
+    try {
+        const dataAdded = await runTransaction(firestore, (transaction) => callback(transaction, docRef, formatDocForFirebase(data)))
+        return { data: dataAdded }
+    } catch (err) {
+        return { err }
+    }
+}
+
+const runWithTransaction = async (collectionName, docData, callback) => {
+    const { id, ...data } = docData
+    const docRef = id ? doc(firestore, collectionName, id) : doc(collection(firestore, collectionName))
+    try {
+        const transactionData = await runTransaction(firestore, (transaction) => callback(transaction, docRef, formatDocForFirebase(data)))
+        return { data: transactionData }
     } catch (err) {
         return { err }
     }
@@ -144,5 +169,7 @@ export default {
     getAll,
     update,
     get,
-    add
+    add,
+
+    runWithTransaction,
 }

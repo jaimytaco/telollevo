@@ -14,6 +14,9 @@ export interface IQuotation{
     status: EQuotationStatus,  
     createdAt: Date,
     updatedAt: Date,
+    
+    shopperId: string,
+    travelerId: string,
 
     flight?: IFlight,
     priceStr?: string

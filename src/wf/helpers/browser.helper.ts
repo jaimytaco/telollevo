@@ -1,3 +1,7 @@
+import {
+    proxy
+} from 'comlink'
+
 interface IIndexedDB extends IDBFactory{
     databases: () => Promise<IDBDatabaseInfo[]>
 }

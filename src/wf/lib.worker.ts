@@ -1,6 +1,5 @@
 import {
     wrap,
-    proxy
 } from 'comlink'
 
 import { 
@@ -14,6 +13,10 @@ import {
     supportsWorkerType,
     supportsIndexedDB,
 } from '@wf/helpers/browser.helper'
+
+import {
+    formatFn
+} from '@wf/helpers/lib.helper'
 
 import {  
     serveFromCache 
@@ -49,21 +52,18 @@ export const wf: IWF = {
 export const registerApp = (app: T) => !wf?.app ? wf.app = app : null
 
 const formatDatabaseActor = () => {
-    if (isNode()) return ADatabase
-    if (supportsWorkerType()) return wrap(new WDatabase())
+    // TODO: See the way Firestore Transactions run in workers with Comlink :(
+    // if (isNode()) return ADatabase
+    // if (supportsWorkerType()) return wrap(new WDatabase())
     return ADatabase
 }
 
-const formatforWorker = (db) => {
-    if (isNode()) return db
-    if (supportsWorkerType()) proxy(db)
-    return db
-}
+
 
 export const registerNetworkDB = async (networkDB: T, credentials) => {
     if (!wf?.database) wf.database = await formatDatabaseActor()
     
-    const formattedDB = formatforWorker(networkDB)
+    const formattedDB = formatFn(networkDB)
     if (!wf?.appInitialized) wf.appInitialized = await wf.database.initApp(formattedDB, credentials)
 
     await wf.database.setNetworkDB(formattedDB)
@@ -73,7 +73,7 @@ export const registerNetworkDB = async (networkDB: T, credentials) => {
 export const registerOfflineDB = async (offlineDB: T, prefix, models) => {
     if (!wf?.database) wf.database = await formatDatabaseActor()
 
-    await wf.database.setOfflineDB(formatforWorker(offlineDB))
+    await wf.database.setOfflineDB(formatFn(offlineDB))
     
     if (supportsIndexedDB()) {
         const { isOfflineFirst, isFirstLoad } = await wf.database.register({ mode: EDatabaseMode.Offline, prefix, models })

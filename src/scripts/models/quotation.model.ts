@@ -1,8 +1,27 @@
-import { IQuotation } from '@types/quotation.type'
-import { EFormat } from '@types/util.type'
-import { formatLocaleDate } from '@helpers/util.helper'
+import {
+    IQuotation,
+    EQuotationStatus,
+} from '@types/quotation.type'
+
+import {
+    EFormat,
+    ECoin
+} from '@types/util.type'
+
+import {
+    formatLocaleDate,
+    hasParameter,
+    mergeUUIDs,
+} from '@helpers/util.helper'
+
+import { IFlight } from '@type/flight.type'
 import MFlight from '@models/flight.model'
-import { ECoin } from '@types/util.type'
+
+import { IOrder } from '@type/order.type'
+import MOrder from '@models/order.model'
+
+import { IUser } from '@type/user.type'
+import MUser from '@models/user.model'
 
 import { logger } from '@wf/helpers/browser.helper'
 import { removeOfflineTimestamp } from '@wf/lib.worker'
@@ -19,6 +38,42 @@ const uninstall = async (wf) => {
     logger(`Quotations uninstalled successfully`)
 }
 
+const getAllByTravelerIdAndOrderId = (wf, mode, isFormatted: EFormat, travelerId, orderId) => {
+    const byTraveler = {
+        field: 'travelerId',
+        operator: wf.operator.EQualTo,
+        value: travelerId
+    }
+
+    const byOrder = {
+        field: 'orderId',
+        operator: wf.operator.EQualTo,
+        value: orderId
+    }
+
+    return getAll(wf, mode, isFormatted, [byTraveler, byOrder])
+}
+
+const getAllByFlightId = async (wf, mode, isFormatted: EFormat, flightId) => {
+    const byFlight = {
+        field: 'flightId',
+        operator: wf.operator.EqualTo,
+        value: flightId
+    }
+
+    return getAll(wf, mode, isFormatted, [byFlight])
+}
+
+const getAllByOrderId = async (wf, mode, isFormatted: EFormat, orderId) => {
+    const byOrder = {
+        field: 'orderId',
+        operator: wf.operator.EqualTo,
+        value: orderId
+    }
+
+    return getAll(wf, mode, isFormatted, [byOrder])
+}
+
 const remove = async (wf, mode, id) => {
     const { database: db } = wf
     const response = await db.remove(mode, 'quotations', id)
@@ -27,34 +82,6 @@ const remove = async (wf, mode, id) => {
         logger(err)
         return { err }
     }
-}
-
-const getAllByFlightId = async (wf, mode, isFormatted: EFormat, flightId) => {
-    const { operator } = wf
-
-    const byFlight = {
-        field: 'flightId',
-        operator: operator.EqualTo,
-        value: flightId
-    }
-
-    const filters = [byFlight]
-
-    return getAll(wf, mode, isFormatted, filters)
-}
-
-const getAllByOrderId = async (wf, mode, isFormatted: EFormat, orderId) => {
-    const { operator } = wf
-
-    const byOrder = {
-        field: 'orderId',
-        operator: operator.EqualTo,
-        value: orderId
-    }
-
-    const filters = [byOrder]
-
-    return getAll(wf, mode, isFormatted, filters)
 }
 
 const add = (wf, mode, quotation: IQuotation) => {
@@ -73,12 +100,12 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
 
     const quotations = responseQuotations.data as IQuotation[]
     if (isFormatted === EFormat.Raw) return quotations
-    
-    for (const quotation of quotations){
-        quotation.flight = await MFlight.get(wf, mode, quotation.flightId, isFormatted)
+
+    for (const quotation of quotations) {
+        quotation.flight = await MFlight.get(wf, mode, quotation.flightId, isFormatted) as IFlight
     }
 
-    return isFormatted === EFormat.Related ? 
+    return isFormatted === EFormat.Related ?
         quotations :
         quotations.map(format)
 }
@@ -90,9 +117,57 @@ const format = (quotation: IQuotation) => {
     return quotation
 }
 
-export default{
+const sanitize = (quotation: IQuotation) => {
+
+}
+
+const doQuote = async (wf, quotation: IQuotation) => {
+    const quotationDetails = await Promise.all([
+        MFlight.get(wf, wf.mode.Offline, quotation.flightId, EFormat.Raw),
+        MOrder.get(wf, wf.mode.Offline, quotation.orderId, EFormat.Raw),
+        MUser.get(wf, wf.mode.Offline, quotation.shopperId, EFormat.Raw),
+        MUser.get(wf, wf.mode.Offline, quotation.travelerId, EFormat.Raw),
+    ])
+
+    const isReadyToQuote = !quotationDetails.filter((response) => hasParameter(response, 'err')).length
+
+    // TODO: Show error in form
+    if (!isReadyToQuote) return {
+        err: {
+            inForm: 'quote-order-step-1_form',
+            desc: 'Hubo un error al registrar su cotización, intente nuevamente'
+        }
+    }
+
+    const data = {
+        id: mergeUUIDs([quotation.orderId, quotation.shopperId, quotation.flightId, quotation.travelerId]),
+        ...quotation
+    }
+
+    const onTransaction = async (transaction, docRef, data) => {
+        const doc = await transaction.get(docRef)
+        if (doc.exists())
+            return Promise.reject({
+                field: 'quote-flight',
+                desc: 'Este pedido ya ha sido cotizado con este vuelo'
+            })
+
+        transaction.set(docRef, data)
+
+        return {
+            data: {
+                id: docRef.id,
+                ...data
+            }
+        }
+    }
+
+    return wf.database.runWithTransaction(wf.mode.Network, 'quotations', data, onTransaction)
+}
+
+export default {
     collection: 'quotations',
-    
+
     format,
     getAll,
     add,
@@ -100,5 +175,8 @@ export default{
 
     getAllByOrderId,
     getAllByFlightId,
+    getAllByTravelerIdAndOrderId,
     uninstall,
+    sanitize,
+    doQuote,
 }

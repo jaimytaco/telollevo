@@ -1,23 +1,38 @@
+import {
+    IFlight
+} from '@types/flight.type'
 import MFlight from '@models/flight.model'
+
+import { 
+    EProductCategory 
+} from '@types/product.type'
 
 import { 
     IOrder,
     EOrderStatus, 
     EOrderShoppers, 
-    EOrderFields 
+    EOrderFields,
+    EOrderShippers,
 } from '@types/order.type'
 import MOrder from '@models/order.model'
 
 import { 
     EFormat,
     ECoin, 
-    EShippingDestination 
+    EShippingDestination,
+    EOrderProductQty,
 } from '@types/util.type'
 
-import { IQuotation } from '@types/quotation.type'
+import { 
+    IQuotation,
+    EQuotationStatus,
+} from '@types/quotation.type'
 import MQuotation from '@models/quotation.model'
 
-import { EUserType } from '@types/user.type'
+import { 
+    IUser, 
+    EUserType 
+} from '@types/user.type'
 import MUser from '@models/user.model'
 
 import {
@@ -30,14 +45,18 @@ import {
     updateOfflineTimestamp
 } from '@wf/lib.worker'
 
-import { createOrder_dialog } from '@data/admin/dialog.data'
+// import { createOrder_dialog } from '@data/admin/dialog.data'
+
 import { 
     capitalizeString,
     getDOMElement, 
     delay, 
 } from '@helpers/util.helper'
+
 import CTable from '@components/table.component'
+
 import { adminHeader } from '@helpers/ui.helper'
+
 
 // const configSelectQuotationInQuotedOrder = async (wf) => {
 //     const selectQuotationBtns = getDOMElement(document, '[data-select-quotation_btn]', 'all')
@@ -45,6 +64,107 @@ import { adminHeader } from '@helpers/ui.helper'
 //         console.log('--- selectQuotationBtn =', selectQuotationBtn)
 //     })
 // }
+
+const configQuoteOrderDialog = async (wf, dialogId) => {
+    const { default: CForm } = await import('@components/form.component')
+
+    const dialog = getDOMElement(document, `#${dialogId}`)
+    if (!dialog) return
+
+    // STEP-1
+    const step1Form = getDOMElement(dialog, '#quote-order-step-1_form')
+    if (!step1Form) return
+    const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
+    if (!btnSubmitStep1) return
+    CForm.init(step1Form.id)
+
+    const quoteOrderBtns = getDOMElement(document, '[data-quote-order_btn]', 'all')
+    const { default: CDialog } = await import('@components/dialog.component')
+    quoteOrderBtns.forEach((quoteOrderBtn) => quoteOrderBtn.onclick = () => {
+        CDialog.handle(dialogId, 'add')
+        step1Form.classList.add('active')
+        const orderId = quoteOrderBtn.getAttribute('data-quote-order_id')
+        const option = getDOMElement(step1Form, '[data-order_id]')
+        if (!option) return
+        const input = getDOMElement(step1Form, '[list="quote-order"]')  
+        if (!input) return
+        input.value = option.value
+    })
+
+    btnSubmitStep1.onclick = (e) => {
+        e.preventDefault()
+        CForm.validateBeforeSubmit(step1Form)
+    }
+
+    step1Form.onsubmit = async (e) => {
+        e.preventDefault()
+        
+        const orderInput = getDOMElement(step1Form, '[list="quote-order"]')
+        if (!orderInput) return
+        const orderOption = getDOMElement(step1Form, `#quote-order [value="${orderInput.value}"]`)
+        const orderId = orderOption ? orderOption.getAttribute('data-order_id') : null
+        const shopperId = orderOption ? orderOption.getAttribute('data-shopper_id') : null
+
+        const flightInput = getDOMElement(step1Form, '[list="quote-flight"]')
+        if (!flightInput) return
+        const flightOption = getDOMElement(step1Form, `#quote-flight [value="${flightInput.value}"]`)
+        const flightId = flightOption ? flightOption.getAttribute('data-flight_id') : null
+        const travelerId = flightOption ? flightOption.getAttribute('data-traveler_id') : null
+
+        const priceInput = getDOMElement(step1Form, '#quote-price')
+        if (!priceInput) return
+        const price = parseFloat(priceInput.value)
+
+        const now = new Date()
+
+        // TODO: use order local object?
+        const quotation = {
+            orderId,
+            shopperId,
+            flightId,
+            travelerId,
+            price,
+            createdAt: now,
+            updatedAt: now,
+            coin: ECoin.USD.code,
+            status: EQuotationStatus.Registered
+        }
+
+        const validateStatus = await CForm.validateOnSubmit(step1Form, MQuotation.sanitize, quotation)
+        if (validateStatus?.err) return
+
+        const response = await MQuotation.doQuote(wf, quotation)
+        if (response?.err){
+            CForm.showInvalid(step1Form, response.err, quotation)
+            return
+        }
+
+        await MQuotation.add(wf, wf.mode.Offline, response.data)
+        await MOrder.toQuoted(wf, orderId)
+
+        logger('quote-order-dialog step-1 with quotation:', quotation)
+
+        step1Form.classList.remove('active')
+        step2Form.classList.add('active')
+    }
+
+    // STEP-2
+    const step2Form = getDOMElement(dialog, '#quote-order-confirmation-step-2_form')
+    if (!step2Form) return
+    const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
+    if (!btnSubmitStep2) return
+    CForm.init(step2Form.id)
+
+    step2Form.onsubmit = async (e) => {
+        e.preventDefault()
+        // TODO: Improve animation after quote-order
+        step2Form.classList.remove('active')
+        CDialog.handle(dialogId, 'remove')
+        await delay(1500)
+        location.reload()
+    }
+
+}
 
 const configCreateOrderDialog = async (wf, dialogId) => {
     const { default: CForm } = await import('@components/form.component')
@@ -61,8 +181,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     
     const createOrderBtns = getDOMElement(document, '[data-create-order-dialog_btn]', 'all')
     const { default: CDialog } = await import('@components/dialog.component')
-
-    createOrderBtns?.forEach((createOrderBtn) => createOrderBtn.onclick = () => {
+    createOrderBtns.forEach((createOrderBtn) => createOrderBtn.onclick = () => {
         CDialog.handle('create-order_dialog', 'add')
         step1Form.classList.add('active')
     })
@@ -121,7 +240,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         order.status = status
         order.shopperId = shopperId
 
-        const validateStatus = CForm.validateOnSubmit(step1Form, MOrder.sanitize, order)
+        const validateStatus = await CForm.validateOnSubmit(step1Form, MOrder.sanitize, order)
         if (validateStatus?.err) return
 
         logger('create-order-dialog step-1 with order:', order)
@@ -143,7 +262,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         CForm.validateBeforeSubmit(step2Form)
     }
 
-    step2Form.onsubmit = (e) => {
+    step2Form.onsubmit = async (e) => {
         e.preventDefault()
 
         const weightMore5kgInput = getDOMElement(step2Form, `[name="${EOrderFields.ProductWeightMore5kg}"]:checked`)
@@ -176,7 +295,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         order.comments = comments
         order.shipper = shipper
         
-        const validateStatus = CForm.validateOnSubmit(step2Form, MOrder.sanitize, order)
+        const validateStatus = await CForm.validateOnSubmit(step2Form, MOrder.sanitize, order)
         if (validateStatus?.err) return
 
         logger('create-order-dialog step-2 with order:', order)
@@ -198,29 +317,13 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         CForm.validateBeforeSubmit(step3Form)
     }
 
-    step3Form.onsubmit = (e) => {
+    step3Form.onsubmit = async (e) => {
         e.preventDefault()
 
         const shippingDestination = (getDOMElement(step3Form, `[name="${EOrderFields.ShippingDestination}"]:checked`)).value
         order.shippingDestination = shippingDestination
-
-        // const sanitizeStatus = MOrder.sanitize(order)
-        // if (sanitizeStatus?.err){
-        //     const { field, desc } = sanitizeStatus.err
-        //     if (!field){
-        //         logger(`Sanitize error: ${desc} for order`, order)
-        //         return
-        //     }
-
-        //     const invalidFieldset = getDOMElement(step3Form,`#${field}`)?.parentNode 
-        //     if (invalidFieldset){
-        //         CForm.handleInvalid('add', desc, invalidFieldset)
-        //         invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        //         logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
-        //         return
-        //     }
-        // }
-        const validateStatus = CForm.validateOnSubmit(step3Form, MOrder.sanitize, order)
+        
+        const validateStatus = await CForm.validateOnSubmit(step3Form, MOrder.sanitize, order)
         if (validateStatus?.err) return
 
         logger('create-order-dialog step-3 with order:', order)
@@ -247,24 +350,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
 
         const shopper = (getDOMElement(step4Form, `[name="${EOrderFields.Shopper}"]`)).value
         order.shopper = shopper
-
-        // const sanitizeStatus = MOrder.sanitize(order)
-        // if (sanitizeStatus?.err){
-        //     const { field, desc } = sanitizeStatus.err
-        //     if (!field){
-        //         logger(`Sanitize error: ${desc} for order`, order)
-        //         return
-        //     }
-
-        //     const invalidFieldset = getDOMElement(step4Form,`#${field}`)?.parentNode 
-        //     if (invalidFieldset){
-        //         CForm.handleInvalid('add', desc, invalidFieldset)
-        //         invalidFieldset.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-        //         logger(`Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for order`, order)
-        //         return
-        //     }
-        // }
-        const validateStatus = CForm.validateOnSubmit(step4Form, MOrder.sanitize, order)
+        
+        const validateStatus = await CForm.validateOnSubmit(step4Form, MOrder.sanitize, order)
         if (validateStatus?.err) return
 
         const now = new Date()
@@ -292,6 +379,279 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         await delay(1500)
         location.reload()
     }
+}
+
+const getCreateOrderDialog = () => `
+    <nav id="create-order_dialog" class="n-dialog n-d-multistep">
+        <form id="create-order-step-1_form">
+            <header>
+                <button type="button" class="btn btn-xs-inline btn-xs-block" data-close-dialog_btn="create-order_dialog">
+                    <picture>
+                        <img src="/img/icon/close.svg" width="20" height="20">
+                    </picture>
+                </button>
+                <div class="h-heading">
+                    <h3>¿Quieres registrar un pedido?</h3>
+                    <p>Indícanos los datos de tu artículo.</p>
+                </div>
+            </header>
+            <main>
+                <fieldset>
+                    <label for="${EOrderFields.ProductUrl}">Link del producto</label>
+                    <input type="text" placeholder="Ingresa el link del producto" id="${EOrderFields.ProductUrl}" required>
+                </fieldset>
+                <fieldset>
+                    <label for="${EOrderFields.ProductName}">Nombre del producto</label>
+                    <input type="text" placeholder="Ingresa el nombre del producto" id="${EOrderFields.ProductName}" required>
+                </fieldset>
+                <fieldset>
+                    <label for="${EOrderFields.ProductCategory}">Categoría</label>
+                    <input list="${EOrderFields.ProductCategory}" placeholder="Selecciona una categoría" required>
+                    <datalist id="${EOrderFields.ProductCategory}">
+                        ${
+                            Object.values(EProductCategory)
+                                .map((value) => `<option value="${value}"></option>`)
+                                .join('')
+                        }
+                    </datalist>
+                </fieldset>
+                <fieldset>
+                    <legend>¿Necesitas la caja del producto?</legend>
+                    <input type="radio" name="${EOrderFields.ProductIsBoxIncluded}" value="yes" id="${EOrderFields.ProductIsBoxIncluded}_yes" required>
+                    <label for="${EOrderFields.ProductIsBoxIncluded}_yes" class="btn">Sí</label>
+
+                    <input type="radio" name="${EOrderFields.ProductIsBoxIncluded}" value="no" id="${EOrderFields.ProductIsBoxIncluded}_no" checked required>
+                    <label for="${EOrderFields.ProductIsBoxIncluded}_no" class="btn">No</label>
+                </fieldset>
+                <fieldset class="fs-sm">
+                    <label for="${EOrderFields.ProductPrice}">
+                        Valor unitario
+                        <br>
+                        <small>(en ${ECoin.USD.code})</small>
+                    </label>
+                    <input type="number" placeholder="0.00" step="0.01" id="${EOrderFields.ProductPrice}" required>
+                </fieldset>
+                <fieldset class="fs-sm">
+                    <label for="product-qty">
+                        Cantidad
+                        <br>
+                        <small>(mínimo ${EOrderProductQty.Min} unidad)</small>
+                    </label>
+                    <input type="number" placeholder="0" id="product-qty" min=${EOrderProductQty.Min} required>
+                </fieldset>
+            </main>
+            <footer>
+                <button class="btn btn-primary btn-submit" type="submit">Continuar</button>
+            </footer>
+        </form>
+
+        <form id="create-order-step-2_form">
+            <header>
+                <button class="btn btn-xs-inline btn-xs-block" type="button" data-current-step="create-order-step-2_form" data-previous-step_btn="create-order-step-1_form">
+                    <picture>
+                        <img src="/img/icon/arrow-left.svg" width="20" height="20">
+                    </picture>
+                </button>
+                <div class="h-heading">
+                    <h3>Ahora que ya sabemos que deseas traer</h3>
+                    <p>Indícanos las características de tu artículo.</p>
+                </div>
+            </header>
+            <main>
+                <fieldset>
+                    <legend>¿Tu artículo pesa más de 5 kilos?</legend>
+                    <input type="radio" name="${EOrderFields.ProductWeightMore5kg}" value="yes" id="${EOrderFields.ProductWeightMore5kg}_yes" required>
+                    <label for="${EOrderFields.ProductWeightMore5kg}_yes" class="btn">Sí</label>
+
+                    <input type="radio" name="${EOrderFields.ProductWeightMore5kg}" value="no" id="${EOrderFields.ProductWeightMore5kg}_no" checked required>
+                    <label for="${EOrderFields.ProductWeightMore5kg}_no" class="btn">No</label>
+                </fieldset>
+                <fieldset>
+                    <legend>
+                        ¿Tu artículo mide más de 50 cm?
+                        <br>
+                        <small>(de alguno de sus lados)</small>
+                    </legend>
+                    <input type="radio" name="${EOrderFields.ProductIsTaller50cm}" value="yes" id="${EOrderFields.ProductIsTaller50cm}_yes" required>
+                    <label for="${EOrderFields.ProductIsTaller50cm}_yes" class="btn">Sí</label>
+
+                    <input type="radio" name="${EOrderFields.ProductIsTaller50cm}" value="no" id="${EOrderFields.ProductIsTaller50cm}_no" checked required>
+                    <label for="${EOrderFields.ProductIsTaller50cm}_no" class="btn">No</label>
+                </fieldset>
+                <fieldset>
+                    <legend>
+                        ¿Alguno de los links contiene más de una unidad? <br>
+                        <small>Por ejemplo packs, cajas o bolsas con varias unidades adentro.</small>
+                    </legend>
+                    <input type="radio" name="${EOrderFields.ProductIsOneUnitPerProduct}" value="yes" id="${EOrderFields.ProductIsOneUnitPerProduct}_yes" required>
+                    <label for="${EOrderFields.ProductIsOneUnitPerProduct}_yes" class="btn">Sí</label>
+
+                    <input type="radio" name="${EOrderFields.ProductIsOneUnitPerProduct}" value="no" id="${EOrderFields.ProductIsOneUnitPerProduct}_no" checked required>
+                    <label for="${EOrderFields.ProductIsOneUnitPerProduct}_no" class="btn">No</label>
+                </fieldset>
+                <fieldset>
+                    <legend>¿Quién enviará tus compras al alojamiento del viajero?</legend>
+                    <input type="radio" name="${EOrderFields.Shipper}" value="${EOrderShippers.Relative}" id="${EOrderFields.Shipper}_relative" required>
+                    <label for="${EOrderFields.Shipper}_relative" class="btn">${capitalizeString(EOrderShippers.Relative)}</label>
+
+                    <input type="radio" name="${EOrderFields.Shipper}" value="${EOrderShippers.Store}" id="${EOrderFields.Shipper}_store" checked required>
+                    <label for="${EOrderFields.Shipper}_store" class="btn">${capitalizeString(EOrderShippers.Store)}</label>
+                </fieldset>
+                <fieldset>
+                    <label for="${EOrderFields.Comments}">Si deseas, puedes dejarle un comentario al viajero</label>
+                    <textarea id="${EOrderFields.Comments}" placeholder="Ingresa un comentario para el viajero"></textarea>
+                </fieldset>
+            </main>
+            <footer>
+                <button class="btn btn-primary btn-submit" type="submit">Continuar</button>
+            </footer>
+        </form>
+
+        <form id="create-order-step-3_form">
+            <header>
+                <button class="btn btn-xs-inline btn-xs-block" type="button" data-current-step="create-order-step-3_form" data-previous-step_btn="create-order-step-2_form">
+                    <picture>
+                        <img src="/img/icon/arrow-left.svg" width="20" height="20">
+                    </picture>
+                </button>
+                <div class="h-heading">
+                    <h3>¿Cómo prefieres la entrega?</h3>
+                    <p>Una vez el artículo llegue a tu país destino.</p>
+                </div>
+            </header>
+            <main>
+                <fieldset>
+                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Inplace_Miraflores}" id="${EOrderFields.ShippingDestination}_inplace-miraflores" checked required>
+                    <label for="${EOrderFields.ShippingDestination}_inplace-miraflores" class="btn btn-f-width">${capitalizeString(EShippingDestination.Inplace_Miraflores)}</label>
+
+                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Town}" id="${EOrderFields.ShippingDestination}_town" required>
+                    <label for="${EOrderFields.ShippingDestination}_town" class="btn btn-f-width">Envio ${EShippingDestination.Town}</label>
+
+                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Province}" id="${EOrderFields.ShippingDestination}_province" required>
+                    <label for="${EOrderFields.ShippingDestination}_province" class="btn btn-f-width">Envio ${EShippingDestination.Province}</label>
+                </fieldset>
+            </main>
+            <footer>
+                <button class="btn btn-primary btn-submit" type="submit">Continuar</button>
+            </footer>
+        </form>
+
+        <form id="create-order-step-4_form">
+            <header>
+                <button class="btn btn-xs-inline btn-xs-block" type="button" data-current-step="create-order-step-4_form" data-previous-step_btn="create-order-step-3_form">
+                    <picture>
+                        <img src="/img/icon/arrow-left.svg" width="20" height="20">
+                    </picture>
+                </button>
+                <div class="h-heading">
+                    <h3>¿Quién deseas que compre tu artículo?</h3>
+                    <p>Escoge a una de las opciones.</p>
+                </div>
+            </header>
+            <main>
+                <fieldset>
+                    <input type="radio" name="${EOrderFields.Shopper}" value="${EOrderShoppers.Myself}" id="${EOrderFields.Shopper}_myself">
+                    <label for="${EOrderFields.Shopper}_myself" class="btn btn-f-width">${capitalizeString(EOrderShoppers.Myself)}</label>
+
+                    <input type="radio" name="${EOrderFields.Shopper}" value="${EOrderShoppers.Business}" id="${EOrderFields.Shopper}_business" checked>
+                    <label for="${EOrderFields.Shopper}_business" class="btn btn-f-width">${capitalizeString(EOrderShoppers.Business)}</label>
+                </fieldset>
+            </main>
+            <footer>
+                <button class="btn btn-primary btn-submit" type="submit">Continuar</button>
+            </footer>
+        </form>
+
+        <!-- TODO: Shopper authentication/register forms -->
+
+        <form id="create-order-confirmation-step-5_form">
+            <main>
+                <div class="card-3">
+                    <picture>
+                        <img src="/img/illustrations/buyer-confirmation.svg" width="158">
+                    </picture>
+                    <div class="h-heading">
+                        <h3>Pedido<br>registrado con éxito.</h3>
+                    </div>
+                </div>
+            </main>
+            <footer>
+                <button class="btn btn-primary btn-submit" type="submit">Listo</button>
+            </footer>
+        </form>
+    </nav>
+`
+
+const getQuoteOrderDialog = async (wf, user: IUser, computedOrders: IOrder[]) => {
+    if (user.type !== EUserType.Traveler) return ''
+    const quotableOrders = computedOrders.filter((computedOrder) => computedOrder.computed.isQuotable)
+    if (!quotableOrders.length) return ''
+    const flights = await MFlight.getAllByTravelerId(wf, wf.mode.Offline, EFormat.Raw, user.id) as IFlight[]
+    return `
+        <nav id="quote-order_dialog" class="n-dialog n-d-multistep">
+            <form id="quote-order-step-1_form">
+                <header>
+                    <button type="button" class="btn btn-xs-inline btn-xs-block" data-close-dialog_btn="quote-order_dialog">
+                        <picture>
+                            <img src="/img/icon/close.svg" width="20" height="20">
+                        </picture>
+                    </button>
+                    <div class="h-heading">
+                        <h3>¿Quieres cotizar un pedido?</h3>
+                        <p>Indícanos en cual de tus vuelos podrías traer el pedido.</p>
+                    </div>
+                </header>
+                <main>
+                    <fieldset>
+                        <label for="quote-order">Pedido a cotizar</label>
+                        <input list="quote-order" placeholder="Selecciona un pedido" required>
+                        <datalist id="quote-order">
+                            ${
+                                quotableOrders
+                                    .map((quotableOrder) => `<option value="${quotableOrder.product.name}" data-order_id="${quotableOrder.id}" data-shopper_id="${quotableOrder.shopperId}">${quotableOrder.product.coin} ${quotableOrder.product.price}</option>`)
+                                    .join('')
+                            }
+                        </datalist>
+                    </fieldset>
+                    <fieldset>
+                        <label for="quote-flight">Vuelo a usar</label>
+                        <input list="quote-flight" placeholder="Selecciona un vuelo" required>
+                        <datalist id="quote-flight">
+                            ${
+                                flights
+                                    .map((flight) => `<option value="${flight.from} a ${flight.to}" data-flight_id="${flight.id}" data-traveler_id="${user.id}">${flight.airline} - ${flight.code}</option>`)
+                                    .join('')
+                            }
+                        </datalist>
+                    </fieldset>
+                    <fieldset>
+                        <label for="quote-price">
+                            Precio<small>(en ${ECoin.USD.code})</small>
+                        </label>
+                        <input type="number" placeholder="0.00" step="0.01" id="quote-price" required>
+                    </fieldset>
+                </main>
+                <footer>
+                    <button class="btn btn-primary btn-submit" type="submit">Cotizar</button>
+                </footer>
+            </form>
+            <form id="quote-order-confirmation-step-2_form">
+                <main>
+                    <div class="card-3">
+                        <picture>
+                            <img src="/img/illustrations/buyer-confirmation.svg" width="158">
+                        </picture>
+                        <div class="h-heading">
+                            <h3>Cotización<br>registrada con éxito.</h3>
+                        </div>
+                    </div>
+                </main>
+                <footer>
+                    <button class="btn btn-primary btn-submit" type="submit">Listo</button>
+                </footer>
+            </form>
+        </nav>
+    `
 }
 
 const loader = async (wf) => {
@@ -363,6 +723,21 @@ const loader = async (wf) => {
 
     await updateOfflineTimestamp('flights', new Date())
 
+    const allShoppers = await Promise.all(
+        orders.map((order) => MUser.get(wf, mode.Network, order.shopperId, EFormat.Raw))
+    ) as IUser[]
+
+    logger(`All shoppers to cache offline for admin-orders: `, allShoppers)
+    
+    await Promise.all(
+        allShoppers
+            .map((shopper) => MUser.add(wf, mode.Offline, shopper))
+    )
+
+    logger('All shoppers cached offline succesfully')
+
+    await updateOfflineTimestamp('users', new Date())
+
     return { done }
 }
 
@@ -372,7 +747,7 @@ const builder = async (wf) => {
             title: '',
             meta: ''
         },
-        body: `${createOrder_dialog}`
+        body: `${getCreateOrderDialog()}`
     }
 
     if (isNode())
@@ -384,21 +759,26 @@ const builder = async (wf) => {
         return emptyContent
     }
 
-    const user = await MUser.get(wf, wf.mode.Offline, userCredential.uid, EFormat.Raw)
+    const user = await MUser.get(wf, wf.mode.Offline, userCredential.uid, EFormat.Raw) as IUser
 
-    const orders = await MOrder.getAll(wf, wf.mode.Offline, EFormat.Pretty)
+    const orders = await MOrder.getAll(wf, wf.mode.Offline, EFormat.Pretty) as IOrder[]
     if (orders?.err) {
         logger(orders.err)
         return { err: orders.err }
     }
 
+    const computedOrders = await Promise.all(
+        orders.map((order) => MOrder.compute(wf, wf.mode.Offline, user, order))
+    )
+
     const rows = orders.map(MOrder.toRow)
 
-    const allStatus = Object.values(MOrder.EOrderStatus).map((status) => capitalizeString(status))
-    const filters = [...allStatus]
-
-    const allSorters = Object.values(MOrder.EOrderSorters)
-    const sorters = [...allSorters]
+    // const allStatus = Object.values(MOrder.EOrderStatus).map((status) => capitalizeString(status))
+    // const filters = [...allStatus]
+    // const allSorters = Object.values(MOrder.EOrderSorters)
+    // const sorters = [...allSorters]
+    const filters = []
+    const sorters = []
 
     const body = `
         ${adminHeader(
@@ -412,12 +792,13 @@ const builder = async (wf) => {
                     <span>Registrar pedido</span>
                 </button>
             </div>
-            `, 'orders', 'órdenes')
+            `, 'orders', 'pedidos')
         }
         <main>
             ${CTable.render('Pedidos', rows, filters, sorters)}
         </main>
-        ${createOrder_dialog}
+        ${getCreateOrderDialog()}
+        ${await getQuoteOrderDialog(wf, user, computedOrders)}
     `
 
     return {
@@ -448,7 +829,13 @@ const action = async (wf) => {
 
     CDialog.init('create-order_dialog')
     configCreateOrderDialog(wf, 'create-order_dialog')
+
+    CDialog.init('quote-order_dialog')
+    configQuoteOrderDialog(wf, 'quote-order_dialog')
+
     // configSelectQuotationInQuotedOrder(wf)
+
+
 }
 
 export default {

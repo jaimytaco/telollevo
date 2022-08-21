@@ -94,4 +94,6 @@ export interface IOrder{
     updatedAt: Date,
 
     quotations?: IQuotation[],
+
+    computed?: T,
 }

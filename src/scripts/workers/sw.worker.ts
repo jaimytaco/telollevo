@@ -36,7 +36,7 @@ import MOrder from '@models/order.model'
 import MFlight from '@models/flight.model'
 import MQuotation from '@models/quotation.model'
 
-let userCredential
+// let userCredential
 
 const prefetchRoutes = (routes) => Promise.all(
     Object.keys(routes)
@@ -67,12 +67,12 @@ const installHdlr = (e) => {
         await cacheStatic(e, CACHE_NAME, app.routes.static)
 
         wf.auth.onAuthStateChanged(async (credential) => {
-            userCredential = credential
+            // userCredential = credential
             const msg = credential ? 'User logged in:' : 'User logged out'
             logger(msg, credential)
 
-            if (userCredential) {
-                const userId = userCredential.uid
+            if (credential) {
+                const userId = credential.uid
                 const user = await MUser.install(wf, userId)
 
                 await prefetchRoutes(app.routes)
@@ -214,7 +214,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 493
+export const SW_VERSION = 554
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000

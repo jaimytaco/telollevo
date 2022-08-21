@@ -11,9 +11,6 @@ export const registerSW = async () => {
     if (!navigator.serviceWorker) return
 
     const workerPath = '/sw.worker.js'
-    // const WSW = (await import('@scripts/workers/sw.worker?worker')).default
-    // const workerPath = getWorkerPath(WSW.toString())
-
     try {
         const registration = await navigator.serviceWorker.register(
             workerPath,

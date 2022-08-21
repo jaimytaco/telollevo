@@ -20,6 +20,10 @@ import {
     IUser,
     EUserType, 
 } from '@types/user.type'
+import MUser from '@models/user.model'
+
+import { IQuotation } from '@types/quotation.type'
+import MQuotation from '@models/quotation.model'
 
 import { 
     EFormat,
@@ -43,6 +47,7 @@ import { removeOfflineTimestamp } from '@wf/lib.worker'
 const getAlert = (user: IUser, flight: IFlight) => {
     if (user.type === EUserType.Admin && flight.status === EFlightStatus.Registered)
         return 'Este vuelo cuenta con al menos una cotización, valídalo para que sea visible para el comprador.'
+    return ''
 }
 
 const toRowExtra = (user: IUser, flight: IFlight) => {
@@ -102,16 +107,16 @@ const toRowActions = (user: IUser, flight: IFlight) => {
         case EFlightStatus.Registered:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
+                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
+                        <picture>
+                            <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
+                        </picture>
+                    </button>
                     ${
                         user.type === EUserType.Admin ?
                             `
                             <button class="btn btn-primary" data-visible-flight_btn="${flight.id}">
                                 <span>Aprobar vuelo</span>
-                            </button>
-                            <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
-                                <picture>
-                                    <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
-                                </picture>
                             </button>
                             ` : ''
                     }
@@ -181,7 +186,7 @@ const toRow = (user: IUser, flight: IFlight) => {
         tags: [capitalizeString(flight.status)],
         heading: `${flight.airline} - ${flight.code}`,
         details: [{
-            description: `Fabián Delgado<br>DNI 88223302`
+            description: `${MUser.getFullName(user)}<br>DNI 88223302`
         }],
         icon: 'flight.svg',
         actions: toRowActions(user, flight),
@@ -190,14 +195,27 @@ const toRow = (user: IUser, flight: IFlight) => {
 }
 
 const getAllByUserAuthenticated = async (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
-    if ([EUserType.Multiple, EUserType.Admin].includes(user.type))
-        return getAll(wf, mode, isFormatted)
+    if (user.type === EUserType.Admin)
+        return getAllWithQuotations(wf, mode, isFormatted, date)
 
-    if (user.type === EUserType.Traveler)
+    if ([EUserType.Traveler, EUserType.Multiple].includes(user.type))
         return getAllByTravelerId(wf, mode, isFormatted, user.id, date)
 
     if (user.type === EUserType.Shopper)
         return []
+}
+
+const getAllWithQuotations = async (wf, mode, isFormatted: EFormat, date?) => {
+    const byRecent = {
+        field: 'updatedAt',
+        operator: wf.operator.GreaterThanOrEqualTo,
+        value: date
+    }
+    const filters = date ? [byRecent] : []
+    const quotations = await MQuotation.getAll(wf, mode, isFormatted, filters) as IQuotation[]
+    const flightIds = quotations.map((quotation) => quotation.flightId)
+    
+    return getAllByIds(wf, mode, flightIds, isFormatted)
 }
 
 const getAllByTravelerId = (wf, mode, isFormatted: EFormat, travelerId, date?) => {
@@ -499,6 +517,7 @@ export default{
     uninstall,
     getAllByTravelerId,
     getAllByUserAuthenticated,
+    getAllWithQuotations,
 
     sanitize,
 }

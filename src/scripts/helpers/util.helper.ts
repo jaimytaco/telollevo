@@ -1,5 +1,8 @@
 import { logger } from '@wf/helpers/browser.helper'
 
+const MAX_MERGE_LENGTH = 20
+export const mergeUUIDs = (ids: string[]) => ids.map((id) => id.slice(0, Math.round(MAX_MERGE_LENGTH / ids.length))).join('').slice(0, MAX_MERGE_LENGTH)
+
 export const hasParameter = (o, key) => !!o && Object.keys(o).includes(key)
 
 export const isValidDate = (d) => d.toString() !== 'Invalid Date'

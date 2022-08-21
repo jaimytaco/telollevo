@@ -1,5 +1,6 @@
 import { EDatabaseMode } from '../enums/database.enum'
 import { isNode } from '../helpers/browser.helper'
+import { formatFn } from '../helpers/lib.helper'
 
 interface IOfflineDbInit {
     isOfflineFirst: boolean
@@ -45,12 +46,18 @@ const remove = (mode, collectionName, id) => {
     if (mode === EDatabaseMode.Offline) return OfflineDB.remove(collectionName, id);
 }
 
+const runWithTransaction = (mode, collectionName, docData, callback) => {
+    if (mode === EDatabaseMode.Network) return NetworkDB.runWithTransaction(collectionName, docData, formatFn(callback))
+}
+
 const ADatabaseMethods = {
     getAll,
     add,
     update,
     get,
     remove,
+
+    runWithTransaction,
 }
 
 export const ADatabase = {

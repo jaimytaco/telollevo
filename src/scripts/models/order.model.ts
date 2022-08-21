@@ -209,6 +209,12 @@ const toRowActions = (order: IOrder) => {
         case EOrderStatus.Registered:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
+                    ${
+                        order.computed.isQuotable ? 
+                            `<button class="btn btn-primary" data-quote-order_btn="${order.id}">
+                                <span>Cotizar pedido</span>
+                            </button>` : ''
+                    }
                     <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${order.id}">
                         <picture>
                             <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
@@ -224,7 +230,14 @@ const toRowActions = (order: IOrder) => {
                             <ul class="sp-popup">
                                 <li>
                                     <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
-                                </li>  
+                                </li>
+                                ${
+                                    order.computed.isQuotable ? 
+                                        `<li>
+                                            <button class="btn" data-quote-order_btn data-quote-order_id="${order.id}">Cotizar pedido</button>
+                                        </li>` : ''
+                                    
+                                }
                             </ul>
                         </span>
                     </div>
@@ -251,10 +264,10 @@ const toRowActions = (order: IOrder) => {
                             <ul class="sp-popup">
                                 <li>
                                     <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
-                                </li> 
+                                </li>
                                 <li>
                                     <button class="btn" data-show-table-extra_id="te-${order.id}">Elegir viajero</button>
-                                </li> 
+                                </li>
                             </ul>
                         </span>
                     </div>
@@ -279,10 +292,24 @@ const toRow = (order: IOrder) => {
     }
 }
 
+const compute = async (wf, mode, user, order) => {
+    order.computed = {
+        isQuotable: await isQuotable(wf, mode, user, order)
+    }
+
+    return order
+}
+
+const isQuotable = async (wf, mode, user: IUser, order: IOrder) => {
+    if (user.type !== EUserType.Traveler) return
+    const quotations = await MQuotation.getAllByTravelerIdAndOrderId(wf, mode, EFormat.Raw, user.id, order.id)
+    return !quotations.length
+}
+
 const getAllByUserAuthenticated = async (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
     if ([EUserType.Traveler, EUserType.Multiple, EUserType.Admin].includes(user.type))
         return getAll(wf, mode, isFormatted)
-    
+
     if (user.type === EUserType.Shopper)
         return getAllByShopperId(wf, mode, isFormatted, user.id, date)
 }
@@ -335,6 +362,8 @@ const remove = async (wf, mode, id) => {
         return { err }
     }
 }
+
+const update = async (wf, mode, order) => wf.database.update(mode, 'orders', order)
 
 const add = (wf, mode, order: IOrder) => {
     const { database: db } = wf
@@ -432,7 +461,7 @@ const sanitize = (order: IOrder) => {
                 desc: ESanitizeOrderErrors.ProductUnits
             }
         }
-    
+
     if (hasParameter(order?.product, 'isBoxIncluded') && !isBoolean(order.product.isBoxIncluded))
         return {
             err: {
@@ -516,6 +545,17 @@ const sanitize = (order: IOrder) => {
         }
 }
 
+const toQuoted = async (wf, orderId) => {
+    const order = await get(wf, wf.mode.Offline, orderId, EFormat.Raw)
+    if (order.status !== EOrderStatus.Registered) return
+    
+    order.updatedAt = new Date()
+    order.status = EOrderStatus.Quoted
+
+    await update(wf, wf.mode.Network, order)
+    await update(wf, wf.mode.Offline, order)
+}
+
 export default {
     collection: 'orders',
     toRow,
@@ -523,8 +563,10 @@ export default {
     EOrderSorters,
 
     format,
+    get,
     getAll,
     add,
+    update,
     remove,
 
     getAllByIds,
@@ -533,4 +575,6 @@ export default {
 
     sanitize,
     uninstall,
+    compute,
+    toQuoted,
 }

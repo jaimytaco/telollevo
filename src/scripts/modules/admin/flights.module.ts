@@ -87,7 +87,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         const travelerId = userCredentials ? userCredentials.uid : null
         flight.travelerId = travelerId
 
-        const validateStatus = CForm.validateOnSubmit(step1Form, MFlight.sanitize, flight)
+        const validateStatus = await CForm.validateOnSubmit(step1Form, MFlight.sanitize, flight)
         if (validateStatus?.err) return
 
         logger('create-flight-dialog step-1 with flight:', flight)
@@ -109,7 +109,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         CForm.validateBeforeSubmit(step2Form)
     }
 
-    step2Form.onsubmit = (e) => {
+    step2Form.onsubmit = async (e) => {
         e.preventDefault()
 
         const typeInputChecked = getDOMElement(step2Form, `[name="${EHousingFields.Type}"]:checked`)
@@ -171,7 +171,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.isResponsibleFor = isResponsibleFor
         flight.areReceiveOrderDatesOk = areReceiveOrderDatesOk
         
-        const validateStatus = CForm.validateOnSubmit(step2Form, MFlight.sanitize, flight)
+        const validateStatus = await CForm.validateOnSubmit(step2Form, MFlight.sanitize, flight)
         if (validateStatus?.err) return
 
         logger('create-flight-dialog step-2 with flight:', flight)
@@ -193,7 +193,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         CForm.validateBeforeSubmit(step3Form)
     }
 
-    step3Form.onsubmit = (e) => {
+    step3Form.onsubmit = async (e) => {
         e.preventDefault()
 
         const nameInput = getDOMElement(step3Form, `#${EReceiverFields.Name}`)
@@ -208,7 +208,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
 
         flight.receiver = receiver
 
-        const validateStatus = CForm.validateOnSubmit(step3Form, MFlight.sanitize, flight)
+        const validateStatus = await CForm.validateOnSubmit(step3Form, MFlight.sanitize, flight)
         if (validateStatus?.err) return
 
         logger('create-flight-dialog step-3 with flight:', flight)
@@ -230,7 +230,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         CForm.validateBeforeSubmit(step4Form)
     }
 
-    step4Form.onsubmit = (e) => {
+    step4Form.onsubmit = async (e) => {
         e.preventDefault()
 
         const shippingDestinationInput = getDOMElement(step4Form, `[list="${EFlightFields.ShippingDestination}"]`)
@@ -249,7 +249,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.deliverOrderAt = new Date(`${deliverOrderAt} 00:00:00`)
         flight.confirmDeliverOrder48h = confirmDeliverOrder48h
 
-        const validateStatus = CForm.validateOnSubmit(step4Form, MFlight.sanitize, flight)
+        const validateStatus = await CForm.validateOnSubmit(step4Form, MFlight.sanitize, flight)
         if (validateStatus?.err) return
 
         logger('create-flight-dialog step-4 with flight:', flight)
@@ -295,7 +295,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.from = from
         flight.to = to
 
-        const validateStatus = CForm.validateOnSubmit(step5Form, MFlight.sanitize, flight)
+        const validateStatus = await CForm.validateOnSubmit(step5Form, MFlight.sanitize, flight)
         if (validateStatus?.err) return
 
         const now = new Date()

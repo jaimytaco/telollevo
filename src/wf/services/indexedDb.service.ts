@@ -1,11 +1,11 @@
-import { 
-    openDB, 
-    deleteDB, 
-    IDBPTransaction 
+import {
+    openDB,
+    deleteDB,
+    IDBPTransaction
 } from 'idb'
 
-import { 
-    getIndexedDBDatabases 
+import {
+    getIndexedDBDatabases
 } from '../helpers/browser.helper'
 
 import {
@@ -29,7 +29,7 @@ const getObjetcStore = (transaction: IDBPTransaction<unknown, string[], 'version
     try {
         return transaction.objectStore(storeName);
     } catch (e) {
-        return null; 
+        return null;
     }
 }
 
@@ -49,12 +49,12 @@ const openDatabase = (storeNames: string[]) => {
                         })
 
 
-                    // stores['products'] = upgradeDb.createObjectStore('products', {
-                    //     keyPath: 'id'
-                    // })
+                // stores['products'] = upgradeDb.createObjectStore('products', {
+                //     keyPath: 'id'
+                // })
 
-                    // indexes['products']
-                    //     .forEach(index => stores['products'].createIndex(`by-${index}`, `${index}`))
+                // indexes['products']
+                //     .forEach(index => stores['products'].createIndex(`by-${index}`, `${index}`))
             }
         }
     })
@@ -70,50 +70,65 @@ const formatOperation = (a, b, op) => {
 }
 
 const remove = async (collectionName, key) => {
-    if (!localDbPromise) return { err: 'offline DB not opened' }
-    const tx = (await localDbPromise).transaction(collectionName, 'readwrite');
-    const store = tx.objectStore(collectionName);
-    store.delete(key);
-    // return tx.complete;
-    return tx.oncomplete
+    try {
+        if (!localDbPromise) return { err: 'offline DB not opened' }
+        const tx = (await localDbPromise).transaction(collectionName, 'readwrite');
+        const store = tx.objectStore(collectionName);
+        store.delete(key);
+        return tx.oncomplete
+    } catch (err) {
+        return { err }
+    }
 }
 
 const getAll = async (collectionName, filters) => {
-    if (!localDbPromise) return { err: 'offline DB not opened' }
-    const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
-    const docs = await query.getAll()
-    const filterFns = !filters ? 
-        null : 
-        filters
-            .map((filter) => {
-                return (doc) => formatOperation(doc[filter.field], filter.value, filter.operator)
-            })
+    try {
+        if (!localDbPromise) return { err: 'offline DB not opened' }
+        const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
+        const docs = await query.getAll()
+        const filterFns = !filters ?
+            null :
+            filters
+                .map((filter) => {
+                    return (doc) => formatOperation(doc[filter.field], filter.value, filter.operator)
+                })
 
-    const data = !filterFns ? 
-        docs : 
-        filterFns
-            .reduce((acc, filterFn) => {
-                acc = acc.filter((doc) => filterFn(doc))
-                return acc
-            }, docs)
+        const data = !filterFns ?
+            docs :
+            filterFns
+                .reduce((acc, filterFn) => {
+                    acc = acc.filter((doc) => filterFn(doc))
+                    return acc
+                }, docs)
 
-    return { data }
+        return { data }
+    } catch (err) {
+        return { err }
+    }
 }
 
 const get = async (collectionName, id) => {
-    if (!localDbPromise) return { err: 'offline DB not opened' }
-    const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
-    const data = await query.get(id)
-    return { data }
+    try {
+        if (!localDbPromise) return { err: 'offline DB not opened' }
+        const query = (await localDbPromise).transaction(collectionName).objectStore(collectionName)
+        const data = await query.get(id)
+        return data ? { data } : { err: `${id} not found in ${collectionName}` }
+    } catch (err) {
+        return { err }
+    }
 }
 
 const add = async (collectionName: string, doc: T) => {
-    if (!localDbPromise) return { err: 'offline DB not opened' }
-    const tx = (await localDbPromise).transaction(collectionName, 'readwrite')
-    const store = tx.objectStore(collectionName)
-    store.put(doc)
-    await tx.oncomplete
-    return { data: doc }
+    try {
+        if (!localDbPromise) return { err: 'offline DB not opened' }
+        const tx = (await localDbPromise).transaction(collectionName, 'readwrite')
+        const store = tx.objectStore(collectionName)
+        store.put(doc)
+        await tx.oncomplete
+        return { data: doc }
+    } catch (err) {
+        return { err }
+    }
 }
 
 const update = add
