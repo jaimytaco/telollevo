@@ -22,7 +22,10 @@ import {
 } from '@types/user.type'
 import MUser from '@models/user.model'
 
-import { IQuotation } from '@types/quotation.type'
+import { 
+    IQuotation,
+    EQuotationStatus,
+} from '@types/quotation.type'
 import MQuotation from '@models/quotation.model'
 
 import { 
@@ -107,19 +110,19 @@ const toRowActions = (user: IUser, flight: IFlight) => {
         case EFlightStatus.Registered:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
+                    ${
+                        user.type === EUserType.Admin ?
+                            `
+                            <button class="btn btn-primary" data-tovisible-flight_btn data-flight_id="${flight.id}">
+                                <span>Aprobar vuelo</span>
+                            </button>
+                            ` : ''
+                    }
                     <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
                         <picture>
                             <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
                         </picture>
                     </button>
-                    ${
-                        user.type === EUserType.Admin ?
-                            `
-                            <button class="btn btn-primary" data-visible-flight_btn="${flight.id}">
-                                <span>Aprobar vuelo</span>
-                            </button>
-                            ` : ''
-                    }
                 </div>
                 <div class="t-r-actions t-r-actions-mobile">
                     <div class="split-btn">
@@ -135,7 +138,7 @@ const toRowActions = (user: IUser, flight: IFlight) => {
                                     user.type === EUserType.Admin ?
                                         `
                                         <li>
-                                            <button class="btn  data-visible-flight_btn="${flight.id}">Aprobar vuelo</button>
+                                            <button class="btn  data-tovisible-flight_btn data-flight_id="${flight.id}">Aprobar vuelo</button>
                                         </li> 
                                         ` : ''
                                 }
@@ -148,7 +151,7 @@ const toRowActions = (user: IUser, flight: IFlight) => {
         case EFlightStatus.Visible:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
-                    <button class="btn btn-primary" data-visible-flight_btn="${flight.id}">
+                    <button class="btn btn-primary" data-toregistered-flight_btn data-flight_id="${flight.id}">
                         <span>Desaprobar vuelo</span>
                     </button>
                     <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
@@ -168,7 +171,7 @@ const toRowActions = (user: IUser, flight: IFlight) => {
                                     <button class="btn" data-show-table-extra_id="te-${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
                                 </li> 
                                 <li>
-                                    <button class="btn data-visible-flight_btn="${flight.id}">Desaprobar vuelo</button>
+                                    <button class="btn data-toregistered-flight_btn data-flight_id="${flight.id}">Desaprobar vuelo</button>
                                 </li> 
                             </ul>
                         </span>
@@ -283,6 +286,9 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
         flight :
         format(flight)
 }
+
+const update = async (wf, mode, flight) => wf.database.update(mode, 'flights', flight)
+
 
 const add = (wf, mode, flight: IFlight) => {
     const { database: db } = wf
@@ -503,6 +509,109 @@ const sanitize = (flight: IFlight) => {
         }
 }
 
+const toVisible = async (wf, id) => {
+    const flight = await get(wf, wf.mode.Offline, id, EFormat.Raw)
+    flight.status = EFlightStatus.Visible
+    flight.updatedAt = new Date()
+
+    const transactionData = {
+        flight: {
+            collectionName: 'flights',
+            datas: [flight]
+        }
+    }
+
+    const onTransaction = async (transaction, transactionData) => {
+        const flightRef = transactionData.flight.docRefs[0]
+        const flightDoc = await transaction.get(flightRef)
+        const flight = flightDoc.data()
+
+        if (!flightDoc.exists())
+            return Promise.reject({
+                desc: `El vuelo con ${flightRef.id} no existe`
+            })
+
+        if (flight.status === EFlightStatus.Visible)
+            return Promise.reject({
+                desc: `El vuelo ya tiene el estado ${EFlightStatus.Visible}`
+            })
+        
+        const data = transactionData.flight.datas[0]
+        transaction.update(flightRef, data)
+
+        return {
+            id: flightRef.id,
+            ...data
+        }
+    }
+
+    return wf.database.customRunWithTransaction(transactionData, onTransaction)
+}
+
+const toRegistered = async (wf, id) => {
+    const flight = await get(wf, wf.mode.Offline, id, EFormat.Raw)
+    flight.status = EFlightStatus.Registered
+    flight.updatedAt = new Date()
+
+    const quotations = await MQuotation.getAllByFlightId(wf, wf.mode.Network, EFormat.Raw, id)
+
+    const transactionData = {
+        flight: {
+            collectionName: 'flights',
+            datas: [flight]
+        },
+        quotation: {
+            collectionName: 'quotations',
+            datas: quotations
+        }
+    }
+
+    const onTransaction = async (transaction, transactionData) => {
+        const quotationRefs = transactionData.quotation.docRefs
+        const quotationDocs = await Promise.all(
+            quotationRefs.map((quotationRef) => transaction.get(quotationRef))
+        )
+        
+        const invalidQuotationDocs = quotationDocs.filter((quotationDoc) => !quotationDoc.exists())
+        if (invalidQuotationDocs.length)
+            return Promise.reject({
+                desc: `Algunas cotizaciones no existen. De preferencia cierre e inicie sesión`
+            })
+
+        const quotations = quotationDocs.map((quotationDoc) => quotationDoc.data())
+        const selectedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Selected)
+        
+        if (selectedQuotations.length)
+            return Promise.reject({
+                desc: 'Este vuelo ya ha sido elegido por un comprador, no se puede reestablecer'
+            })
+
+        const flightRef = transactionData.flight.docRefs[0]
+        const flightDoc = await transaction.get(flightRef)
+        const flight = flightDoc.data()
+
+        if (!flightDoc.exists())
+            return Promise.reject({
+                desc: `El vuelo con ${flightRef.id} no existe`
+            })
+
+        if (flight.status !== EFlightStatus.Visible)
+            return Promise.reject({
+                desc: `El vuelo ya se encuentra como no ${EFlightStatus.Visible}`
+            })
+        
+        const data = transactionData.flight.datas[0]
+        transaction.update(flightRef, data)
+
+        return {
+            id: flightRef.id,
+            ...data
+        }
+    }
+
+    return wf.database.customRunWithTransaction(transactionData, onTransaction)
+}
+
 export default{
     collection: 'flights',
     toRow,
@@ -510,6 +619,7 @@ export default{
     format,
     get,
     getAll,
+    update,
     add,
     remove,
 
@@ -520,4 +630,6 @@ export default{
     getAllWithQuotations,
 
     sanitize,
+    toVisible,
+    toRegistered,
 }

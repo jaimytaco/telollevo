@@ -106,37 +106,30 @@ const add = async (collectionName, docData) => {
     }
 }
 
-// TODO: Untested
-const updateWithTransaction = async (collectionName, docData, callback) => {
-    const { id, ...data } = docData
-    const docRef = doc(firestore, collectionName, id)
-    const dataFormatted = formatDocForFirebase(data)
-    try {
-        const dataUpdated = await runTransaction(firestore, (transaction) => callback(transaction, docRef, dataFormatted))
-        return { data: dataUpdated }
-    } catch (err) {
-        return { err }
-    }
-}
-
-// TODO: Untested
-const addWithTransaction = async (collectionName, docData, callback) => {
-    const { id, ...data } = docData
-    const docRef = doc(collection(firestore, collectionName))
-    try {
-        const dataAdded = await runTransaction(firestore, (transaction) => callback(transaction, docRef, formatDocForFirebase(data)))
-        return { data: dataAdded }
-    } catch (err) {
-        return { err }
-    }
-}
-
 const runWithTransaction = async (collectionName, docData, callback) => {
     const { id, ...data } = docData
     const docRef = id ? doc(firestore, collectionName, id) : doc(collection(firestore, collectionName))
     try {
         const transactionData = await runTransaction(firestore, (transaction) => callback(transaction, docRef, formatDocForFirebase(data)))
         return { data: transactionData }
+    } catch (err) {
+        return { err }
+    }
+}
+
+const getDocRef = (docData, collectionName) => {
+    const { id, ...data } = docData
+    return id ? doc(firestore, collectionName, id) : doc(collection(firestore, collectionName))
+}
+
+const customRunWithTransaction = async (transactionData, onTransaction) => {
+    for (const key of Object.keys(transactionData)){
+        transactionData[key].docRefs = transactionData[key].datas.map((data) => getDocRef(data, transactionData[key].collectionName))
+    }
+
+    try {
+        const transactionResponse = await runTransaction(firestore, (transaction) => onTransaction(transaction, transactionData))
+        return { data: transactionResponse }
     } catch (err) {
         return { err }
     }
@@ -172,4 +165,5 @@ export default {
     add,
 
     runWithTransaction,
+    customRunWithTransaction,
 }

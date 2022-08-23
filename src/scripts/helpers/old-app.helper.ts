@@ -96,7 +96,7 @@ export const initApp = async () => {
         configCreateOrderDialog,
 
         configCreateFlightDialog,
-        configApproveFlight,
+        configFlightToVisible,
         configSelectQuotationInQuotedOrder,
 
         configLogin
@@ -137,7 +137,7 @@ export const initApp = async () => {
         },
         'admin-flights': async () => {
             CDialog.init('create-flight_dialog')
-            configApproveFlight(wf)
+            configFlightToVisible(wf)
             configCreateFlightDialog(wf, 'create-flight_dialog')
         },
         'public-login': () => {

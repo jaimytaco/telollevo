@@ -140,7 +140,7 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
         }
 
         await MQuotation.add(wf, wf.mode.Offline, response.data)
-        await MOrder.toQuoted(wf, orderId)
+        // await MOrder.toQuoted(wf, orderId)
 
         logger('quote-order-dialog step-1 with quotation:', quotation)
 

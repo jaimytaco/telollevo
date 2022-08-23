@@ -1,6 +1,6 @@
 import {
-    getDOMElement, 
-    delay, 
+    getDOMElement,
+    delay,
 } from '@helpers/util.helper'
 
 import { logger } from '@wf/helpers/browser.helper'
@@ -10,6 +10,12 @@ import MUser from '@models/user.model'
 
 import { EFormat } from '@types/util.type'
 
+const getUserCredentials = (wf) => wf.auth.getCurrentUser()
+
+const getUserAuthenticated = async (wf) => {
+    const userCredentials = await getUserCredentials(wf)
+    return userCredentials ? await MUser.get(wf, wf.mode.Offline, userCredentials.uid) : null
+}
 
 const configSignIn = async (wf) => {
     const loginForm = getDOMElement(document, '#login-form')
@@ -21,7 +27,7 @@ const configSignIn = async (wf) => {
             if (!emailInput || !passwordInput) return
 
             const userCredential = await wf.auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value)
-            if (userCredential?.err){
+            if (userCredential?.err) {
                 logger(userCredential.err)
                 // TODO: undo UI animation
                 return
@@ -35,7 +41,7 @@ const configSignIn = async (wf) => {
 
             if ([EUserType.Admin, EUserType.Shopper, EUserType.Multiple].includes(user.type)) location.href = '/admin/orders'
             if (user.type === EUserType.Traveler) location.href = '/admin/flights'
-        }  
+        }
 }
 
 const configSignOut = async (wf) => {
@@ -45,7 +51,7 @@ const configSignOut = async (wf) => {
         signOutBtn.onclick = async (e) => {
             e.preventDefault()
             await wf.auth.signOut()
-            
+
             // TODO: sign-out animation
             await delay(1500)
             location.reload()
@@ -55,4 +61,6 @@ const configSignOut = async (wf) => {
 export default {
     configSignIn,
     configSignOut,
+    getUserCredentials,
+    getUserAuthenticated,
 }

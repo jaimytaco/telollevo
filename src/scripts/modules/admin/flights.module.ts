@@ -1,20 +1,23 @@
 import { EFormat } from '@types/util.type'
 
-import { 
+import {
     IFlight,
-    EFlightStatus, 
-    EFlightFields, 
-    EPlaceFields, 
-    EHousingFields, 
+    EFlightStatus,
+    EFlightFields,
+    EPlaceFields,
+    EHousingFields,
     EReceiverFields,
 } from '@types/flight.type'
 import MFlight from '@models/flight.model'
 
-import { IUser } from '@types/user.type'
+import { IUser, EUserType } from '@types/user.type'
 import MUser from '@models/user.model'
 
 import { IQuotation } from '@types/quotation.type'
 import MQuotation from '@models/quotation.model'
+
+import { IUser } from '@types/user.type'
+import MUser from '@models/user.model'
 
 import { IOrder } from '@types/order.type'
 import MOrder from '@models/order.model'
@@ -23,25 +26,71 @@ import { createFlight_dialog } from '@data/admin/dialog.data'
 import CTable from '@components/table.component'
 import { adminHeader } from '@helpers/ui.helper'
 
+import ModAuth from '@modules/admin/auth.module'
+
 import {
     getOfflineTimestamp,
     updateOfflineTimestamp
 } from '@wf/lib.worker'
 
-import { 
+import {
     logger,
     isNode
 } from '@wf/helpers/browser.helper'
 
-import { 
-    getDOMElement, 
-    delay, 
+import {
+    getDOMElement,
+    delay,
 } from '@helpers/util.helper'
 
 
+const configFlightToVisible = async (wf) => {
+    const visibleFlightBtns = getDOMElement(document, '[data-tovisible-flight_btn]', 'all')
+    visibleFlightBtns.forEach((visibleFlightBtn) => visibleFlightBtn.onclick = async () => {
+        const user = await ModAuth.getUserAuthenticated(wf)
+        if (user?.type !== EUserType.Admin) return
+
+        const flightId = visibleFlightBtn.getAttribute('data-flight_id')
+        const response = await MFlight.toVisible(wf, flightId)
+        if (response?.err){
+            logger(response.err.desc)
+            // TODO: Shoy error in UI
+            return
+        }
+
+        await MFlight.update(wf, wf.mode.Offline, response.data)
+        await delay(1500)
+
+        // TODO: Show success in UI
+        location.reload()
+    })
+}
+
+const configFlightToRegistered = async (wf) => {
+    const registeredFlightBtns = getDOMElement(document, '[data-toregistered-flight_btn]', 'all')
+    registeredFlightBtns.forEach((registeredFlightBtn) => registeredFlightBtn.onclick = async () => {
+        const user = await ModAuth.getUserAuthenticated(wf)
+        if (user?.type !== EUserType.Admin) return
+
+        const flightId = registeredFlightBtn.getAttribute('data-flight_id')
+        const response = await MFlight.toRegistered(wf, flightId)
+        if (response?.err){
+            logger(response.err.desc)
+            // TODO: Shoy error in UI
+            return
+        }
+
+        await MFlight.update(wf, wf.mode.Offline, response.data)
+        await delay(1500)
+
+        // TODO: Show success in UI
+        location.reload()
+    })
+}
+
 const configCreateFlightDialog = async (wf, dialogId) => {
     const { default: CForm } = await import('@components/form.component')
-    
+
     const dialog = getDOMElement(document, `#${dialogId}`)
     if (!dialog) return
 
@@ -74,7 +123,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         const receiveOrdersSinceInput = getDOMElement(step1Form, `#${EFlightFields.ReceiveOrdersSince}`)
         if (!receiveOrdersSinceInput) return
         const receiveOrdersSince = receiveOrdersSinceInput.value
-        
+
         const receiveOrdersUntilInput = getDOMElement(step1Form, `#${EFlightFields.ReceiveOrdersUntil}`)
         if (!receiveOrdersUntilInput) return
         const receiveOrdersUntil = receiveOrdersUntilInput.value
@@ -121,7 +170,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         const address = addressInput.value
 
         const addressMoreInput = getDOMElement(step2Form, `#${EHousingFields.AddressMore}`)
-        if (!addressMoreInput) return 
+        if (!addressMoreInput) return
         const addressMore = addressMoreInput.value
 
         const districtInput = getDOMElement(step2Form, `#${EPlaceFields.District}`)
@@ -170,7 +219,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.housing = housing
         flight.isResponsibleFor = isResponsibleFor
         flight.areReceiveOrderDatesOk = areReceiveOrderDatesOk
-        
+
         const validateStatus = await CForm.validateOnSubmit(step2Form, MFlight.sanitize, flight)
         if (validateStatus?.err) return
 
@@ -305,7 +354,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         logger('create-flight-dialog step-5 with flight:', flight)
 
         const responseFlight = await MFlight.add(wf, wf.mode.Network, flight)
-        if (responseFlight?.err){
+        if (responseFlight?.err) {
             logger(responseFlight.err)
             // TODO: show network error in UI
             return
@@ -341,7 +390,7 @@ const loader = async (wf) => {
     const user = await MUser.get(wf, mode.Offline, userId, EFormat.Raw) as IUser
 
     const flights = await MFlight.getAllByUserAuthenticated(wf, mode.Network, EFormat.Raw, user, lastUpdate) as IFlight[]
-    
+
     if (flights?.err) {
         const { err } = flights
         logger(err)
@@ -390,7 +439,7 @@ const loader = async (wf) => {
 
     const orderIds = [...new Set(allQuotations.map((quotation) => quotation.orderId))]
     const orders = await MOrder.getAllByIds(wf, mode.Network, orderIds, EFormat.Raw) as IOrder[]
-    
+
     logger(`All orders to cache offline for admin-flights: `, orders)
 
     await Promise.all(
@@ -438,8 +487,8 @@ const builder = async (wf) => {
 
     const body = `
         ${adminHeader(
-            user,
-            `
+        user,
+        `
                 <div class="n-t-actions-2">
                     <button class="btn btn-secondary btn-sm" data-create-flight-dialog_btn>
                         <picture>
@@ -457,9 +506,9 @@ const builder = async (wf) => {
     `
 
     return {
-        head: { 
-            title: `${wf.app.name} | Vuelos`, 
-            meta: '' 
+        head: {
+            title: `${wf.app.name} | Vuelos`,
+            meta: ''
         },
         body
     }
@@ -480,11 +529,13 @@ const action = async (wf) => {
     CCard8.handleAll()
 
     CDialog.init('create-flight_dialog')
-    // configApproveFlight(wf)
+    // configFlightToVisible(wf)
     configCreateFlightDialog(wf, 'create-flight_dialog')
+    configFlightToVisible(wf)
+    configFlightToRegistered(wf)
 }
 
-export default{
+export default {
     builder,
     loader,
     action,

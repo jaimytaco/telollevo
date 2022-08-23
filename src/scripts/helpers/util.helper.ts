@@ -52,20 +52,20 @@ export const delay = (ms) => new Promise((resolve) => setTimeout(() => resolve()
 
 
 
-export const configApproveFlight = async (wf) => {
-    const visibleFlightBtns = getDOMElement(document, '[data-visible-flight_btn]', 'all')
-    visibleFlightBtns?.forEach((visibleFlightBtn) => visibleFlightBtn.onclick = async () => {
-        // TODO: visible flight logic
-        const { EFlightStatus } = await import('@types/flight.type')
-        const id = visibleFlightBtn.getAttribute('data-visible-flight_btn')
-        const { data: flight, err } = await wf.database.get(wf.mode.Network, 'flights', id)
-        if (err) return
+// export const configFlightToVisible = async (wf) => {
+//     const visibleFlightBtns = getDOMElement(document, '[data-tovisible-flight_btn]', 'all')
+//     visibleFlightBtns?.forEach((visibleFlightBtn) => visibleFlightBtn.onclick = async () => {
+//         // TODO: visible flight logic
+//         const { EFlightStatus } = await import('@types/flight.type')
+//         const id = visibleFlightBtn.getAttribute('data-tovisible-flight_btn')
+//         const { data: flight, err } = await wf.database.get(wf.mode.Network, 'flights', id)
+//         if (err) return
 
-        // TODO: check if flight has quotations
-        flight.status = flight.status === EFlightStatus.Registered ? EFlightStatus.Visible : EFlightStatus.Registered
-        await wf.database.update(wf.mode.Network, 'flights', flight)
+//         // TODO: check if flight has quotations
+//         flight.status = flight.status === EFlightStatus.Registered ? EFlightStatus.Visible : EFlightStatus.Registered
+//         await wf.database.update(wf.mode.Network, 'flights', flight)
 
-        // TODO: reload
-        location.reload() 
-    })
-}
+//         // TODO: reload
+//         location.reload() 
+//     })
+// }

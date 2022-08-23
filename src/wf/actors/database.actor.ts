@@ -50,6 +50,10 @@ const runWithTransaction = (mode, collectionName, docData, callback) => {
     if (mode === EDatabaseMode.Network) return NetworkDB.runWithTransaction(collectionName, docData, formatFn(callback))
 }
 
+const customRunWithTransaction = (transactionData, onTransaction) => {
+    return NetworkDB.customRunWithTransaction(transactionData, onTransaction)
+}
+
 const ADatabaseMethods = {
     getAll,
     add,
@@ -58,6 +62,7 @@ const ADatabaseMethods = {
     remove,
 
     runWithTransaction,
+    customRunWithTransaction,
 }
 
 export const ADatabase = {
