@@ -726,15 +726,22 @@ const loader = async (wf) => {
     const allShoppers = await Promise.all(
         orders.map((order) => MUser.get(wf, mode.Network, order.shopperId, EFormat.Raw))
     ) as IUser[]
-
-    logger(`All shoppers to cache offline for admin-orders: `, allShoppers)
     
-    await Promise.all(
-        allShoppers
-            .map((shopper) => MUser.add(wf, mode.Offline, shopper))
+    const travelerIds = flights.map((flight) => flight.travelerId)
+    const allTravelers = await Promise.all(
+        travelerIds.map((travelerId) => MUser.get(wf, mode.Network, travelerId, EFormat.Raw))
     )
 
-    logger('All shoppers cached offline succesfully')
+    const otherUsers = [...allShoppers, ...allTravelers]
+
+    logger(`All shoppers/travelers to cache offline for admin-orders: `, otherUsers)
+    
+    await Promise.all(
+        otherUsers
+            .map((otherUser) => MUser.add(wf, mode.Offline, otherUser))
+    )
+
+    logger('All shoppers/travelers cached offline succesfully')
 
     await updateOfflineTimestamp('users', new Date())
 
@@ -767,9 +774,13 @@ const builder = async (wf) => {
         return { err: orders.err }
     }
 
+    console.log('--- orders =', orders)
+
     const computedOrders = await Promise.all(
         orders.map((order) => MOrder.compute(wf, wf.mode.Offline, user, order))
     )
+
+    console.log('--- computedOrders =', computedOrders)
 
     const rows = orders.map(MOrder.toRow)
 

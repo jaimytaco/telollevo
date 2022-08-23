@@ -29,6 +29,10 @@ import { EProductCategory } from '@types/product.type'
 import MQuotation from '@models/quotation.model'
 
 import { IUser, EUserType } from '@types/user.type'
+import MUser from '@models/user.model'
+
+import { IFlight, EFlightStatus } from '@types/flight.type'
+import MFlight from '@models/flight.model'
 
 import { logger } from '@wf/helpers/browser.helper'
 import { removeOfflineTimestamp } from '@wf/lib.worker'
@@ -109,7 +113,7 @@ const toProductDetails = (order: IOrder) => {
 }
 
 const toRowExtra = (order: IOrder) => {
-    switch (order.status) {
+    switch (order.computed.status) {
         case EOrderStatus.Registered:
             return `
                 <div id="te-${order.id}" class="t-r-extra">
@@ -164,38 +168,37 @@ const toRowExtra = (order: IOrder) => {
                             <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                         </div>
                         <div class="card-14-group">
-                            ${order.quotations
-                    .map((quotation: IQuotation) => `
-                                        <div class="card-14">
-                                            <div class="card-7 c-7-p">
-                                                <p>
-                                                    <strong>Fabián Delgado</strong>
-                                                    <br>
-                                                    <span>${quotation.flight.from} <span class="c-tertiary">→</span> ${quotation.flight.to}</span>
-                                                </p>
-                                            </div>
-                                            <button class="btn btn-primary" data-select-quotation_btn="q-${quotation.id}">Elegir por ${quotation.priceStr}</button>
-                                            <div class="card-15">
-                                                <p>
-                                                    <span>Recibe pedido  ·  ${quotation.flight.receiveOrdersSince} al ${quotation.flight.receiveOrdersUntil}</span>
-                                                    <span>Entrega pedido  ·  ${quotation.flight.deliverOrderAt}</span>
-                                                </p>
-                                            </div>
-                                            <div class="card-8 c-8-visible card-7-group" data-heading="Dirección de envío">
-                                                <div class="card-7 c-7-p">
-                                                    <p class="c-7-close">
-                                                        <span>
-                                                            ${quotation.flight.housing.address}, ${quotation.flight.housing.place.district}<br>
-                                                            ${quotation.flight.housing.place.city}, ${quotation.flight.housing.place.state}, ${quotation.flight.housing.place.country}<br>
-                                                            ${quotation.flight.housing.place.zipcode}
-                                                        </span>
-                                                    </p>
-                                                </div>
-                                                <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn>Ver dirección de envío</button>
-                                                <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-close" data-c-8_btn>Ocultar dirección de envío</button>
-                                            </div>
+                            ${order.quotations.map((quotation: IQuotation) => `
+                                <div class="card-14">
+                                    <div class="card-7 c-7-p">
+                                        <p>
+                                            <strong>${MUser.getFullName(quotation.traveler)}</strong>
+                                            <br>
+                                            <span>${quotation.flight.from} <span class="c-tertiary">→</span> ${quotation.flight.to}</span>
+                                        </p>
+                                    </div>
+                                    <button class="btn btn-primary" data-select-quotation_btn="q-${quotation.id}">Elegir por ${quotation.priceStr}</button>
+                                    <div class="card-15">
+                                        <p>
+                                            <span>Recibe pedido  ·  ${quotation.flight.receiveOrdersSince} al ${quotation.flight.receiveOrdersUntil}</span>
+                                            <span>Entrega pedido  ·  ${quotation.flight.deliverOrderAt}</span>
+                                        </p>
+                                    </div>
+                                    <div class="card-8 c-8-visible card-7-group" data-heading="Dirección de envío">
+                                        <div class="card-7 c-7-p">
+                                            <p class="c-7-close">
+                                                <span>
+                                                    ${quotation.flight.housing.address}, ${quotation.flight.housing.place.district}<br>
+                                                    ${quotation.flight.housing.place.city}, ${quotation.flight.housing.place.state}, ${quotation.flight.housing.place.country}<br>
+                                                    ${quotation.flight.housing.place.zipcode}
+                                                </span>
+                                            </p>
                                         </div>
-                                    `)
+                                        <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn>Ver dirección de envío</button>
+                                        <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-close" data-c-8_btn>Ocultar dirección de envío</button>
+                                    </div>
+                                </div>
+                            `)
                 }
                         </div>
                     </div>
@@ -209,12 +212,11 @@ const toRowActions = (order: IOrder) => {
         case EOrderStatus.Registered:
             return `
                 <div class="t-r-actions t-r-actions-desktop">
-                    ${
-                        order.computed.isQuotable ? 
-                            `<button class="btn btn-primary" data-quote-order_btn="${order.id}">
+                    ${order.computed.isQuotable ?
+                    `<button class="btn btn-primary" data-quote-order_btn="${order.id}">
                                 <span>Cotizar pedido</span>
                             </button>` : ''
-                    }
+                }
                     <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${order.id}">
                         <picture>
                             <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
@@ -231,13 +233,12 @@ const toRowActions = (order: IOrder) => {
                                 <li>
                                     <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
                                 </li>
-                                ${
-                                    order.computed.isQuotable ? 
-                                        `<li>
+                                ${order.computed.isQuotable ?
+                    `<li>
                                             <button class="btn" data-quote-order_btn data-quote-order_id="${order.id}">Cotizar pedido</button>
                                         </li>` : ''
-                                    
-                                }
+
+                }
                             </ul>
                         </span>
                     </div>
@@ -281,7 +282,7 @@ const toRowActions = (order: IOrder) => {
 const toRow = (order: IOrder) => {
     return {
         id: order.id,
-        tags: [capitalizeString(order.status)],
+        tags: [capitalizeString(order.computed.status)],
         heading: order.product.name,
         details: [{
             description: order.product.category
@@ -293,11 +294,33 @@ const toRow = (order: IOrder) => {
 }
 
 const compute = async (wf, mode, user, order) => {
+    const isOrderQuotable = await isQuotable(wf, mode, user, order)
+    const canOrderSelectFlight = await canSelectFlight(wf, mode, order)
+    const status = computeStatus(order, canOrderSelectFlight)
+
     order.computed = {
-        isQuotable: await isQuotable(wf, mode, user, order)
+        isQuotable: isOrderQuotable,
+        canSelectFlight: canOrderSelectFlight,
+        status,
     }
 
     return order
+}
+
+const computeStatus = (order: IOrder, canSelectFlight) => {
+    return order.status === EOrderStatus.Registered && canSelectFlight ?
+        EOrderStatus.Quoted :
+        order.status
+}
+
+const getMinSelectedFlightsToSelectFlight = () => 1
+
+const canSelectFlight = async (wf, mode, order: IOrder) => {
+    const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id)
+    const flightIds = quotations.map((quotation) => quotation.flightId)
+    const flights = await Promise.all(flightIds.map((flightId) => MFlight.get(wf, mode, flightId, EFormat.Raw)))
+    const selectedFlights = flights.filter((flight) => flight.status === EFlightStatus.Visible)
+    return getMinSelectedFlightsToSelectFlight() <= selectedFlights.length
 }
 
 const isQuotable = async (wf, mode, user: IUser, order: IOrder) => {
@@ -383,7 +406,8 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     if (isFormatted === EFormat.Raw) return orders
 
     const quotations = await MQuotation.getAll(wf, mode, isFormatted)
-
+    console.log('--- quotations =', quotations)
+    
     if (quotations?.err) {
         const { err } = quotations
         logger(err)
@@ -413,12 +437,32 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
     const order = responseOrder.data as IOrder
     if (isFormatted === EFormat.Raw) return order
 
+    const orderRelated = await relate(wf, mode, order)
+
     return isFormatted === EFormat.Related ?
-        order :
-        format(order)
+        orderRelated :
+        format(orderRelated)
 }
 
-const format = (order: IOrder) => order
+// TODO: try-catch use-case?
+// const relate = async (wf, mode, order: IOrder) => {
+//     const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Related, order.id)
+//     if (quotations?.err) {
+//         const { err } = quotations
+//         logger(err)
+//         return { err }
+//     }
+    
+//     return {
+//         ...order,
+//         quotations,
+//     }
+// }
+
+const format = (order: IOrder) => ({
+    ...order,
+    quotations: order.quotations.map(MQuotation.format)
+})
 
 const sanitize = (order: IOrder) => {
     // Sanitize for step-1
@@ -548,7 +592,7 @@ const sanitize = (order: IOrder) => {
 const toQuoted = async (wf, orderId) => {
     const order = await get(wf, wf.mode.Offline, orderId, EFormat.Raw)
     if (order.status !== EOrderStatus.Registered) return
-    
+
     order.updatedAt = new Date()
     order.status = EOrderStatus.Quoted
 
