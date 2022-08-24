@@ -105,88 +105,109 @@ const toRowExtra = (user: IUser, flight: IFlight) => {
     `
 }
 
+const toRowActions_RegisteredFlight = (user: IUser, flight: IFlight) => {
+    return `
+        <div class="t-r-actions t-r-actions-desktop">
+            ${
+                user.type === EUserType.Admin ?
+                    `
+                    <button class="btn btn-primary" data-tovisible-flight_btn data-flight_id="${flight.id}">
+                        <span>Aprobar vuelo</span>
+                    </button>
+                    ` : ''
+            }
+            <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
+                <picture>
+                    <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
+                </picture>
+            </button>
+        </div>
+        <div class="t-r-actions t-r-actions-mobile">
+            <div class="split-btn">
+                <span class="sp-popup-trigger btn" tabindex="-1">
+                    <picture>
+                        <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                    </picture>
+                    <ul class="sp-popup">
+                        <li>
+                            <button class="btn" data-show-table-extra_id="te-${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
+                        </li> 
+                        ${
+                            user.type === EUserType.Admin ?
+                                `
+                                <li>
+                                    <button class="btn" data-tovisible-flight_btn data-flight_id="${flight.id}">Aprobar vuelo</button>
+                                </li> 
+                                ` : ''
+                        }
+                        
+                    </ul>
+                </span>
+            </div>
+        </div>
+    `
+}
+
+const toRowActions_VisibleFlight = (user: IUser, flight: IFlight) => {
+    return `
+        <div class="t-r-actions t-r-actions-desktop">
+            ${
+                user.type === EUserType.Admin ?
+                `<button class="btn btn-primary" data-toregistered-flight_btn data-flight_id="${flight.id}">
+                    <span>Desaprobar vuelo</span>
+                </button>
+                ` : ''
+            }
+            
+            <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
+                <picture>
+                    <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
+                </picture>
+            </button>
+        </div>
+        <div class="t-r-actions t-r-actions-mobile">
+            <div class="split-btn">
+                <span class="sp-popup-trigger btn" tabindex="-1">
+                    <picture>
+                        <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                    </picture>
+                    <ul class="sp-popup">
+                        <li>
+                            <button class="btn" data-show-table-extra_id="te-${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
+                        </li> 
+                        ${
+                            user.type === EUserType.Admin ?
+                            ` <li>
+                                <button class="btn" data-toregistered-flight_btn data-flight_id="${flight.id}">Desaprobar vuelo</button>
+                            </li> ` : ''
+                        }
+                    
+                    </ul>
+                </span>
+            </div>
+        </div>
+    `
+}
+
 const toRowActions = (user: IUser, flight: IFlight) => {
     switch(flight.status){
         case EFlightStatus.Registered:
-            return `
-                <div class="t-r-actions t-r-actions-desktop">
-                    ${
-                        user.type === EUserType.Admin ?
-                            `
-                            <button class="btn btn-primary" data-tovisible-flight_btn data-flight_id="${flight.id}">
-                                <span>Aprobar vuelo</span>
-                            </button>
-                            ` : ''
-                    }
-                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
-                        <picture>
-                            <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
-                        </picture>
-                    </button>
-                </div>
-                <div class="t-r-actions t-r-actions-mobile">
-                    <div class="split-btn">
-                        <span class="sp-popup-trigger btn" tabindex="-1">
-                            <picture>
-                                <img src="/img/icon/more-vertical.svg" width="14" height="14">
-                            </picture>
-                            <ul class="sp-popup">
-                                <li>
-                                    <button class="btn" data-show-table-extra_id="te-${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
-                                </li> 
-                                ${
-                                    user.type === EUserType.Admin ?
-                                        `
-                                        <li>
-                                            <button class="btn  data-tovisible-flight_btn data-flight_id="${flight.id}">Aprobar vuelo</button>
-                                        </li> 
-                                        ` : ''
-                                }
-                                
-                            </ul>
-                        </span>
-                    </div>
-                </div>
-            `
+            return toRowActions_RegisteredFlight(user, flight)
         case EFlightStatus.Visible:
-            return `
-                <div class="t-r-actions t-r-actions-desktop">
-                    <button class="btn btn-primary" data-toregistered-flight_btn data-flight_id="${flight.id}">
-                        <span>Desaprobar vuelo</span>
-                    </button>
-                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${flight.id}">
-                        <picture>
-                            <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
-                        </picture>
-                    </button>
-                </div>
-                <div class="t-r-actions t-r-actions-mobile">
-                    <div class="split-btn">
-                        <span class="sp-popup-trigger btn" tabindex="-1">
-                            <picture>
-                                <img src="/img/icon/more-vertical.svg" width="14" height="14">
-                            </picture>
-                            <ul class="sp-popup">
-                                <li>
-                                    <button class="btn" data-show-table-extra_id="te-${flight.id}" data-show-table-extra_id-close="Ocultar vuelo" data-show-table-extra_id-open="Ver vuelo">Ver vuelo</button>
-                                </li> 
-                                <li>
-                                    <button class="btn data-toregistered-flight_btn data-flight_id="${flight.id}">Desaprobar vuelo</button>
-                                </li> 
-                            </ul>
-                        </span>
-                    </div>
-                </div>
-            `
+            return toRowActions_VisibleFlight(user, flight)
         default:
             return ''
     }
 }
 
+const toRowTags = (flight: IFlight) => {
+    return [capitalizeString(flight.status)]
+}
+
 const toRow = (user: IUser, flight: IFlight) => {
     return {
         id: flight.id,
-        tags: [capitalizeString(flight.status)],
+        tags: toRowTags(flight),
         heading: `${flight.airline} - ${flight.code}`,
         details: [{
             description: `${MUser.getFullName(user)}<br>DNI 88223302`

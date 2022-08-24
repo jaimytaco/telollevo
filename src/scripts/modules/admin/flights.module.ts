@@ -53,7 +53,7 @@ const configFlightToVisible = async (wf) => {
         const flightId = visibleFlightBtn.getAttribute('data-flight_id')
         const response = await MFlight.toVisible(wf, flightId)
         if (response?.err){
-            logger(response.err.desc)
+            logger(response.err.desca)
             // TODO: Shoy error in UI
             return
         }
@@ -465,13 +465,12 @@ const builder = async (wf) => {
     if (isNode())
         return emptyContent
 
-    const userCredential = await wf.auth.getCurrentUser()
-    if (!userCredential) {
+    const user = await ModAuth.getUserAuthenticated(wf) as IUser
+    if (!user) {
         logger('Builder for admin-flights needs user authentication')
         return emptyContent
     }
 
-    const user = await MUser.get(wf, wf.mode.Offline, userCredential.uid, EFormat.Raw) as IUser
 
     const flights = await MFlight.getAll(wf, wf.mode.Offline, EFormat.Pretty) as IFlight[]
     if (flights?.err) {

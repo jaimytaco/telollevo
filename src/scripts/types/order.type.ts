@@ -48,7 +48,9 @@ export enum EOrderStatus{
     WithTrackingCode = 'con código de seguimiento',
     ReadyToDeliver = 'listo para entrega',
     Delivered = 'entregado',
-    Canceled = 'cancelado'
+    Canceled = 'cancelado',
+
+    TravelerQuoted = 'ya cotizado'
 }
 
 export enum EOrderShippers{

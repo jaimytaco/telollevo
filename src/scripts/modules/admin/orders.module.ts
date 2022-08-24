@@ -35,6 +35,8 @@ import {
 } from '@types/user.type'
 import MUser from '@models/user.model'
 
+import ModAuth from '@modules/admin/auth.module'
+
 import {
     logger,
     isNode
@@ -760,13 +762,11 @@ const builder = async (wf) => {
     if (isNode())
         return emptyContent
 
-    const userCredential = await wf.auth.getCurrentUser()
-    if (!userCredential) {
+    const user = await ModAuth.getUserAuthenticated(wf) as IUser
+    if (!user) {
         logger('Builder for admin-orders needs user authentication')
         return emptyContent
     }
-
-    const user = await MUser.get(wf, wf.mode.Offline, userCredential.uid, EFormat.Raw) as IUser
 
     const orders = await MOrder.getAll(wf, wf.mode.Offline, EFormat.Pretty) as IOrder[]
     if (orders?.err) {
@@ -774,15 +774,13 @@ const builder = async (wf) => {
         return { err: orders.err }
     }
 
-    console.log('--- orders =', orders)
-
     const computedOrders = await Promise.all(
         orders.map((order) => MOrder.compute(wf, wf.mode.Offline, user, order))
     )
 
     console.log('--- computedOrders =', computedOrders)
 
-    const rows = orders.map(MOrder.toRow)
+    const rows = computedOrders.map((computedOrder) => MOrder.toRow(user, computedOrder))
 
     // const allStatus = Object.values(MOrder.EOrderStatus).map((status) => capitalizeString(status))
     // const filters = [...allStatus]

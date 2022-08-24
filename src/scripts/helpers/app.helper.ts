@@ -80,10 +80,6 @@ export const initApp = async () => {
         '/admin/flights': ModAdminFlights.action,
     }
 
-    // wf.auth.onAuthStateChanged(async (credential) => {
-    //     console.log('--- credential on listener =', credential)
-    // })
-
     const { pathname } = location
     if (actions[pathname]){
         if (app.routes[pathname]?.withAuth){

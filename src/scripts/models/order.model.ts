@@ -112,206 +112,249 @@ const toProductDetails = (order: IOrder) => {
     `
 }
 
-const toRowExtra = (order: IOrder) => {
-    switch (order.computed.status) {
-        case EOrderStatus.Registered:
-            return `
-                <div id="te-${order.id}" class="t-r-extra">
-                    <div class="card-4">
-                        <div class="card-5 c-5-bordered">
-                            <picture>
-                                <img src="/img/icon/alert-secondary.svg" widtht="20" height="20">
-                            </picture>
-                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+const toRowExtra_RegisteredOrder = (order: IOrder) => {
+    return `
+        <div id="te-${order.id}" class="t-r-extra">
+            <div class="card-4">
+                <div class="card-5 c-5-bordered">
+                    <picture>
+                        <img src="/img/icon/alert-secondary.svg" widtht="20" height="20">
+                    </picture>
+                    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </div>
+                <div class="card-6">
+                    <h6>Detalles del artículo</h6>
+                    <div class="card-7-group">
+                        <div class="card-7">
+                            <p>
+                                Link del artículo:
+                                <br>
+                                <span>Revisa <a href="${order.product.url}" target="_blank">aquí</a> el artículo.</span>
+                            </p>
                         </div>
-                        <div class="card-6">
-                            <h6>Detalles del artículo</h6>
-                            <div class="card-7-group">
-                                <div class="card-7">
-                                    <p>
-                                        Link del artículo:
-                                        <br>
-                                        <span>Revisa <a href="${order.product.url}" target="_blank">aquí</a> el artículo.</span>
-                                    </p>
-                                </div>
-                                <div class="card-7">
-                                    <p>
-                                        Valor del artículo:
-                                        <br>
-                                        <span>El artículo tiene un precio de ${order.product.price} ${order.product.coin}.</span>
-                                    </p>
-                                </div>
+                        <div class="card-7">
+                            <p>
+                                Valor del artículo:
+                                <br>
+                                <span>El artículo tiene un precio de ${order.product.price} ${order.product.coin}.</span>
+                            </p>
+                        </div>
+                    </div>
+                    ${order.comments.length ? `
+                            <div class="card-5">
+                                <p>
+                                    <strong>Mensaje del comprador:</strong>
+                                    <br>
+                                    ${order.comments}
+                                </p>
                             </div>
-                            ${order.comments.length ? `
-                                    <div class="card-5">
-                                        <p>
-                                            <strong>Mensaje del comprador:</strong>
-                                            <br>
-                                            ${order.comments}
-                                        </p>
-                                    </div>
-                                ` : ''
-                }
-                        </div>
-                        ${toProductDetails(order)}
-                    </div>
+                        ` : ''
+        }
                 </div>
-            `
-        case EOrderStatus.Quoted:
-            return `
-                <div id="te-${order.id}" class="t-r-extra">
-                    <div class="card-4">
-                        <div class="card-5 c-5-bordered">
-                            <picture>
-                                <img src="/img/icon/alert-secondary.svg" widtht="20" height="20">
-                            </picture>
-                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                        </div>
-                        <div class="card-14-group">
-                            ${order.quotations.map((quotation: IQuotation) => `
-                                <div class="card-14">
-                                    <div class="card-7 c-7-p">
-                                        <p>
-                                            <strong>${MUser.getFullName(quotation.traveler)}</strong>
-                                            <br>
-                                            <span>${quotation.flight.from} <span class="c-tertiary">→</span> ${quotation.flight.to}</span>
-                                        </p>
-                                    </div>
-                                    <button class="btn btn-primary" data-select-quotation_btn="q-${quotation.id}">Elegir por ${quotation.priceStr}</button>
-                                    <div class="card-15">
-                                        <p>
-                                            <span>Recibe pedido  ·  ${quotation.flight.receiveOrdersSince} al ${quotation.flight.receiveOrdersUntil}</span>
-                                            <span>Entrega pedido  ·  ${quotation.flight.deliverOrderAt}</span>
-                                        </p>
-                                    </div>
-                                    <div class="card-8 c-8-visible card-7-group" data-heading="Dirección de envío">
-                                        <div class="card-7 c-7-p">
-                                            <p class="c-7-close">
-                                                <span>
-                                                    ${quotation.flight.housing.address}, ${quotation.flight.housing.place.district}<br>
-                                                    ${quotation.flight.housing.place.city}, ${quotation.flight.housing.place.state}, ${quotation.flight.housing.place.country}<br>
-                                                    ${quotation.flight.housing.place.zipcode}
-                                                </span>
-                                            </p>
-                                        </div>
-                                        <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn>Ver dirección de envío</button>
-                                        <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-close" data-c-8_btn>Ocultar dirección de envío</button>
-                                    </div>
-                                </div>
-                            `)
-                }
-                        </div>
-                    </div>
-                </div>
-            `
-    }
+                ${toProductDetails(order)}
+            </div>
+        </div>
+    `
 }
 
-const toRowActions = (order: IOrder) => {
-    switch (order.status) {
-        case EOrderStatus.Registered:
-            return `
-                <div class="t-r-actions t-r-actions-desktop">
-                    ${order.computed.isQuotable ?
-                    `<button class="btn btn-primary" data-quote-order_btn="${order.id}">
-                                <span>Cotizar pedido</span>
-                            </button>` : ''
-                }
-                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${order.id}">
-                        <picture>
-                            <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
-                        </picture>
-                    </button>
+const toRowExtra_QuotedOrder = (order: IOrder) => {
+    return `
+        <div id="te-${order.id}" class="t-r-extra">
+            <div class="card-4">
+                <div class="card-5 c-5-bordered">
+                    <picture>
+                        <img src="/img/icon/alert-secondary.svg" widtht="20" height="20">
+                    </picture>
+                    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
                 </div>
-                <div class="t-r-actions t-r-actions-mobile">
-                    <div class="split-btn">
-                        <span class="sp-popup-trigger btn" tabindex="-1">
-                            <picture>
-                                <img src="/img/icon/more-vertical.svg" width="14" height="14">
-                            </picture>
-                            <ul class="sp-popup">
-                                <li>
-                                    <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
-                                </li>
-                                ${order.computed.isQuotable ?
-                    `<li>
-                                            <button class="btn" data-quote-order_btn data-quote-order_id="${order.id}">Cotizar pedido</button>
-                                        </li>` : ''
+                <div class="card-14-group">
+                    ${order.quotations.map((quotation: IQuotation) => `
+                        <div class="card-14">
+                            <div class="card-7 c-7-p">
+                                <p>
+                                    <strong>${MUser.getFullName(quotation.traveler)}</strong>
+                                    <br>
+                                    <span>${quotation.flight.from} <span class="c-tertiary">→</span> ${quotation.flight.to}</span>
+                                </p>
+                            </div>
+                            <button class="btn btn-primary" data-select-quotation_btn="q-${quotation.id}">Elegir por ${quotation.priceStr}</button>
+                            <div class="card-15">
+                                <p>
+                                    <span>Recibe pedido  ·  ${quotation.flight.receiveOrdersSince} al ${quotation.flight.receiveOrdersUntil}</span>
+                                    <span>Entrega pedido  ·  ${quotation.flight.deliverOrderAt}</span>
+                                </p>
+                            </div>
+                            <div class="card-8 c-8-visible card-7-group" data-heading="Dirección de envío">
+                                <div class="card-7 c-7-p">
+                                    <p class="c-7-close">
+                                        <span>
+                                            ${quotation.flight.housing.address}, ${quotation.flight.housing.place.district}<br>
+                                            ${quotation.flight.housing.place.city}, ${quotation.flight.housing.place.state}, ${quotation.flight.housing.place.country}<br>
+                                            ${quotation.flight.housing.place.zipcode}
+                                        </span>
+                                    </p>
+                                </div>
+                                <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn>Ver dirección de envío</button>
+                                <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-close" data-c-8_btn>Ocultar dirección de envío</button>
+                            </div>
+                        </div>
+                    `)
+        }
+                </div>
+            </div>
+        </div>
+    `
+}
 
-                }
-                            </ul>
-                        </span>
-                    </div>
-                </div>
-            `
+const toRowExtra = (user: IUser, order: IOrder) => {
+    switch (order.computed.status) {
+        case EOrderStatus.Registered:
+            return toRowExtra_RegisteredOrder(order)
         case EOrderStatus.Quoted:
-            return `
-                <div class="t-r-actions t-r-actions-desktop">
-                    <button class="btn btn-primary" data-show-table-extra_id="te-${order.id}">
-                        <span>Elegir viajero</span>
-                    </button>
-                    <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${order.id}">
-                        <picture>
-                            <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
-                        </picture>
-                    </button>
-                </div>
-                <div class="t-r-actions t-r-actions-mobile">
-                    <div class="split-btn">
-                        <span class="sp-popup-trigger btn" tabindex="-1">
-                            <picture>
-                                <img src="/img/icon/more-vertical.svg" width="14" height="14">
-                            </picture>
-                            <ul class="sp-popup">
-                                <li>
-                                    <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
-                                </li>
-                                <li>
-                                    <button class="btn" data-show-table-extra_id="te-${order.id}">Elegir viajero</button>
-                                </li>
-                            </ul>
-                        </span>
-                    </div>
-                </div>
-            `
+            if (user.type === EUserType.Shopper) 
+                return toRowExtra_QuotedOrder(order)
+            return toRowExtra_RegisteredOrder(order)
         default:
             return ''
     }
 }
 
-const toRow = (order: IOrder) => {
+const toRowActions_RegisteredOrder = (order: IOrder) => {
+    return `
+        <div class="t-r-actions t-r-actions-desktop">
+            ${order.computed.isQuotable ?
+                `<button class="btn btn-primary" data-quote-order_btn="${order.id}">
+                    <span>Cotizar pedido</span>
+                </button>` : ''
+            }
+            <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${order.id}">
+                <picture>
+                    <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
+                </picture>
+            </button>
+        </div>
+        <div class="t-r-actions t-r-actions-mobile">
+            <div class="split-btn">
+                <span class="sp-popup-trigger btn" tabindex="-1">
+                    <picture>
+                        <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                    </picture>
+                    <ul class="sp-popup">
+                        <li>
+                            <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
+                        </li>
+                        ${
+                            order.computed.isQuotable ?
+                                `<li>
+                                    <button class="btn" data-quote-order_btn data-quote-order_id="${order.id}">Cotizar pedido</button>
+                                </li>` : ''
+                        }
+                    </ul>
+                </span>
+            </div>
+        </div>
+    `
+}
+
+const toRowActions_QuotedOrder = (user: IUser, order: IOrder) => {
+    return `
+        <div class="t-r-actions t-r-actions-desktop">
+            ${
+                user.type === EUserType.Shopper ?
+                `
+                    <button class="btn btn-primary" data-show-table-extra_id="te-${order.id}">
+                        <span>Elegir viajero</span>
+                    </button>
+                ` : ''
+            }
+            <button class="btn btn-round btn-spin" data-show-table-extra_id="te-${order.id}">
+                <picture>
+                    <img src="/img/icon/chevron-down-sm.svg" width="14" height="14">
+                </picture>
+            </button>
+        </div>
+        <div class="t-r-actions t-r-actions-mobile">
+            <div class="split-btn">
+                <span class="sp-popup-trigger btn" tabindex="-1">
+                    <picture>
+                        <img src="/img/icon/more-vertical.svg" width="14" height="14">
+                    </picture>
+                    <ul class="sp-popup">
+                        <li>
+                            <button class="btn" data-show-table-extra_id="te-${order.id}" data-show-table-extra_id-close="Ocultar pedido" data-show-table-extra_id-open="Ver pedido">Ver pedido</button>
+                        </li>
+                        ${
+                            user.type === EUserType.Shopper ?
+                            `
+                            <li>
+                                <button class="btn" data-show-table-extra_id="te-${order.id}">Elegir viajero</button>
+                            </li>
+                            ` : ''
+                        }
+                    </ul>
+                </span>
+            </div>
+        </div>
+    `
+}
+
+const toRowActions = (user: IUser, order: IOrder) => {
+    switch (order.computed.status) {
+        case EOrderStatus.Registered:
+            return toRowActions_RegisteredOrder(order)
+        case EOrderStatus.Quoted:
+            return toRowActions_QuotedOrder(user, order)
+        default:
+            return ''
+    }
+}
+
+const toRowTags = (user: IUser, order: IOrder) => {
+    const status = order.computed.status
+    if (status === EOrderStatus.Quoted && user.type === EUserType.Traveler){
+        const hasTravelerQuoted = getAllTravelerIdsWhoQuoted(order).includes(user.id)
+        const tags = hasTravelerQuoted ? [EOrderStatus.TravelerQuoted] : [EOrderStatus.Registered]
+        return tags.map(capitalizeString)
+    }
+    return [status].map(capitalizeString)
+}
+
+const toRow = (user: IUser, order: IOrder) => {
     return {
         id: order.id,
-        tags: [capitalizeString(order.computed.status)],
+        tags: toRowTags(user, order),
         heading: order.product.name,
         details: [{
             description: order.product.category
         }],
         icon: 'order.svg',
-        actions: toRowActions(order),
-        extra: toRowExtra(order),
+        actions: toRowActions(user, order),
+        extra: toRowExtra(user, order),
     }
 }
 
 const compute = async (wf, mode, user, order) => {
     const isOrderQuotable = await isQuotable(wf, mode, user, order)
     const canOrderSelectFlight = await canSelectFlight(wf, mode, order)
-    const status = computeStatus(order, canOrderSelectFlight)
+    const status = computeStatus(user, order, canOrderSelectFlight)
 
-    order.computed = {
-        isQuotable: isOrderQuotable,
-        canSelectFlight: canOrderSelectFlight,
-        status,
+    return {
+        ...order,
+        computed: {
+            isQuotable: isOrderQuotable,
+            canSelectFlight: canOrderSelectFlight,
+            status,
+        }
     }
-
-    return order
 }
 
-const computeStatus = (order: IOrder, canSelectFlight) => {
+const computeStatus = (user: IUser, order: IOrder, canSelectFlight) => {
     return order.status === EOrderStatus.Registered && canSelectFlight ?
         EOrderStatus.Quoted :
         order.status
 }
+
+const getAllTravelerIdsWhoQuoted = (order: IOrder) => order.quotations.map((quotation) => quotation.travelerId)
 
 const getMinSelectedFlightsToSelectFlight = () => 1
 
@@ -324,7 +367,7 @@ const canSelectFlight = async (wf, mode, order: IOrder) => {
 }
 
 const isQuotable = async (wf, mode, user: IUser, order: IOrder) => {
-    if (user.type !== EUserType.Traveler) return
+    if (user.type !== EUserType.Traveler) return false
     const quotations = await MQuotation.getAllByTravelerIdAndOrderId(wf, mode, EFormat.Raw, user.id, order.id)
     return !quotations.length
 }
@@ -406,8 +449,7 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     if (isFormatted === EFormat.Raw) return orders
 
     const quotations = await MQuotation.getAll(wf, mode, isFormatted)
-    console.log('--- quotations =', quotations)
-    
+
     if (quotations?.err) {
         const { err } = quotations
         logger(err)

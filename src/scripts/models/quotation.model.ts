@@ -99,15 +99,12 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     }
 
     const quotations = responseQuotations.data as IQuotation[]
-    console.log('--- quotations in getAll =', quotations)
     if (isFormatted === EFormat.Raw) return quotations
 
     for (const quotation of quotations) {
         quotation.flight = await MFlight.get(wf, mode, quotation.flightId, isFormatted) as IFlight
         quotation.traveler = await MUser.get(wf, mode, quotation.travelerId, isFormatted) as IUser
     }
-
-    console.log('--- quotations in getAll FOR =', quotations)
 
     return isFormatted === EFormat.Related ?
         quotations :
