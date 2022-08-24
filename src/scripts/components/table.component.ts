@@ -60,11 +60,13 @@ const renderRows = (rows: IRow[]) => {
         <div class="t-row t-r-last"></div>`
 }
 
+// TODO: Render s-table-header-actions
 const render = (heading, rows, filters, sorters) => {
     return `
         <section class="s-table">
             <header>
                 <h1>${heading}</h1>
+                <!--
                 <div class="s-t-h-actions">
                     <div class="split-btn">
                         <span class="sp-popup-trigger btn btn-underline" tabindex="-1">
@@ -101,6 +103,7 @@ const render = (heading, rows, filters, sorters) => {
                         </span>     
                     </div>
                 </div>
+                -->
             </header>
             <div class="s-t-body">
                 ${renderRows(rows)}
