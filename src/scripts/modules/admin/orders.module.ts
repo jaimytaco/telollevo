@@ -750,6 +750,19 @@ const loader = async (wf) => {
     return { done }
 }
 
+const getHeaderAction = (user: IUser) => {
+    return user.type === EUserType.Shopper ? `
+        <div class="n-t-actions-2">
+            <button class="btn btn-secondary btn-sm" data-create-order-dialog_btn>
+                <picture>
+                    <img src="/img/icon/plus-light.svg" width="14" height="14">
+                </picture>
+                <span>Registrar pedido</span>
+            </button>
+        </div>
+    ` : ''
+}
+
 const builder = async (wf) => {
     const emptyContent = {
         head: {
@@ -791,17 +804,7 @@ const builder = async (wf) => {
 
     const body = `
         ${adminHeader(
-        user,
-        `
-            <div class="n-t-actions-2">
-                <button class="btn btn-secondary btn-sm" data-create-order-dialog_btn>
-                    <picture>
-                        <img src="/img/icon/plus-light.svg" width="14" height="14">
-                    </picture>
-                    <span>Registrar pedido</span>
-                </button>
-            </div>
-            `, 'orders', 'pedidos')
+        user, getHeaderAction(user), 'orders', 'pedidos')
         }
         <main>
             ${CTable.render('Pedidos', rows, filters, sorters)}

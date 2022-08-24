@@ -381,6 +381,19 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     }
 }
 
+const getHeaderAction = (user: IUser) => {
+    return user.type === EUserType.Traveler ? `
+        <div class="n-t-actions-2">
+            <button class="btn btn-secondary btn-sm" data-create-flight-dialog_btn>
+                <picture>
+                    <img src="/img/icon/plus-light.svg" width="14" height="14">
+                </picture>
+                <span>Registrar vuelo</span>
+            </button>
+        </div>
+    ` : ''
+}
+
 const loader = async (wf) => {
     const { mode, auth } = wf
     const lastUpdate = await getOfflineTimestamp('flights')
@@ -485,19 +498,7 @@ const builder = async (wf) => {
     const sorters = []
 
     const body = `
-        ${adminHeader(
-        user,
-        `
-                <div class="n-t-actions-2">
-                    <button class="btn btn-secondary btn-sm" data-create-flight-dialog_btn>
-                        <picture>
-                            <img src="/img/icon/plus-light.svg" width="14" height="14">
-                        </picture>
-                        <span>Registrar vuelo</span>
-                    </button>
-                </div>
-            `, 'flights', 'vuelos')
-        }
+        ${adminHeader(user, getHeaderAction(user), 'flights', 'vuelos')}
         <main>
             ${CTable.render('Vuelos', rows, filters, sorters)}
         </main>
