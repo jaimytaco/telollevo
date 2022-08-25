@@ -1,0 +1,20 @@
+.card-18{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    gap: 4px 12px;
+}
+
+.card-18 > hr{
+    inline-size: 100%;
+    margin: 2px 0;
+    background: none;
+    border: none;
+}
+
+.card-18 > p{
+    inline-size: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 4px 0;
+}
