@@ -42,7 +42,7 @@ export enum ESanitizeOrderErrors{
 export enum EOrderStatus{
     Registered = 'registrado',
     Quoted = 'cotizado', // will be computed
-    Payed = 'pagado', // will be computed
+    Payed = 'pagado',
     Assigned = 'con viajero asignado',
     WithPurchaseOrder = 'con orden de compra',
     WithTrackingCode = 'con código de seguimiento',

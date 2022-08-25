@@ -253,7 +253,6 @@ const doPay = async (wf, quotationId) => {
     }
 
     const onTransaction = async (transaction, transactionData) => {
-        console.log('--- transactionData =', transactionData)
         const quotationRefs = transactionData.quotation.docRefs
         const quotationDocs = await Promise.all(
             quotationRefs.map((quotationRef) => transaction.get(quotationRef))
@@ -269,16 +268,12 @@ const doPay = async (wf, quotationId) => {
         const quotations = quotationDocs.map((quotationDoc) => quotationDoc.data())
         const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Payed)
         
-        console.log('--- payedQuotations =', payedQuotations)
-
         if (payedQuotations.length)
             return Promise.reject({
                 desc: 'No se puede pagar esta cotización porque la orden ya ha sido pagada'
             })
         
-        
         const quotationToPay = quotations[0]
-        console.log('--- quotationToPay =', quotationToPay)
 
         if (quotationToPay.status === EQuotationStatus.Payed)
             return Promise.reject({

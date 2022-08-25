@@ -124,10 +124,16 @@ const configPickAndPayQuotationDialog = async (wf, dialogId) => {
             // TODO: Show error in UI
             return
         }
-        
+
         const payedQuotation = MQuotation.uncompute(payedQuotationResponse.data)
-        console.log('--- payedQuotation =', payedQuotation)
         await MQuotation.update(wf, wf.mode.Offline, payedQuotation)
+        
+        const order = await MOrder.get(wf, wf.mode.Network, payedQuotation.orderId, EFormat.Raw)
+        order.updatedAt = new Date()
+        order.status = EOrderStatus.Payed
+        await MOrder.update(wf, wf.mode.Network, order)
+        await MOrder.update(wf, wf.mode.Offline, order)
+
 
         step1Form.classList.remove('active')
         step2Form.classList.add('active')
@@ -952,6 +958,7 @@ const builder = async (wf) => {
     }
 
     const orders = await MOrder.getAll(wf, wf.mode.Offline, EFormat.Pretty) as IOrder[]
+    // const orders = await MOrder.getAllByUserAuthenticated(wf, wf.mode.Offline, EFormat.Pretty, user) as IOrder[]
     if (orders?.err) {
         logger(orders.err)
         return { err: orders.err }
@@ -960,6 +967,8 @@ const builder = async (wf) => {
     const computedOrders = await Promise.all(
         orders.map((order) => MOrder.compute(wf, wf.mode.Offline, user, order))
     )
+
+    console.log('--- computedOrders =', computedOrders)
 
     const rows = computedOrders.map((computedOrder) => MOrder.toRow(user, computedOrder))
 

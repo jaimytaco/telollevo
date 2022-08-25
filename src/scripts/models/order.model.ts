@@ -306,6 +306,8 @@ const toRowActions = (user: IUser, order: IOrder) => {
             return toRowActions_RegisteredOrder(order)
         case EOrderStatus.Quoted:
             return toRowActions_QuotedOrder(user, order)
+        case EOrderStatus.Payed:
+            return toRowActions_RegisteredOrder(order)
         default:
             return ''
     }
@@ -336,10 +338,8 @@ const toRow = (user: IUser, order: IOrder) => {
 }
 
 const compute = async (wf, mode, user, order: IOrder) => {
-    const isPayedOrder = await isPayed(wf, mode, user, order)
-    // const isOrderQuotableByTraveler = await isQuotableByTraveler(wf, mode, user, order)
-    const canOrderSelectFlight = !isPayedOrder && await canSelectFlight(wf, mode, order)
-    const status = computeStatus(user, order, isPayedOrder, canOrderSelectFlight)
+    const canOrderSelectFlight = await canSelectFlight(wf, mode, order)
+    const status = computeStatus(user, order, canOrderSelectFlight)
     const quotations = await Promise.all(
         (order.quotations as IQuotation[]).map((quotation) => MQuotation.compute(wf, mode, quotation))
     )
@@ -348,19 +348,13 @@ const compute = async (wf, mode, user, order: IOrder) => {
         ...order,
         quotations,
         computed: {
-            isPayed: isPayedOrder,
-            // isQuotableByTraveler: isOrderQuotableByTraveler,
-            canSelectFlight: canOrderSelectFlight,
             status,
         }
     }
 }
 
-const computeStatus = (user: IUser, order: IOrder, isPayed, canSelectFlight) => {
-    // return order.status === EOrderStatus.Registered && canSelectFlight ?
-    //     EOrderStatus.Quoted :
-    //     order.status
-    if (isPayed) return EOrderStatus.Payed
+const computeStatus = (user: IUser, order: IOrder, canSelectFlight) => {
+    if (order.status !== EOrderStatus.Registered) return order.status
     if (canSelectFlight) return EOrderStatus.Quoted
     return EOrderStatus.Registered
 }
@@ -370,18 +364,21 @@ const getAllTravelerIdsWhoQuoted = (order: IOrder) => order.quotations.map((quot
 const getMinSelectedFlightsToSelectFlight = () => 1
 
 const canSelectFlight = async (wf, mode, order: IOrder) => {
+    if (order.status === EOrderStatus.Payed) return false
+
     const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id)
     const flightIds = quotations.map((quotation) => quotation.flightId)
     const flights = await Promise.all(flightIds.map((flightId) => MFlight.get(wf, mode, flightId, EFormat.Raw)))
     const selectedFlights = flights.filter((flight) => flight.status === EFlightStatus.Visible)
+
     return getMinSelectedFlightsToSelectFlight() <= selectedFlights.length
 }
 
-const isPayed = async (wf, mode, user: IUser, order: IOrder) => {
-    const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id)
-    const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Payed)
-    return !!payedQuotations.length
-}
+// const isPayed = async (wf, mode, user: IUser, order: IOrder) => {
+//     const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id)
+//     const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Payed)
+//     return !!payedQuotations.length
+// }
 
 const isQuotableByTraveler = async (wf, mode, user: IUser, order: IOrder) => {
     if (user.type !== EUserType.Traveler) return false
@@ -389,8 +386,11 @@ const isQuotableByTraveler = async (wf, mode, user: IUser, order: IOrder) => {
     return !quotations.length
 }
 
-const getAllByUserAuthenticated = async (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
-    if ([EUserType.Traveler, EUserType.Multiple, EUserType.Admin].includes(user.type))
+const getAllByUserAuthenticated = (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
+    if (user.type === EUserType.Traveler)
+        return getAll(wf, mode, isFormatted)
+
+    if (user.type === EUserType.Admin)
         return getAll(wf, mode, isFormatted)
 
     if (user.type === EUserType.Shopper)
@@ -398,17 +398,15 @@ const getAllByUserAuthenticated = async (wf, mode, isFormatted: EFormat, user: I
 }
 
 const getAllByShopperId = (wf, mode, isFormatted: EFormat, shopperId, date?) => {
-    const { operator } = wf
-
     const byShopper = {
         field: 'shopperId',
-        operator: operator.EqualTo,
+        operator: wf.operator.EqualTo,
         value: shopperId
     }
 
     const byRecent = {
         field: 'updatedAt',
-        operator: operator.GreaterThanOrEqualTo,
+        operator: wf.operator.GreaterThanOrEqualTo,
         value: date
     }
 

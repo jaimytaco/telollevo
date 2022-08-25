@@ -215,8 +215,8 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 698
+export const SW_VERSION = 703
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000
-const MAX_FETCH_MS = 1500
+const MAX_FETCH_MS = 3000
