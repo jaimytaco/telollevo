@@ -106,7 +106,7 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
     }
 
     const user = responseUser.data as IUser
-    return mode === EFormat.Pretty ? format(user) : user
+    return mode === EFormat.Pretty ? prettify(user) : user
 }
 
 const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
@@ -124,15 +124,15 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
 
     return isFormatted === EFormat.Related ?
         users :
-        users.map(format)
+        users.map(prettify)
 }
 
-const format = (user: IUser) => user
+const prettify = (user: IUser) => user
 
 export default{
     collection: 'users',
     
-    format,
+    prettify,
     getAll,
     get,
     add,

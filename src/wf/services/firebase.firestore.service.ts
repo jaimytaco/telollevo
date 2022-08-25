@@ -124,6 +124,7 @@ const getDocRef = (docData, collectionName) => {
 
 const customRunWithTransaction = async (transactionData, onTransaction) => {
     for (const key of Object.keys(transactionData)){
+        if (key === 'fns') continue
         transactionData[key].docRefs = transactionData[key].datas.map((data) => getDocRef(data, transactionData[key].collectionName))
     }
 
@@ -166,4 +167,6 @@ export default {
 
     runWithTransaction,
     customRunWithTransaction,
+
+    formatDocForDB: formatDocForFirebase,
 }

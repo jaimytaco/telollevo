@@ -1,5 +1,7 @@
 import { logger } from '@wf/helpers/browser.helper'
 
+export const formatPrice = (symbol, amount) => `${symbol}${amount.toFixed(2)}`
+
 const MAX_MERGE_LENGTH = 20
 export const mergeUUIDs = (ids: string[]) => ids.map((id) => id.slice(0, Math.round(MAX_MERGE_LENGTH / ids.length))).join('').slice(0, MAX_MERGE_LENGTH)
 
@@ -49,23 +51,3 @@ export const getDOMElement = (parent, query, mode: 'all' | undefined) => {
 }
 
 export const delay = (ms) => new Promise((resolve) => setTimeout(() => resolve(), ms))
-
-
-
-// export const configFlightToVisible = async (wf) => {
-//     const visibleFlightBtns = getDOMElement(document, '[data-tovisible-flight_btn]', 'all')
-//     visibleFlightBtns?.forEach((visibleFlightBtn) => visibleFlightBtn.onclick = async () => {
-//         // TODO: visible flight logic
-//         const { EFlightStatus } = await import('@types/flight.type')
-//         const id = visibleFlightBtn.getAttribute('data-tovisible-flight_btn')
-//         const { data: flight, err } = await wf.database.get(wf.mode.Network, 'flights', id)
-//         if (err) return
-
-//         // TODO: check if flight has quotations
-//         flight.status = flight.status === EFlightStatus.Registered ? EFlightStatus.Visible : EFlightStatus.Registered
-//         await wf.database.update(wf.mode.Network, 'flights', flight)
-
-//         // TODO: reload
-//         location.reload() 
-//     })
-// }

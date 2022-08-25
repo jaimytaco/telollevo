@@ -15,6 +15,10 @@ export enum ECoin{
     }
 }
 
+export enum ETax{
+    Peru = .18,
+}
+
 export enum EShippingDestination{
     Inplace_Miraflores = 'en el local de Te lo llevo en Miraflores (Av. Aramburú 480, Piso 2 - Lima)',
     Town = 'dentro de Lima',

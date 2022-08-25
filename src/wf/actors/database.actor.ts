@@ -54,6 +54,8 @@ const customRunWithTransaction = (transactionData, onTransaction) => {
     return NetworkDB.customRunWithTransaction(transactionData, onTransaction)
 }
 
+const formatDocForDB = (docData: T) => NetworkDB.formatDocForDB(docData)
+
 const ADatabaseMethods = {
     getAll,
     add,
@@ -63,6 +65,8 @@ const ADatabaseMethods = {
 
     runWithTransaction,
     customRunWithTransaction,
+
+    formatDocForDB,
 }
 
 export const ADatabase = {

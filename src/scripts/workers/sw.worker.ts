@@ -84,11 +84,12 @@ const installHdlr = (e) => {
 
                 unprefetchRoutes(app.routes)
             }
+
+            skipWaiting()
         })
 
         logger(`Installed SW (v.${SW_VERSION})`)
-
-        skipWaiting()
+        // skipWaiting()
     }
 
     e.waitUntil(fn())
@@ -214,7 +215,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 631
+export const SW_VERSION = 684
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000

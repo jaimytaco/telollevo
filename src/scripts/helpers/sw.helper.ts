@@ -27,6 +27,7 @@ export const images = [
     '/img/icon/search.svg',
     '/img/icon/filter.svg',
     '/img/icon/alert-secondary.svg',
+    '/img/icon/lock-secondary.svg',
     '/img/icon/more-vertical.svg',
     '/img/icon/arrow-left.svg',
     '/img/icon/sort.svg',

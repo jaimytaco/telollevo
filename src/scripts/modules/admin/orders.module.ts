@@ -60,18 +60,99 @@ import CTable from '@components/table.component'
 import { adminHeader } from '@helpers/ui.helper'
 
 
-// const configSelectQuotationInQuotedOrder = async (wf) => {
-//     const selectQuotationBtns = getDOMElement(document, '[data-select-quotation_btn]', 'all')
-//     selectQuotationBtns?.forEach((selectQuotationBtn) => selectQuotationBtn.onclick = async () => {
-//         console.log('--- selectQuotationBtn =', selectQuotationBtn)
-//     })
-// }
-
-const configQuoteOrderDialog = async (wf, dialogId) => {
+const configPickAndPayQuotationDialog = async (wf, dialogId) => {
+    const { default: CDialog } = await import('@components/dialog.component')
     const { default: CForm } = await import('@components/form.component')
 
     const dialog = getDOMElement(document, `#${dialogId}`)
     if (!dialog) return
+    CDialog.init(dialogId)
+
+    // STEP-1
+    const step1Form = getDOMElement(dialog, '#pick-and-pay-quotation-step-1_form')
+    if (!step1Form) return
+    const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
+    if (!btnSubmitStep1) return
+    CForm.init(step1Form.id)
+
+    const pickAndPayQuotationBtns = getDOMElement(document, '[data-pick-and-pay-quotation_btn]', 'all')
+    pickAndPayQuotationBtns.forEach((pickAndPayQuotationBtn) => {
+        pickAndPayQuotationBtn.onclick = async (e) => {
+            e.preventDefault()
+            step1Form.reset()
+
+            const quotationId = pickAndPayQuotationBtn.getAttribute('data-quotation_id')
+            btnSubmitStep1.setAttribute('data-quotation_id', quotationId)
+
+            const quotation = await MQuotation.get(wf, wf.mode.Offline, quotationId, EFormat.Raw)
+            if (quotation?.err) return
+            const computedQuotation = await MQuotation.compute(wf, wf.mode.Offline, quotation)
+            
+            const priceSpan = getDOMElement(step1Form, '#price')
+            if (!priceSpan) return
+            priceSpan.textContent = computedQuotation.computed.priceStr
+            
+            const commissionSpan = getDOMElement(step1Form, '#commission')
+            if (!commissionSpan) return
+            commissionSpan.textContent = computedQuotation.computed.commissionStr
+
+            const taxSpan = getDOMElement(step1Form, '#tax')
+            if (!taxSpan) return
+            taxSpan.textContent = computedQuotation.computed.taxStr
+
+            const totalSpans = getDOMElement(step1Form, '#total, #submit-total', 'all')
+            totalSpans.forEach((totalSpan) => { totalSpan.textContent = computedQuotation.computed.totalStr })
+
+            CDialog.handle(dialogId, 'add')
+            step1Form.classList.add('active')
+        }
+    })
+
+    btnSubmitStep1.onclick = (e) => {
+        e.preventDefault()
+        CForm.validateBeforeSubmit(step1Form)
+    }
+
+    step1Form.onsubmit = async (e) => {
+        e.preventDefault()
+
+        const quotationId = btnSubmitStep1.getAttribute('data-quotation_id')
+        // TODO: Show loading in UI
+        const payedQuotationResponse = await MQuotation.doPay(wf, quotationId)
+        if (payedQuotationResponse?.err){
+            logger(payedQuotationResponse.err.desc)
+            // TODO: Show error in UI
+            return
+        }
+
+        step1Form.classList.remove('active')
+        step2Form.classList.add('active')
+    }
+
+    // STEP-2
+    const step2Form = getDOMElement(dialog, '#pick-and-pay-quotation-confirmation-step-2_form')
+    if (!step2Form) return
+    const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
+    if (!btnSubmitStep2) return
+    CForm.init(step2Form.id)
+
+    step2Form.onsubmit = async (e) => {
+        e.preventDefault()
+        // TODO: Improve animation after quote-order
+        step2Form.classList.remove('active')
+        CDialog.handle(dialogId, 'remove')
+        await delay(1500)
+        location.reload()
+    }
+}
+
+const configQuoteOrderDialog = async (wf, dialogId) => {
+    const { default: CDialog } = await import('@components/dialog.component')
+    const { default: CForm } = await import('@components/form.component')
+
+    const dialog = getDOMElement(document, `#${dialogId}`)
+    if (!dialog) return
+    CDialog.init(dialogId)
 
     // STEP-1
     const step1Form = getDOMElement(dialog, '#quote-order-step-1_form')
@@ -81,7 +162,6 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
     CForm.init(step1Form.id)
 
     const quoteOrderBtns = getDOMElement(document, '[data-quote-order_btn]', 'all')
-    const { default: CDialog } = await import('@components/dialog.component')
     quoteOrderBtns.forEach((quoteOrderBtn) => quoteOrderBtn.onclick = () => {
         CDialog.handle(dialogId, 'add')
         step1Form.classList.add('active')
@@ -169,10 +249,12 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
 }
 
 const configCreateOrderDialog = async (wf, dialogId) => {
+    const { default: CDialog } = await import('@components/dialog.component')
     const { default: CForm } = await import('@components/form.component')
 
     const dialog = getDOMElement(document, `#${dialogId}`)
     if (!dialog) return
+    CDialog.init(dialogId)
 
     // STEP-1
     const step1Form = getDOMElement(dialog, '#create-order-step-1_form')
@@ -182,7 +264,6 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     CForm.init(step1Form.id)
     
     const createOrderBtns = getDOMElement(document, '[data-create-order-dialog_btn]', 'all')
-    const { default: CDialog } = await import('@components/dialog.component')
     createOrderBtns.forEach((createOrderBtn) => createOrderBtn.onclick = () => {
         CDialog.handle('create-order_dialog', 'add')
         step1Form.classList.add('active')
@@ -656,6 +737,91 @@ const getQuoteOrderDialog = async (wf, user: IUser, computedOrders: IOrder[]) =>
     `
 }
 
+const getPickAndPayQuotationDialog = () => {
+    return `
+        <nav id="pick-and-pay-quotation_dialog" class="n-dialog n-d-multistep">
+            <form id="pick-and-pay-quotation-step-1_form">
+                <header>
+                    <button type="button" class="btn btn-xs-inline btn-xs-block" data-close-dialog_btn="pick-and-pay-quotation_dialog">
+                        <picture>
+                            <img src="/img/icon/close.svg" width="20" height="20">
+                        </picture>
+                    </button>
+                    <div class="h-heading">
+                        <h3>Es momento de pagar el envío</h3>
+                        <p>Ingresa los datos de tu tarjeta.</p>
+                    </div>
+                </header>
+                <main>
+                    <div class="card-18">
+                        <p>
+                            <span>Costo de envío</span>
+                            <span id="price"></span>
+                        </p>
+                        <p>
+                            <span>Servicio de compra</span>
+                            <span id="commission"></span>
+                        </p>
+                        <p>
+                            <span>Impuestos</span>
+                            <span id="tax"></span>
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>TOTAL</strong>
+                            <strong id="total"></strong>
+                        </p>
+                    </div>
+                    <div class="card-5">
+                        <picture>
+                            <img src="/img/icon/lock-secondary.svg" widtht="20" height="20">
+                        </picture>
+                        <p>El pago es seguro. La información de tu tarjeta no se comparte con los viajeros.</p>
+                    </div>
+                    <fieldset>
+                        <label for="cc-number">Número de tarjeta</label>
+                        <input type="text" id="cc-number" placeholder="P. ej. 1234 5678 8765 4321" autocomplete="cc-number" required>
+                    </fieldset>
+                    <fieldset class="fs-sm">
+                        <label for="cc-exp">Fecha de vencimiento</label>
+                        <input type="text" id="cc-exp" placeholder="P. ej. 02 / 21" autocomplete="cc-exp" required>
+                    </fieldset>
+                    <fieldset class="fs-sm">
+                        <label for="cc-csc">Código de seguridad <small>(CVV)</small></label>
+                        <input type="text" id="cc-csc" placeholder="P. ej. 1234" autocomplete="cc-csc" required>
+                    </fieldset>
+                    <fieldset>
+                        <label for="cc-name">Nombre que aparece en la tarjeta</label>
+                        <input type="text" id="cc-name" placeholder="P. ej. Carlos Pérez" autocomplete="cc-name" required>
+                    </fieldset>
+                </main>
+                <footer>
+                    <button class="btn btn-primary btn-submit" type="submit">
+                        Pagar <span id="submit-total"></span>
+                    </button>
+                </footer>
+            </form>
+
+            <form id="pick-and-pay-quotation-confirmation-step-2_form">
+                <main>
+                    <div class="card-3">
+                        <picture>
+                            <img src="/img/illustrations/buyer-confirmation.svg" width="158">
+                        </picture>
+                        <div class="h-heading">
+                            <h3>Pago de envío<br>realizado con éxito.</h3>
+                        </div>
+                    </div>
+                </main>
+                <footer>
+                    <button class="btn btn-primary btn-submit" type="submit">Listo</button>
+                </footer>
+            </form>
+            
+        </nav>
+    `
+}
+
 const loader = async (wf) => {
     const { mode, auth } = wf
     const lastUpdate = await getOfflineTimestamp('orders')
@@ -791,8 +957,6 @@ const builder = async (wf) => {
         orders.map((order) => MOrder.compute(wf, wf.mode.Offline, user, order))
     )
 
-    console.log('--- computedOrders =', computedOrders)
-
     const rows = computedOrders.map((computedOrder) => MOrder.toRow(user, computedOrder))
 
     // const allStatus = Object.values(MOrder.EOrderStatus).map((status) => capitalizeString(status))
@@ -811,6 +975,7 @@ const builder = async (wf) => {
         </main>
         ${getCreateOrderDialog()}
         ${await getQuoteOrderDialog(wf, user, computedOrders)}
+        ${getPickAndPayQuotationDialog()}
     `
 
     return {
@@ -823,7 +988,6 @@ const builder = async (wf) => {
 }
 
 const action = async (wf) => {
-    const { default: CDialog } = await import('@components/dialog.component')
     const { default: CTable } = await import('@components/table.component')
     const { default: CCard8 } = await import('@components/card8.component')
     const { getDOMElement } = await import('@helpers/util.helper')
@@ -839,11 +1003,9 @@ const action = async (wf) => {
 
     CCard8.handleAll()
 
-    CDialog.init('create-order_dialog')
     configCreateOrderDialog(wf, 'create-order_dialog')
-
-    CDialog.init('quote-order_dialog')
     configQuoteOrderDialog(wf, 'quote-order_dialog')
+    configPickAndPayQuotationDialog(wf, 'pick-and-pay-quotation_dialog')
 
     // configSelectQuotationInQuotedOrder(wf)
 

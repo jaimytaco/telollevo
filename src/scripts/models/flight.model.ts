@@ -305,7 +305,7 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
     
     return isFormatted === EFormat.Related ?
         flight :
-        format(flight)
+        prettify(flight)
 }
 
 const update = async (wf, mode, flight) => wf.database.update(mode, 'flights', flight)
@@ -331,10 +331,10 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
 
     return isFormatted === EFormat.Related ?
         flights :
-        flights.map(format)
+        flights.map(prettify)
 }
 
-const format = (flight: IFlight) => {
+const prettify = (flight: IFlight) => {
     flight.receiveOrdersSince = formatLocaleDate(flight.receiveOrdersSince)
     flight.receiveOrdersUntil = formatLocaleDate(flight.receiveOrdersUntil)
     flight.deliverOrderAt = formatLocaleDate(flight.deliverOrderAt)
@@ -637,7 +637,7 @@ export default{
     collection: 'flights',
     toRow,
 
-    format,
+    prettify,
     get,
     getAll,
     update,

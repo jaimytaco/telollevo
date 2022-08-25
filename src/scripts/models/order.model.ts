@@ -177,7 +177,7 @@ const toRowExtra_QuotedOrder = (order: IOrder) => {
                                     <span>${quotation.flight.from} <span class="c-tertiary">→</span> ${quotation.flight.to}</span>
                                 </p>
                             </div>
-                            <button class="btn btn-primary" data-select-quotation_btn="q-${quotation.id}">Elegir por ${quotation.priceStr}</button>
+                            <button class="btn btn-primary" data-pick-and-pay-quotation_btn data-quotation_id="${quotation.id}">Elegir por ${quotation.computed.priceStr}</button>
                             <div class="card-15">
                                 <p>
                                     <span>Recibe pedido  ·  ${quotation.flight.receiveOrdersSince} al ${quotation.flight.receiveOrdersUntil}</span>
@@ -333,13 +333,17 @@ const toRow = (user: IUser, order: IOrder) => {
     }
 }
 
-const compute = async (wf, mode, user, order) => {
+const compute = async (wf, mode, user, order: IOrder) => {
     const isOrderQuotable = await isQuotable(wf, mode, user, order)
     const canOrderSelectFlight = await canSelectFlight(wf, mode, order)
     const status = computeStatus(user, order, canOrderSelectFlight)
+    const quotations = await Promise.all(
+        (order.quotations as IQuotation[]).map((quotation) => MQuotation.compute(wf, mode, quotation))
+    )
 
     return {
         ...order,
+        quotations,
         computed: {
             isQuotable: isOrderQuotable,
             canSelectFlight: canOrderSelectFlight,
@@ -448,23 +452,32 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     const orders = responseOrders.data as IOrder[]
     if (isFormatted === EFormat.Raw) return orders
 
-    const quotations = await MQuotation.getAll(wf, mode, isFormatted)
+    // const quotations = await MQuotation.getAll(wf, mode, isFormatted)
 
-    if (quotations?.err) {
-        const { err } = quotations
-        logger(err)
-        return { err }
-    }
+    // if (quotations?.err) {
+    //     const { err } = quotations
+    //     logger(err)
+    //     return { err }
+    // }
 
-    const ordersWithQuotation = orders.map((order) => {
-        order.quotations = quotations
-            .filter((quotation) => quotation.orderId === order.id)
+    // const ordersWithQuotation = orders.map((order) => {
+    //     order.quotations = quotations
+    //         .filter((quotation) => quotation.orderId === order.id)
+    //     return order
+    // })
+
+    const quotationsByOrders = await Promise.all(
+        orders.map((order) => MQuotation.getAllByOrderId(wf, mode, isFormatted, order.id) as IQuotation[])
+    )
+
+    const ordersWithQuotation = orders.map((order, index) => {
+        order.quotations = quotationsByOrders[index]
         return order
     })
 
     return isFormatted === EFormat.Related ?
         ordersWithQuotation :
-        ordersWithQuotation.map(format)
+        ordersWithQuotation.map(prettify)
 }
 
 const get = async (wf, mode, id, isFormatted: EFormat) => {
@@ -479,11 +492,15 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
     const order = responseOrder.data as IOrder
     if (isFormatted === EFormat.Raw) return order
 
-    const orderRelated = await relate(wf, mode, order)
+    const quotations = await MQuotation.getAllByOrderId(wf, mode, isFormatted, order.id)
+    const orderWithQuotations = {
+        ...order,
+        quotations
+    }
 
     return isFormatted === EFormat.Related ?
-        orderRelated :
-        format(orderRelated)
+        orderWithQuotations :
+        prettify(orderWithQuotations)
 }
 
 // TODO: try-catch use-case?
@@ -501,9 +518,9 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
 //     }
 // }
 
-const format = (order: IOrder) => ({
+const prettify = (order: IOrder) => ({
     ...order,
-    quotations: order.quotations.map(MQuotation.format)
+    quotations: order.quotations.map(MQuotation.prettify)
 })
 
 const sanitize = (order: IOrder) => {
@@ -648,7 +665,7 @@ export default {
     EOrderStatus,
     EOrderSorters,
 
-    format,
+    prettify,
     get,
     getAll,
     add,

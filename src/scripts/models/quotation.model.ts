@@ -1,27 +1,35 @@
 import {
     IQuotation,
     EQuotationStatus,
+    EQuotationComissionPercentage,
 } from '@types/quotation.type'
 
 import {
     EFormat,
-    ECoin
+    ECoin,
+    ETax,
 } from '@types/util.type'
 
 import {
     formatLocaleDate,
     hasParameter,
     mergeUUIDs,
+    formatPrice,
 } from '@helpers/util.helper'
 
-import { IFlight } from '@type/flight.type'
+import { IFlight } from '@types/flight.type'
 import MFlight from '@models/flight.model'
 
-import { IOrder } from '@type/order.type'
+import { 
+    IOrder, 
+    EOrderShoppers,
+} from '@types/order.type'
 import MOrder from '@models/order.model'
 
-import { IUser } from '@type/user.type'
+import { IUser } from '@types/user.type'
 import MUser from '@models/user.model'
+
+import ModPayment from '@modules/admin/payment.module'
 
 import { logger } from '@wf/helpers/browser.helper'
 import { removeOfflineTimestamp } from '@wf/lib.worker'
@@ -64,7 +72,7 @@ const getAllByFlightId = async (wf, mode, isFormatted: EFormat, flightId) => {
     return getAll(wf, mode, isFormatted, [byFlight])
 }
 
-const getAllByOrderId = async (wf, mode, isFormatted: EFormat, orderId) => {
+const getAllByOrderId = (wf, mode, isFormatted: EFormat, orderId) => {
     const byOrder = {
         field: 'orderId',
         operator: wf.operator.EqualTo,
@@ -101,28 +109,167 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
     const quotations = responseQuotations.data as IQuotation[]
     if (isFormatted === EFormat.Raw) return quotations
 
-    for (const quotation of quotations) {
-        quotation.flight = await MFlight.get(wf, mode, quotation.flightId, isFormatted) as IFlight
-        quotation.traveler = await MUser.get(wf, mode, quotation.travelerId, isFormatted) as IUser
-    }
+    // for (const quotation of quotations) {
+    //     quotation.flight = await MFlight.get(wf, mode, quotation.flightId, isFormatted) as IFlight
+    //     quotation.traveler = await MUser.get(wf, mode, quotation.travelerId, isFormatted) as IUser
+    // }
+
+    // return isFormatted === EFormat.Related ?
+    //     quotations :
+    //     quotations.map(prettify)
+
+    const quotationsRelated = await Promise.all(
+        quotations.map((quotation) => relate(wf, mode, isFormatted, quotation))
+    )
 
     return isFormatted === EFormat.Related ?
-        quotations :
-        quotations.map(format)
+        quotationsRelated :
+        quotationsRelated.map(prettify)
 }
 
-const format = (quotation: IQuotation) => {
-    quotation.priceStr = `${ECoin[quotation.coin].symbol}${quotation.price.toFixed(2)}`
+const get = async (wf, mode, id, isFormatted: EFormat) => {
+    const { database: db } = wf
+    const responseQuotation = await db.get(mode, 'quotations', id)
+    if (responseQuotation?.err) {
+        const { err } = responseQuotation
+        logger(err)
+        return { err }
+    }
+
+    const quotation = responseQuotation.data as IOrder
+    if (isFormatted === EFormat.Raw) return quotation
+
+    // quotation.flight = await MFlight.get(wf, mode, quotation.flightId, isFormatted) as IFlight
+    // quotation.traveler = await MUser.get(wf, mode, quotation.travelerId, isFormatted) as IUser
+    // return isFormatted === EFormat.Related ?
+    //     quotation :
+    //     prettify(quotation)
+
+    const quotationRelated = await relate(quotation)
+    return isFormatted === EFormat.Related ?
+        quotationRelated :
+        prettify(quotationRelated)
+}
+
+const relate = async (wf, mode, isFormatted: EFormat, quotation: IQuotation) => {
+    const flight = await MFlight.get(wf, mode, quotation.flightId, isFormatted) as IFlight
+    const traveler = await MUser.get(wf, mode, quotation.travelerId, isFormatted) as IUser
+    // const order = await MOrder.get(wf, mode, quotation.orderId, isFormatted) as IOrder
+    return {
+        ...quotation,
+        flight,
+        traveler,
+        // order,
+    } as IQuotation
+}
+
+const prettify = (quotation: IQuotation) => {
+    // quotation.priceStr = formatPrice(ECoin[quotation.coin].symbol, quotation.price)
     quotation.createdAt = formatLocaleDate(quotation.createdAt)
-    if (quotation.flight) quotation.flight = MFlight.format(quotation.flight)
-    if (quotation.traveler) quotation.traveler = MUser.format(quotation.traveler)
+    if (quotation.flight) quotation.flight = MFlight.prettify(quotation.flight)
+    if (quotation.traveler) quotation.traveler = MUser.prettify(quotation.traveler)
+    // if (quotation.order) quotation.order = MOrder.prettify(quotation.order)
     return quotation
 }
 
-const sanitize = (quotation: IQuotation) => {
+const compute = async (wf, mode, quotation: IQuotation) => {
+    const order = await MOrder.get(wf, mode, quotation.orderId, EFormat.Raw) as IOrder
+    const commissionPercentage = (order.shopper === EOrderShoppers.Myself ? 
+        EQuotationComissionPercentage.Myself : 
+        EQuotationComissionPercentage.Bussiness) as number
+    
+    const symbol = ECoin[quotation.coin].symbol
+    const price = quotation.price
+    const commission = quotation.price * commissionPercentage
+    const tax = quotation.price * ETax.Peru
+    const total = quotation.price + commission + tax
 
+    return {
+        ...quotation,
+        computed: {
+            price,
+            commission,
+            tax,
+            total,
+            priceStr: formatPrice(symbol, price),
+            commissionStr: formatPrice(symbol, commission),
+            taxStr: formatPrice(symbol, tax),
+            totalStr: formatPrice(symbol, total),
+        }
+    }
 }
 
+const sanitize = (quotation: IQuotation) => {}
+
+const doPay = async (wf, quotationId) => {
+    // TODO: Payment response logic
+    const paymentResponse = {}
+    if (paymentResponse?.err){
+        logger(paymentResponse.err)
+        return { err: paymentResponse.err }
+    }
+
+    const quotation = await get(wf, wf.mode.Offline, quotationId, EFormat.Raw)
+    const computedQuotation = await compute(wf, wf.mode.Offline, quotation)
+
+    const transactionData = {
+        quotation: {
+            collectionName: 'quotations',
+            datas: [computedQuotation]
+        },
+        fns: {
+            formatDocForDB: (computedQuotationToFormat) => {
+                const { id, ...data } = computedQuotationToFormat
+                return wf.database.formatDocForDB(data)
+            },
+            makePayment: (computedQuotationToPay) => ModPayment.makePayment(computedQuotationToPay)
+        }
+    }
+
+    const onTransaction = async (transaction, transactionData) => {
+        const quotationRef = transactionData.quotation.docRefs[0]
+        const quotationDoc = await transaction.get(quotationRef)
+        const quotation = quotationDoc.data()
+
+        if (!quotationDoc.exists())
+            return Promise.reject({
+                desc: `La cotización con ${quotationRef.id} no existe`
+            })
+
+        if (quotation.status === EQuotationStatus.Payed)
+            return Promise.reject({
+                desc: `La cotización ya tiene el estado ${EQuotationStatus.Payed}`
+            })
+        
+        const data = transactionData.quotation.datas[0]
+        const paymentResponse = await transactionData.fns.makePayment(data)
+        
+        if (paymentResponse?.err)
+            return Promise.reject({
+                desc: `Error en pasarela de pago: ${paymentResponse.err}`
+            })
+
+        const payedQuotation = {
+            ...data,
+            updatedAt: new Date(),
+            status: EQuotationStatus.Payed,
+            payment: paymentResponse
+        }
+
+        const formattedQuotation = transactionData.fns.formatDocForDB(payedQuotation)
+
+        transaction.update(quotationRef, formattedQuotation)
+
+        return {
+            id: quotationRef.id,
+            ...payedQuotation,
+        }
+    }
+
+    return wf.database.customRunWithTransaction(transactionData, onTransaction)
+}
+
+// TODO: Valid payed-status
 const doQuote = async (wf, quotation: IQuotation) => {
     const quotationDetails = await Promise.all([
         MFlight.get(wf, wf.mode.Offline, quotation.flightId, EFormat.Raw),
@@ -171,8 +318,9 @@ const doQuote = async (wf, quotation: IQuotation) => {
 export default {
     collection: 'quotations',
 
-    format,
+    prettify,
     getAll,
+    get,
     add,
     remove,
 
@@ -182,4 +330,6 @@ export default {
     uninstall,
     sanitize,
     doQuote,
+    compute,
+    doPay,
 }
