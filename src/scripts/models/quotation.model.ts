@@ -46,6 +46,22 @@ const uninstall = async (wf) => {
     logger(`Quotations uninstalled successfully`)
 }
 
+const getAllByShopperIdAndOrderId = (wf, mode, isFormatted: EFormat, shopperId, orderId) => {
+    const byShopper = {
+        field: 'shopperId',
+        operator: wf.operator.EQualTo,
+        value: shopperId
+    }
+
+    const byOrder = {
+        field: 'orderId',
+        operator: wf.operator.EQualTo,
+        value: orderId
+    }
+
+    return getAll(wf, mode, isFormatted, [byShopper, byOrder])
+}
+
 const getAllByTravelerIdAndOrderId = (wf, mode, isFormatted: EFormat, travelerId, orderId) => {
     const byTraveler = {
         field: 'travelerId',
@@ -91,6 +107,8 @@ const remove = async (wf, mode, id) => {
         return { err }
     }
 }
+
+const update = async (wf, mode, quotation) => wf.database.update(mode, 'quotations', quotation)
 
 const add = (wf, mode, quotation: IQuotation) => {
     const { database: db } = wf
@@ -199,6 +217,11 @@ const compute = async (wf, mode, quotation: IQuotation) => {
     }
 }
 
+const uncompute = (quotation: IQuotation) => {
+    delete quotation.computed
+    return quotation
+}
+
 const sanitize = (quotation: IQuotation) => {}
 
 const doPay = async (wf, quotationId) => {
@@ -209,13 +232,16 @@ const doPay = async (wf, quotationId) => {
         return { err: paymentResponse.err }
     }
 
-    const quotation = await get(wf, wf.mode.Offline, quotationId, EFormat.Raw)
-    const computedQuotation = await compute(wf, wf.mode.Offline, quotation)
+    const quotationToPay = await get(wf, wf.mode.Offline, quotationId, EFormat.Raw)
+    const computedQuotationToPay = await compute(wf, wf.mode.Offline, quotationToPay)
+
+    const quotations = await getAllByOrderId(wf, wf.mode.Offline, EFormat.Raw, computedQuotationToPay.orderId)
+    const otherQuotations = quotations.filter((quotation) => quotation.id !== computedQuotationToPay.id)
 
     const transactionData = {
         quotation: {
             collectionName: 'quotations',
-            datas: [computedQuotation]
+            datas: [computedQuotationToPay, ...otherQuotations],
         },
         fns: {
             formatDocForDB: (computedQuotationToFormat) => {
@@ -227,16 +253,34 @@ const doPay = async (wf, quotationId) => {
     }
 
     const onTransaction = async (transaction, transactionData) => {
-        const quotationRef = transactionData.quotation.docRefs[0]
-        const quotationDoc = await transaction.get(quotationRef)
-        const quotation = quotationDoc.data()
+        console.log('--- transactionData =', transactionData)
+        const quotationRefs = transactionData.quotation.docRefs
+        const quotationDocs = await Promise.all(
+            quotationRefs.map((quotationRef) => transaction.get(quotationRef))
+        )
+        const quotationDocsThatNotExist = quotationDocs
+            .filter((quotationDoc) => !quotationDoc.exists())
 
-        if (!quotationDoc.exists())
+        if (quotationDocsThatNotExist.length)
             return Promise.reject({
-                desc: `La cotización con ${quotationRef.id} no existe`
+                desc: 'Algunas de las cotizaciones de la orden no existen'
             })
 
-        if (quotation.status === EQuotationStatus.Payed)
+        const quotations = quotationDocs.map((quotationDoc) => quotationDoc.data())
+        const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Payed)
+        
+        console.log('--- payedQuotations =', payedQuotations)
+
+        if (payedQuotations.length)
+            return Promise.reject({
+                desc: 'No se puede pagar esta cotización porque la orden ya ha sido pagada'
+            })
+        
+        
+        const quotationToPay = quotations[0]
+        console.log('--- quotationToPay =', quotationToPay)
+
+        if (quotationToPay.status === EQuotationStatus.Payed)
             return Promise.reject({
                 desc: `La cotización ya tiene el estado ${EQuotationStatus.Payed}`
             })
@@ -258,10 +302,10 @@ const doPay = async (wf, quotationId) => {
 
         const formattedQuotation = transactionData.fns.formatDocForDB(payedQuotation)
 
-        transaction.update(quotationRef, formattedQuotation)
+        transaction.update(quotationRefs[0], formattedQuotation)
 
         return {
-            id: quotationRef.id,
+            id: quotationRefs[0].id,
             ...payedQuotation,
         }
     }
@@ -321,15 +365,18 @@ export default {
     prettify,
     getAll,
     get,
+    update,
     add,
     remove,
 
     getAllByOrderId,
     getAllByFlightId,
+    getAllByShopperIdAndOrderId,
     getAllByTravelerIdAndOrderId,
     uninstall,
     sanitize,
     doQuote,
     compute,
+    uncompute,
     doPay,
 }

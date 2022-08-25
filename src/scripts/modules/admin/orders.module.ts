@@ -124,6 +124,10 @@ const configPickAndPayQuotationDialog = async (wf, dialogId) => {
             // TODO: Show error in UI
             return
         }
+        
+        const payedQuotation = MQuotation.uncompute(payedQuotationResponse.data)
+        console.log('--- payedQuotation =', payedQuotation)
+        await MQuotation.update(wf, wf.mode.Offline, payedQuotation)
 
         step1Form.classList.remove('active')
         step2Form.classList.add('active')
@@ -667,7 +671,7 @@ const getCreateOrderDialog = () => `
 
 const getQuoteOrderDialog = async (wf, user: IUser, computedOrders: IOrder[]) => {
     if (user.type !== EUserType.Traveler) return ''
-    const quotableOrders = computedOrders.filter((computedOrder) => computedOrder.computed.isQuotable)
+    const quotableOrders = computedOrders.filter((computedOrder) => computedOrder.computed.isQuotableByTraveler)
     if (!quotableOrders.length) return ''
     const flights = await MFlight.getAllByTravelerId(wf, wf.mode.Offline, EFormat.Raw, user.id) as IFlight[]
     return `

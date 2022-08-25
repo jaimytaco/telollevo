@@ -310,7 +310,6 @@ const get = async (wf, mode, id, isFormatted: EFormat) => {
 
 const update = async (wf, mode, flight) => wf.database.update(mode, 'flights', flight)
 
-
 const add = (wf, mode, flight: IFlight) => {
     const { database: db } = wf
     return db.add(mode, 'flights', flight)
