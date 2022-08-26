@@ -1,0 +1,23 @@
+body > .loader{
+    position: fixed;
+    top: 0;
+    left: 0;
+    inline-size: 100vw;
+    block-size: 100vh;
+    color: var(--font-color-primary);
+    background: var(--bg-color-body);
+    opacity: 1;
+    visibility: visible;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body[data-is-loaded] > .loader,
+body.data-is-loaded > .loader{
+    opacity: 0;
+    visibility: hidden;
+    z-index: -1;
+    transition: all .3s ease;
+}
