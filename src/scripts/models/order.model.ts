@@ -141,14 +141,14 @@ const toRowExtra_RegisteredOrder = (order: IOrder) => {
                         </div>
                     </div>
                     ${order.comments.length ? `
-                            <div class="card-5">
-                                <p>
-                                    <strong>Mensaje del comprador:</strong>
-                                    <br>
-                                    ${order.comments}
-                                </p>
-                            </div>
-                        ` : ''
+                        <div class="card-5">
+                            <p>
+                                <strong>Mensaje del comprador:</strong>
+                                <br>
+                                ${order.comments}
+                            </p>
+                        </div>
+                    ` : ''
         }
                 </div>
                 ${toProductDetails(order)}
@@ -206,6 +206,59 @@ const toRowExtra_QuotedOrder = (order: IOrder) => {
     `
 }
 
+const toRowExtra_PaidOrder = (order: IOrder) => {
+    return `
+        <div id="te-${order.id}" class="t-r-extra">
+            <div class="card-4">
+                <div class="card-5 c-5-bordered">
+                    <picture>
+                        <img src="/img/icon/alert-secondary.svg" widtht="20" height="20">
+                    </picture>
+                    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </div>
+                <div class="card-6">
+                    <h6>Detalles del envío</h6>
+                    <div class="card-7-group">
+                        <div class="card-7">
+                            <p>
+                                ${MUser.getFullName(order.computed.pickedTraveler)}  ·  <span>Esperando pedido</span>
+                            </p>
+                        </div>
+                        <div class="card-15">
+                            <p>
+                                <span>Recibe pedido  ·  ${order.computed.pickedFlight.receiveOrdersSince} al ${order.computed.pickedFlight.receiveOrdersUntil}</span>
+                                <span>Entrega pedido  ·  ${order.computed.pickedFlight.deliverOrderAt}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-8 card-7-group" data-heading="Más detalles">
+                    <div class="card-7">
+                        <picture>
+                            <img src="/img/icon/package.svg" width="18" height="18">
+                        </picture>
+                        <p>El alojamiento es un ${order.computed.pickedFlight.shippingDestination} con dirección ${order.computed.pickedFlight.housing.address}, ${order.computed.pickedFlight.housing.place.district}, ${order.computed.pickedFlight.housing.place.city}, ${order.computed.pickedFlight.housing.place.state} - ${order.computed.pickedFlight.housing.place.country} ${order.computed.pickedFlight.housing.place.zipcode}</p>
+                    </div>
+                    <div class="card-7">
+                        <picture>
+                            <img src="/img/icon/package.svg" width="18" height="18">
+                        </picture>
+                        <p>El pedido será recepcionado por ${order.computed.pickedFlight.receiver.name} - ${order.computed.pickedFlight.receiver.phone}</p>
+                    </div>
+                    <div class="card-7">
+                        <picture>
+                            <img src="/img/icon/package.svg" width="18" height="18">
+                        </picture>
+                        <p>La entrega será en ${order.computed.pickedFlight.shippingDestination}</p>
+                        </div>
+                    <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn="">Ver más detalles</button>
+                    <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-close" data-c-8_btn="">Ocultar más detalles</button>
+                </div>
+            </div>
+        </div>
+    `
+}
+
 const toRowExtra = (user: IUser, order: IOrder) => {
     switch (order.computed.status) {
         case EOrderStatus.Registered:
@@ -215,7 +268,7 @@ const toRowExtra = (user: IUser, order: IOrder) => {
                 return toRowExtra_QuotedOrder(order)
             return toRowExtra_RegisteredOrder(order)
         case EOrderStatus.Paid:
-            return toRowExtra_RegisteredOrder(order)
+            return toRowExtra_PaidOrder(order)
         default:
             return ''
     }
@@ -337,6 +390,20 @@ const toRow = (user: IUser, order: IOrder) => {
     }
 }
 
+const toPaid = async (wf, payedQuotation: IQuotation) => {
+    const order = await get(wf, wf.mode.Network, payedQuotation.orderId, EFormat.Raw)
+    order.updatedAt = new Date()
+    order.status = EOrderStatus.Paid
+    order.pickedFlightId = payedQuotation.flightId
+    order.pickedTravelerId = payedQuotation.travelerId
+    order.pickedQuotationId = payedQuotation.id
+
+    await Promise.all([
+        update(wf, wf.mode.Network, order),
+        update(wf, wf.mode.Offline, order)
+    ])
+}
+
 const compute = async (wf, mode, user, order: IOrder) => {
     const canOrderSelectFlight = await canSelectFlight(wf, mode, order)
     const status = computeStatus(user, order, canOrderSelectFlight)
@@ -344,11 +411,19 @@ const compute = async (wf, mode, user, order: IOrder) => {
         (order.quotations as IQuotation[]).map((quotation) => MQuotation.compute(wf, mode, quotation))
     )
 
+    const pickedFlight = status === EOrderStatus.Paid ? 
+        await MFlight.get(wf, mode, order.pickedFlightId, EFormat.Pretty) : null
+    
+    const pickedTraveler = status === EOrderStatus.Paid ? 
+        await MUser.get(wf, mode, order.pickedTravelerId, EFormat.Pretty) : null
+
     return {
         ...order,
         quotations,
         computed: {
             status,
+            pickedFlight,
+            pickedTraveler,
         }
     }
 }
@@ -373,12 +448,6 @@ const canSelectFlight = async (wf, mode, order: IOrder) => {
 
     return getMinSelectedFlightsToSelectFlight() <= selectedFlights.length
 }
-
-// const isPaid = async (wf, mode, user: IUser, order: IOrder) => {
-//     const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id)
-//     const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Paid)
-//     return !!payedQuotations.length
-// }
 
 const isQuotableByTraveler = async (wf, mode, user: IUser, order: IOrder) => {
     if (user.type !== EUserType.Traveler) return false
@@ -740,4 +809,5 @@ export default {
     uninstall,
     compute,
     toQuoted,
+    toPaid,
 }

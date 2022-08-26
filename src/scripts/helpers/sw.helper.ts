@@ -76,3 +76,9 @@ export const routes = [
     '/404',
     '/admin/layout'
 ]
+
+export enum ESWStatus{
+    Claimed = 'claimed',
+    ContentReady = 'content-ready',
+    Unregister = 'unregister',
+}

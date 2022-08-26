@@ -4,6 +4,7 @@ import {
     scripts,
     styles,
     routes,
+    ESWStatus,
 } from '@helpers/sw.helper'
 
 import ModLogin from '@modules/login.module'
@@ -34,13 +35,13 @@ export const app = {
             loader: ModAdminOrders.loader,
             withAuth: true,
         },
-        // '/admin/flights': {
-        //     code: 'admin-flights',
-        //     pattern: '/admin/flights{/}?',
-        //     builder: ModAdminFlights.builder,
-        //     loader: ModAdminFlights.loader,
-        //     withAuth: true,
-        // }
+        '/admin/flights': {
+            code: 'admin-flights',
+            pattern: '/admin/flights{/}?',
+            builder: ModAdminFlights.builder,
+            loader: ModAdminFlights.loader,
+            withAuth: true,
+        }
     },
     models: [
         MOrder.collection,
@@ -52,8 +53,36 @@ export const app = {
 
 export const initApp = async () => {
     const { SW_VERSION } = await import('@scripts/workers/sw.worker') // Hack to generate sw.worker.js file
-    const { registerSW } = await import('@wf/actors/pwa.actor')
+    const { delay } = await import('@helpers/util.helper')
+    const { 
+        registerSW, 
+        subscribeToSWMessage, 
+        getSWState,
+        supportsSW,
+    } = await import('@wf/actors/pwa.actor')
+
+    if (!supportsSW()){
+        // TODO: Show error message
+        // TODO: Consider client-side rendering
+        return
+    }
+
+    const swState = getSWState()
+    
     registerSW()
+
+    subscribeToSWMessage(async (msg) => {
+        if (!swState && msg === ESWStatus.ContentReady){
+            // TODO: Consider animation pre-reload
+            location.reload()
+            return
+        }
+
+        if (swState && msg === ESWStatus.Claimed){
+            await delay(1500) // TODO: Check a way to detect claimed after user-installing
+            // TODO: Show pop-up for new version of SW
+        }
+    })
 
     const { 
         registerApp,

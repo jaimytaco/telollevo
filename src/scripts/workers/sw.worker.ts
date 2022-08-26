@@ -1,6 +1,7 @@
 import { app } from '@helpers/app.helper'
 import { CREDENTIALS } from '@helpers/database.helper'
 import { delay } from '@helpers/util.helper'
+import { ESWStatus } from '@helpers/sw.helper'
 
 import {
     registerNetworkDB,
@@ -36,7 +37,8 @@ import MOrder from '@models/order.model'
 import MFlight from '@models/flight.model'
 import MQuotation from '@models/quotation.model'
 
-// let userCredential
+import ModAuth from '@modules/admin/auth.module'
+
 
 const prefetchRoutes = (routes) => Promise.all(
     Object.keys(routes)
@@ -67,7 +69,6 @@ const installHdlr = (e) => {
         await cacheStatic(e, CACHE_NAME, app.routes.static)
 
         wf.auth.onAuthStateChanged(async (credential) => {
-            // userCredential = credential
             const msg = credential ? 'User logged in:' : 'User logged out'
             logger(msg, credential)
 
@@ -85,11 +86,11 @@ const installHdlr = (e) => {
                 unprefetchRoutes(app.routes)
             }
 
-            skipWaiting()
+            sendMessage({ msg: ESWStatus.ContentReady })
         })
 
         logger(`Installed SW (v.${SW_VERSION})`)
-        // skipWaiting()
+        skipWaiting()
     }
 
     e.waitUntil(fn())
@@ -106,6 +107,8 @@ const activateHdlr = async (e) => {
         logger(`Claiming clients SW (v.${SW_VERSION})`)
         await clients.claim()
         logger(`Claimed clients SW (v.${SW_VERSION})`)
+
+        sendMessage({ msg: ESWStatus.Claimed })
     }
 
     e.waitUntil(fn())
@@ -172,14 +175,17 @@ const fetchHdlr = (e) => {
         if (destination === 'document') {
             const url = new URL(request.url)
             const { pathname } = url
-            if (pathname.endsWith('/')){
+            if (pathname !== '/' && pathname.endsWith('/')){
                 logger('Redirecting to same pathname without /')
                 return Response.redirect(pathname.slice(0, -1))
             }
 
-            const currentUserCredential = await wf.auth.getCurrentUser()
-            logger(`Verifing user authentication:${currentUserCredential ? '' : ' None'}`, currentUserCredential)
-            // const redirectForAuth = !userCredential && app.routes[pathname]?.withAuth
+            const currentUserCredential = await ModAuth.getUserAuthenticated(wf)
+            if (currentUserCredential?.err){
+                sendMessage({ msg: 'unregister-sw' })
+                return
+            }
+            
             const redirectForAuth = !currentUserCredential && app.routes[pathname]?.withAuth
             
             if (redirectForAuth){
@@ -215,7 +221,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 717
+export const SW_VERSION = 742
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000

@@ -224,7 +224,7 @@ const uncompute = (quotation: IQuotation) => {
 
 const sanitize = (quotation: IQuotation) => {}
 
-const doPay = async (wf, quotationId) => {
+const toPaid = async (wf, quotationId) => {
     // TODO: Payment response logic
     const paymentResponse = {}
     if (paymentResponse?.err){
@@ -309,7 +309,7 @@ const doPay = async (wf, quotationId) => {
 }
 
 // TODO: Valid payed-status
-const doQuote = async (wf, quotation: IQuotation) => {
+const toQuoted = async (wf, quotation: IQuotation) => {
     const quotationDetails = await Promise.all([
         MFlight.get(wf, wf.mode.Offline, quotation.flightId, EFormat.Raw),
         MOrder.get(wf, wf.mode.Offline, quotation.orderId, EFormat.Raw),
@@ -370,8 +370,8 @@ export default {
     getAllByTravelerIdAndOrderId,
     uninstall,
     sanitize,
-    doQuote,
+    toQuoted,
     compute,
     uncompute,
-    doPay,
+    toPaid,
 }

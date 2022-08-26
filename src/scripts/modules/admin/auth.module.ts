@@ -10,10 +10,17 @@ import MUser from '@models/user.model'
 
 import { EFormat } from '@types/util.type'
 
-const getUserCredentials = (wf) => wf.auth.getCurrentUser()
+const getUserCredentials = (wf) => {
+    if (!wf) return { err: 'wf not working' }
+    if (!wf.auth) return { err: 'wf.auth not working' }
+    if (!wf.auth.getCurrentUser) return { err: 'wf.auth.getCurrentUser not working' }
+    return wf.auth.getCurrentUser()
+}
 
 const getUserAuthenticated = async (wf) => {
     const userCredentials = await getUserCredentials(wf)
+    if (userCredentials?.err) return userCredentials
+    logger(`Verifing user authentication:${userCredentials ? '' : ' None'}`, userCredentials)
     return userCredentials ? await MUser.get(wf, wf.mode.Offline, userCredentials.uid) : null
 }
 
@@ -45,7 +52,6 @@ const configSignIn = async (wf) => {
 }
 
 const configSignOut = async (wf) => {
-    const { getDOMElement } = await import('@helpers/util.helper')
     const signOutBtn = getDOMElement(document, '[data-sign-out_btn]')
     if (signOutBtn)
         signOutBtn.onclick = async (e) => {

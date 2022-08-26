@@ -484,7 +484,6 @@ const builder = async (wf) => {
         return emptyContent
     }
 
-
     const flights = await MFlight.getAll(wf, wf.mode.Offline, EFormat.Pretty) as IFlight[]
     if (flights?.err) {
         logger(flights.err)

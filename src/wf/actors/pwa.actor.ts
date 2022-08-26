@@ -1,6 +1,17 @@
 import {
     isBrowser,
+    logger,
+    subscribeToServiceWorkerMessage,
+    getServiceWorkerState,
+    supportsServiceWorker,
 } from '@wf/helpers/browser.helper'
+
+
+export const supportsSW = supportsServiceWorker
+
+export const getSWState = getServiceWorkerState
+
+export const subscribeToSWMessage = subscribeToServiceWorkerMessage
 
 // Taken from https://stackoverflow.com/questions/37573482/to-check-if-serviceworker-is-in-waiting-state
 export const registerSW = async () => {
@@ -20,13 +31,15 @@ export const registerSW = async () => {
             }
         )
 
-        // navigator.serviceWorker.addEventListener('message', ({ data }) => {
-        //     const message = data.msg
-        //     if (message === 'START_PREFETCH'){
-        //         const keys = Object.keys(ui)
-        //         keys.map((key) => fetch(ui[key].pathname))
-        //     }
-        // })
+        subscribeToSWMessage(async (msg) => {
+            if (msg === 'unregister-sw'){
+                if (!registration) return
+                logger('Unregistering ServiceWorker')
+                await registration.unregister()
+                logger('ServiceWorker unregistered successfully')
+                location.reload()
+            }
+        })
 
         if (registration.waiting && registration.active) {
             // The page has been loaded when there's already a waiting and active SW.
@@ -62,6 +75,7 @@ export const registerSW = async () => {
     }
 }
 
-export const APWA = {
-    registerSW
-}
+// export const APWA = {
+//     registerSW,
+//     subscribeToSWMessage,
+// }

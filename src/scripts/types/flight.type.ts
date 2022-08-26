@@ -100,6 +100,7 @@ export enum ESanitizeFlightErrors{
 export enum EFlightStatus{
     Registered = 'registrado',
     Visible = 'visible',
+    Picked = 'con pedidos', // will be computed
 }
 
 export interface IFlight{

@@ -218,11 +218,11 @@ const toRow = (user: IUser, flight: IFlight) => {
     }
 }
 
-const getAllByUserAuthenticated = async (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
+const getAllByUserAuthenticated = (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
     if (user.type === EUserType.Admin)
         return getAllWithQuotations(wf, mode, isFormatted, date)
 
-    if ([EUserType.Traveler, EUserType.Multiple].includes(user.type))
+    if (user.type === EUserType.Traveler)
         return getAllByTravelerId(wf, mode, isFormatted, user.id, date)
 
     if (user.type === EUserType.Shopper)

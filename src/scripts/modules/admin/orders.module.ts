@@ -118,7 +118,7 @@ const configPickAndPayQuotationDialog = async (wf, dialogId) => {
 
         const quotationId = btnSubmitStep1.getAttribute('data-quotation_id')
         // TODO: Show loading in UI
-        const payedQuotationResponse = await MQuotation.doPay(wf, quotationId)
+        const payedQuotationResponse = await MQuotation.toPaid(wf, quotationId)
         if (payedQuotationResponse?.err){
             logger(payedQuotationResponse.err.desc)
             // TODO: Show error in UI
@@ -127,16 +127,8 @@ const configPickAndPayQuotationDialog = async (wf, dialogId) => {
 
         const payedQuotation = MQuotation.uncompute(payedQuotationResponse.data)
         await MQuotation.update(wf, wf.mode.Offline, payedQuotation)
-        
-        const order = await MOrder.get(wf, wf.mode.Network, payedQuotation.orderId, EFormat.Raw)
-        order.updatedAt = new Date()
-        order.status = EOrderStatus.Paid
-        order.pickedTravelerId = payedQuotation.travelerId
-        order.pickedQuotationId = payedQuotation.id
 
-        await MOrder.update(wf, wf.mode.Network, order)
-        await MOrder.update(wf, wf.mode.Offline, order)
-
+        await MOrder.toPaid(wf, payedQuotation)
 
         step1Form.classList.remove('active')
         step2Form.classList.add('active')
@@ -960,7 +952,8 @@ const builder = async (wf) => {
         return emptyContent
     }
     
-    const orders = await MOrder.getAll(wf, wf.mode.Offline, EFormat.Pretty) as IOrder[]
+    // const orders = await MOrder.getAll(wf, wf.mode.Offline, EFormat.Pretty) as IOrder[]
+    const orders = await MOrder.getAllByUserAuthenticated(wf, wf.mode.Offline, EFormat.Pretty, user)
 
     const computedOrders = await Promise.all(
         orders.map((order) => MOrder.compute(wf, wf.mode.Offline, user, order))

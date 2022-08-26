@@ -45,9 +45,11 @@ export const supportsIndexedDB = () => isServiceWorker() || isBrowser() ? !!inde
 
 export const getIndexedDBDatabases: Promise<IIndexedDBDatabase[]> = () => (indexedDB as IIndexedDB).databases()
 
-export const getServiceWorkerContainer = () => navigator.serviceWorker
+export const supportsServiceWorker = () => !!navigator.serviceWorker
 
-export const isServiceWorkerRunning = () => navigator.serviceWorker.controller?.state
+export const getServiceWorkerState = () => navigator.serviceWorker.controller?.state
+
+export const subscribeToServiceWorkerMessage = (callback) => navigator.serviceWorker.addEventListener('message', ({ data }) => callback(data.msg))
 
 export const getWorkerPath = (fn: string) => {
     const { DEV } = import.meta.env
