@@ -130,6 +130,7 @@ export const buildRouteResponse = async ({ routes, url, cacheName }) => {
 
 const getLayoutPathname = () => '/admin/layout'
 
+export const getLoaderTag = () => 'data-is-loaded'
 export const getTitleTag = () => '[TITLE]'
 export const getMetaTag = () => '<!-- [META] -->'
 export const getBodyTag = () => '<!-- [BODY] -->'

@@ -3,11 +3,13 @@ import AdminLayout from '@layouts/AdminLayout.astro'
 import {
     getTitleTag,
     getMetaTag,
-    getBodyTag
+    getBodyTag,
+    getLoaderTag,
 } from '@wf/lib.worker'
 ---
 
 <AdminLayout 
+    loader={getLoaderTag()}
     title={getTitleTag()} 
     meta={getMetaTag()} 
     body={getBodyTag()}>

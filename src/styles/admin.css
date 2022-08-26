@@ -2,6 +2,9 @@
 @import './admin/font.css';
 @import './admin/global.css';
 @import './admin/button.css';
+
+@import './loader.css';
+
 @import './admin/table.css';
 @import './admin/cards.css';
 @import './admin/card-18.css';

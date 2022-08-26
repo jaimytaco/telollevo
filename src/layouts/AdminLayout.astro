@@ -5,10 +5,11 @@ interface IProps {
 	title: string,
     meta: string,
     body: string,
-    path: string
+    page: string,
+    loader: string,
 }
 
-const { title, meta, body, page } = Astro.props as IProps
+const { title, meta, body, page, loader } = Astro.props as IProps
 ---
 
 <html lang="es">
@@ -21,7 +22,11 @@ const { title, meta, body, page } = Astro.props as IProps
     <title>{title}</title>
     <Fragment set:html={meta}>
 </head>
-<body data-page={page}>
+<body class={loader} data-page={page}>
+    <div class="loader">
+        <p>Loading...</p>
+    </div>
+
     <Fragment set:html={body}>
     
     <script>

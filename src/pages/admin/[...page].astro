@@ -38,6 +38,7 @@ const { content, err } = await AUI.getViewContent(wf, app.routes, `/admin/${page
 ---
 
 <AdminLayout 
+    loader={''}
     title={err ? '' : content.head.title} 
     meta={err ? '' : content.head.meta} 
     body={err ? '' : content.body}
