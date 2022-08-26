@@ -42,7 +42,7 @@ export enum ESanitizeOrderErrors{
 export enum EOrderStatus{
     Registered = 'registrado',
     Quoted = 'cotizado', // will be computed
-    Payed = 'pagado',
+    Paid = 'pagado',
     Assigned = 'con viajero asignado',
     WithPurchaseOrder = 'con orden de compra',
     WithTrackingCode = 'con código de seguimiento',
@@ -91,11 +91,12 @@ export interface IOrder{
     shopper: EOrderShoppers,
     comments: string,
     shopperId: string,
-    travelerId: string,
+    // travelerId: string,
     createdAt: Date,
     updatedAt: Date,
 
     quotations?: IQuotation[],
-
     computed?: T,
+    pickedTravelerId?: string,
+    pickedQuotationId?: string,
 }

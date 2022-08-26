@@ -266,7 +266,7 @@ const doPay = async (wf, quotationId) => {
             })
 
         const quotations = quotationDocs.map((quotationDoc) => quotationDoc.data())
-        const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Payed)
+        const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Paid)
         
         if (payedQuotations.length)
             return Promise.reject({
@@ -275,9 +275,9 @@ const doPay = async (wf, quotationId) => {
         
         const quotationToPay = quotations[0]
 
-        if (quotationToPay.status === EQuotationStatus.Payed)
+        if (quotationToPay.status === EQuotationStatus.Paid)
             return Promise.reject({
-                desc: `La cotización ya tiene el estado ${EQuotationStatus.Payed}`
+                desc: `La cotización ya tiene el estado ${EQuotationStatus.Paid}`
             })
         
         const data = transactionData.quotation.datas[0]
@@ -291,7 +291,7 @@ const doPay = async (wf, quotationId) => {
         const payedQuotation = {
             ...data,
             updatedAt: new Date(),
-            status: EQuotationStatus.Payed,
+            status: EQuotationStatus.Paid,
             payment: paymentResponse
         }
 

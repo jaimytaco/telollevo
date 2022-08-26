@@ -214,7 +214,7 @@ const toRowExtra = (user: IUser, order: IOrder) => {
             if (user.type === EUserType.Shopper) 
                 return toRowExtra_QuotedOrder(order)
             return toRowExtra_RegisteredOrder(order)
-        case EOrderStatus.Payed:
+        case EOrderStatus.Paid:
             return toRowExtra_RegisteredOrder(order)
         default:
             return ''
@@ -306,7 +306,7 @@ const toRowActions = (user: IUser, order: IOrder) => {
             return toRowActions_RegisteredOrder(order)
         case EOrderStatus.Quoted:
             return toRowActions_QuotedOrder(user, order)
-        case EOrderStatus.Payed:
+        case EOrderStatus.Paid:
             return toRowActions_RegisteredOrder(order)
         default:
             return ''
@@ -364,7 +364,7 @@ const getAllTravelerIdsWhoQuoted = (order: IOrder) => order.quotations.map((quot
 const getMinSelectedFlightsToSelectFlight = () => 1
 
 const canSelectFlight = async (wf, mode, order: IOrder) => {
-    if (order.status === EOrderStatus.Payed) return false
+    if (order.status === EOrderStatus.Paid) return false
 
     const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id)
     const flightIds = quotations.map((quotation) => quotation.flightId)
@@ -374,9 +374,9 @@ const canSelectFlight = async (wf, mode, order: IOrder) => {
     return getMinSelectedFlightsToSelectFlight() <= selectedFlights.length
 }
 
-// const isPayed = async (wf, mode, user: IUser, order: IOrder) => {
+// const isPaid = async (wf, mode, user: IUser, order: IOrder) => {
 //     const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id)
-//     const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Payed)
+//     const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Paid)
 //     return !!payedQuotations.length
 // }
 
@@ -386,15 +386,64 @@ const isQuotableByTraveler = async (wf, mode, user: IUser, order: IOrder) => {
     return !quotations.length
 }
 
-const getAllByUserAuthenticated = (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
-    if (user.type === EUserType.Traveler)
-        return getAll(wf, mode, isFormatted)
+const getAllByUserAuthenticated = async (wf, mode, isFormatted: EFormat, user: IUser, date?) => {
+    if (user.type === EUserType.Traveler){        
+        const registeredOrders = await getAllByStatus(wf, mode, isFormatted, EOrderStatus.Registered, date)
+        const paidOrders = await getAllPaidWithTravelerPicked(wf, mode, isFormatted, user.id, date)
+        return [...registeredOrders, ...paidOrders]
+    }
 
     if (user.type === EUserType.Admin)
         return getAll(wf, mode, isFormatted)
 
     if (user.type === EUserType.Shopper)
         return getAllByShopperId(wf, mode, isFormatted, user.id, date)
+}
+
+const getAllPaidWithTravelerPicked = (wf, mode, isFormatted: EFormat, travelerId, date?) => {
+    const byStatus = {
+        field: 'status',
+        operator: wf.operator.EqualTo,
+        value: EOrderStatus.Paid
+    }
+
+    const byTraveler = {
+        field: 'pickedTravelerId',
+        operator: wf.operator.EqualTo,
+        value: travelerId
+    }
+
+    const byRecent = {
+        field: 'updatedAt',
+        operator: wf.operator.GreaterThanOrEqualTo,
+        value: date
+    }
+
+    const filters = date ?
+        [byStatus, byTraveler, byRecent] :
+        [byStatus, byTraveler]
+
+    return getAll(wf, mode, isFormatted, filters)
+}
+
+const getAllByStatus = (wf, mode, isFormatted: EFormat, status: EOrderStatus, date?) => {
+    const byStatus = {
+        field: 'status',
+        operator: wf.operator.EqualTo,
+        value: status
+    }
+
+    const byRecent = {
+        field: 'updatedAt',
+        operator: wf.operator.GreaterThanOrEqualTo,
+        value: date
+    }
+
+    const filters = date ?
+        [byStatus, byRecent] :
+        [byStatus]
+
+    return getAll(wf, mode, isFormatted, filters)
 }
 
 const getAllByShopperId = (wf, mode, isFormatted: EFormat, shopperId, date?) => {

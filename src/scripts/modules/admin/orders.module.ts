@@ -130,7 +130,10 @@ const configPickAndPayQuotationDialog = async (wf, dialogId) => {
         
         const order = await MOrder.get(wf, wf.mode.Network, payedQuotation.orderId, EFormat.Raw)
         order.updatedAt = new Date()
-        order.status = EOrderStatus.Payed
+        order.status = EOrderStatus.Paid
+        order.pickedTravelerId = payedQuotation.travelerId
+        order.pickedQuotationId = payedQuotation.id
+
         await MOrder.update(wf, wf.mode.Network, order)
         await MOrder.update(wf, wf.mode.Offline, order)
 
@@ -956,19 +959,12 @@ const builder = async (wf) => {
         logger('Builder for admin-orders needs user authentication')
         return emptyContent
     }
-
+    
     const orders = await MOrder.getAll(wf, wf.mode.Offline, EFormat.Pretty) as IOrder[]
-    // const orders = await MOrder.getAllByUserAuthenticated(wf, wf.mode.Offline, EFormat.Pretty, user) as IOrder[]
-    if (orders?.err) {
-        logger(orders.err)
-        return { err: orders.err }
-    }
 
     const computedOrders = await Promise.all(
         orders.map((order) => MOrder.compute(wf, wf.mode.Offline, user, order))
     )
-
-    console.log('--- computedOrders =', computedOrders)
 
     const rows = computedOrders.map((computedOrder) => MOrder.toRow(user, computedOrder))
 

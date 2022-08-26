@@ -34,13 +34,13 @@ export const app = {
             loader: ModAdminOrders.loader,
             withAuth: true,
         },
-        '/admin/flights': {
-            code: 'admin-flights',
-            pattern: '/admin/flights{/}?',
-            builder: ModAdminFlights.builder,
-            loader: ModAdminFlights.loader,
-            withAuth: true,
-        }
+        // '/admin/flights': {
+        //     code: 'admin-flights',
+        //     pattern: '/admin/flights{/}?',
+        //     builder: ModAdminFlights.builder,
+        //     loader: ModAdminFlights.loader,
+        //     withAuth: true,
+        // }
     },
     models: [
         MOrder.collection,

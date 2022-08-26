@@ -9,7 +9,7 @@ export enum EQuotationComissionPercentage{
 export enum EQuotationStatus{
     Registered = 'registrado',
     // Selected = 'seleccionado', // TODO: If it is neccesary
-    Payed = 'pagado',
+    Paid = 'pagado',
 }
 
 export interface IQuotation{
