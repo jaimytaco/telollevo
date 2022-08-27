@@ -264,9 +264,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     // STEP-1
     const step1Form = getDOMElement(dialog, '#create-order-step-1_form')
     if (!step1Form) return
-    const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
-    if (!btnSubmitStep1) return
-    CForm.init(step1Form.id)
+    // const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
+    // if (!btnSubmitStep1) return
     
     const createOrderBtns = getDOMElement(document, '[data-create-order-dialog_btn]', 'all')
     createOrderBtns.forEach((createOrderBtn) => createOrderBtn.onclick = () => {
@@ -274,13 +273,9 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         step1Form.classList.add('active')
     })
 
-    // TODO: use order local object?
-    const order = {}
+    CForm.init(step1Form.id)
 
-    btnSubmitStep1.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step1Form)
-    }
+    const order = {}
 
     step1Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -341,14 +336,14 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     // STEP-2
     const step2Form = getDOMElement(dialog, '#create-order-step-2_form')
     if (!step2Form) return
-    const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
-    if (!btnSubmitStep2) return
+    // const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
+    // if (!btnSubmitStep2) return
     CForm.init(step2Form.id)
 
-    btnSubmitStep2.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step2Form)
-    }
+    // btnSubmitStep2.onclick = (e) => {
+    //     e.preventDefault()
+    //     CForm.validateBeforeSubmit(step2Form)
+    // }
 
     step2Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -396,14 +391,14 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     // STEP-3
     const step3Form = getDOMElement(dialog, '#create-order-step-3_form')
     if (!step3Form) return
-    const btnSubmitStep3 = getDOMElement(step3Form, 'button[type="submit"]')
-    if (!btnSubmitStep3) return
+    // const btnSubmitStep3 = getDOMElement(step3Form, 'button[type="submit"]')
+    // if (!btnSubmitStep3) return
     CForm.init(step3Form.id)
 
-    btnSubmitStep3.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step3Form)
-    }
+    // btnSubmitStep3.onclick = (e) => {
+    //     e.preventDefault()
+    //     CForm.validateBeforeSubmit(step3Form)
+    // }
 
     step3Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -424,14 +419,14 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     // STEP-4
     const step4Form = getDOMElement(dialog, '#create-order-step-4_form')
     if (!step4Form) return
-    const btnSubmitStep4 = getDOMElement(step4Form, 'button[type="submit"]')
-    if (!btnSubmitStep4) return
+    // const btnSubmitStep4 = getDOMElement(step4Form, 'button[type="submit"]')
+    // if (!btnSubmitStep4) return
     CForm.init(step4Form.id)
 
-    btnSubmitStep4.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step4Form)
-    }
+    // btnSubmitStep4.onclick = (e) => {
+    //     e.preventDefault()
+    //     CForm.validateBeforeSubmit(step4Form)
+    // }
 
     step4Form.onsubmit = async (e) => {
         e.preventDefault()

@@ -68,6 +68,17 @@ const handleFreeze = (form, mode='freeze') => {
     btnSubmit.classList[mode === 'freeze' ? 'add' : 'remove']('btn-loading')
 }
 
+const initDatalist = (input) => {
+    const datalist = getDOMElement(input.parentNode, 'datalist')
+    if (!datalist) return
+    const options = [...datalist.options].map((option) => option.value)
+
+    input.oninput = (e) => {
+        const isValid = options.some((option) => option === input.value)
+        handleInvalid(isValid ? 'remove' : 'add', 'Debe seleccionar una opción válida', input.parentNode)
+    }
+}
+
 const init = (id, onSubmit) => {
     const form = getDOMElement(document, `#${id}`)
     if (!form) return
@@ -79,6 +90,9 @@ const init = (id, onSubmit) => {
             handleInvalid('add', input.validationMessage, input.parentNode)
         }
     }
+
+    const datalists = getDOMElement(form, 'input[list]', 'all')
+    datalists.map(initDatalist)
 
     const btnSubmit = getDOMElement(form, '[type="submit"]')
     if (!btnSubmit) return
