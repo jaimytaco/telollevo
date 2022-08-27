@@ -21,6 +21,7 @@ import {
     ECoin, 
     EShippingDestination,
     EOrderProductQty,
+    EConnectionStatus,
 } from '@types/util.type'
 
 import { 
@@ -264,8 +265,6 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     // STEP-1
     const step1Form = getDOMElement(dialog, '#create-order-step-1_form')
     if (!step1Form) return
-    // const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
-    // if (!btnSubmitStep1) return
     
     const createOrderBtns = getDOMElement(document, '[data-create-order-dialog_btn]', 'all')
     createOrderBtns.forEach((createOrderBtn) => createOrderBtn.onclick = () => {
@@ -324,7 +323,14 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         order.shopperId = shopperId
 
         const validateStatus = await CForm.validateOnSubmit(step1Form, MOrder.sanitize, order)
-        if (validateStatus?.err) return
+        if (validateStatus?.err) {
+            CForm.showInvalid(step1Form, validateStatus.err, order)
+            return
+        }
+
+        CForm.handleFreeze(step1Form)
+        await delay(1000)
+        CForm.handleFreeze(step1Form, 'unfreeze')
 
         logger('create-order-dialog step-1 with order:', order)
 
@@ -336,14 +342,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     // STEP-2
     const step2Form = getDOMElement(dialog, '#create-order-step-2_form')
     if (!step2Form) return
-    // const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
-    // if (!btnSubmitStep2) return
+    
     CForm.init(step2Form.id)
-
-    // btnSubmitStep2.onclick = (e) => {
-    //     e.preventDefault()
-    //     CForm.validateBeforeSubmit(step2Form)
-    // }
 
     step2Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -379,7 +379,14 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         order.shipper = shipper
         
         const validateStatus = await CForm.validateOnSubmit(step2Form, MOrder.sanitize, order)
-        if (validateStatus?.err) return
+        if (validateStatus?.err){
+            CForm.showInvalid(step2Form, validateStatus.err, order)
+            return
+        }
+
+        CForm.handleFreeze(step2Form)
+        await delay(1000)
+        CForm.handleFreeze(step2Form, 'unfreeze')
 
         logger('create-order-dialog step-2 with order:', order)
 
@@ -391,14 +398,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     // STEP-3
     const step3Form = getDOMElement(dialog, '#create-order-step-3_form')
     if (!step3Form) return
-    // const btnSubmitStep3 = getDOMElement(step3Form, 'button[type="submit"]')
-    // if (!btnSubmitStep3) return
+    
     CForm.init(step3Form.id)
-
-    // btnSubmitStep3.onclick = (e) => {
-    //     e.preventDefault()
-    //     CForm.validateBeforeSubmit(step3Form)
-    // }
 
     step3Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -407,7 +408,14 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         order.shippingDestination = shippingDestination
         
         const validateStatus = await CForm.validateOnSubmit(step3Form, MOrder.sanitize, order)
-        if (validateStatus?.err) return
+        if (validateStatus?.err){
+            CForm.showInvalid(step3Form, validateStatus.err, order)
+            return
+        }
+
+        CForm.handleFreeze(step3Form)
+        await delay(1000)
+        CForm.handleFreeze(step3Form, 'unfreeze')
 
         logger('create-order-dialog step-3 with order:', order)
 
@@ -419,14 +427,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
     // STEP-4
     const step4Form = getDOMElement(dialog, '#create-order-step-4_form')
     if (!step4Form) return
-    // const btnSubmitStep4 = getDOMElement(step4Form, 'button[type="submit"]')
-    // if (!btnSubmitStep4) return
-    CForm.init(step4Form.id)
 
-    // btnSubmitStep4.onclick = (e) => {
-    //     e.preventDefault()
-    //     CForm.validateBeforeSubmit(step4Form)
-    // }
+    CForm.init(step4Form.id)
 
     step4Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -435,18 +437,39 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         order.shopper = shopper
         
         const validateStatus = await CForm.validateOnSubmit(step4Form, MOrder.sanitize, order)
-        if (validateStatus?.err) return
+        if (validateStatus?.err){
+            CForm.showInvalid(step4Form, validateStatus.err, order)
+            return
+        }
 
         const now = new Date()
         order.createdAt = now
         order.updatedAt = now
 
+        CForm.handleFreeze(step4Form)
+
+        const networkResponse = await MOrder.add(wf, wf.mode.Network, order)
+        console.log('--- step4Form: networkResponse =', networkResponse)
+        if (networkResponse?.err){
+            await delay(1000)
+            CForm.showInvalid(step4Form, { inForm: true, desc: EConnectionStatus.NetworkError }, order)
+            CForm.handleFreeze(step4Form, 'unfreeze')
+            return
+        }
+        
+        // TODO: Consider handling error for offline-db
+        const offlineResponse = await MOrder.add(wf, wf.mode.Offline, networkResponse.data)
+        // if (offlineResponse?.err){
+        //     await delay(1000)
+        //     CForm.showInvalid(step4Form, { inForm: true, desc: offlineResponse.err }, networkResponse.data)
+        //     CForm.handleFreeze(step4Form, 'unfreeze')
+        //     return
+        // }
+
         logger('create-order-dialog step-4 with order:', order)
 
-        const { data, err } = await MOrder.add(wf, wf.mode.Network, order)
-        await MOrder.add(wf, wf.mode.Offline, data)
-
-        // TODO: Turn loading animation on dialog
+        await delay(1000)
+        CForm.handleFreeze(step4Form, 'unfreeze')
 
         step4Form.classList.remove('active')
         step5Form.classList.add('active')
@@ -456,10 +479,12 @@ const configCreateOrderDialog = async (wf, dialogId) => {
 
     step5Form.onsubmit = async (e) => {
         e.preventDefault()
-        // TODO: Improve animation after create-order
-        step5Form.classList.remove('active')
-        CDialog.handle('create-order_dialog', 'remove')
-        await delay(1500)
+
+        CForm.handleFreeze(step5Form)
+        await delay(1000)
+        // step5Form.classList.remove('active')
+        // CDialog.handle('create-order_dialog', 'remove')
+        // await delay(1500)
         location.reload()
     }
 }

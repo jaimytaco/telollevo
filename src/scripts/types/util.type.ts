@@ -1,3 +1,7 @@
+export enum EConnectionStatus{
+    NetworkError = 'No tienes una conexión estable a internet, intenta nuevamente',
+}
+
 export enum EOrderProductQty{
     Min = 1,
 }
