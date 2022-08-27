@@ -38,52 +38,27 @@ const configSignIn = async (wf) => {
         const passwordInput = getDOMElement(loginForm, '#login-password')
         if (!emailInput || !passwordInput) return
 
+        CForm.handleFreeze(loginForm)
+
         const userCredential = await wf.auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value)
         if (userCredential?.err) {
             logger(userCredential.err)
             // TODO: undo UI animation
+            CForm.showInvalid(loginForm, { inForm: true, desc: userCredential.err }, userCredential)
+            CForm.handleFreeze(loginForm, 'unfreeze')
             return
         }
 
         const user = await MUser.get(wf, wf.mode.Network, userCredential.user.uid, EFormat.Raw)
 
-        // TODO: UI animations 
-
+        // TODO: Consider waiting to user-install
         await delay(1500)
 
         if ([EUserType.Admin, EUserType.Shopper, EUserType.Multiple].includes(user.type)) location.href = '/admin/orders'
         if (user.type === EUserType.Traveler) location.href = '/admin/flights'
     } 
     
-    CForm.init(loginForm.id, onSubmit)
-
-    // btnSubmit.onclick = (e) => {
-    //     e.preventDefault()
-    //     CForm.validateBeforeSubmit(loginForm)
-    // }
-
-    // loginForm.onsubmit = async (e) => {
-    //     e.preventDefault()
-    //     const emailInput = getDOMElement(loginForm, '#login-email')
-    //     const passwordInput = getDOMElement(loginForm, '#login-password')
-    //     if (!emailInput || !passwordInput) return
-
-    //     const userCredential = await wf.auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value)
-    //     if (userCredential?.err) {
-    //         logger(userCredential.err)
-    //         // TODO: undo UI animation
-    //         return
-    //     }
-
-    //     const user = await MUser.get(wf, wf.mode.Network, userCredential.user.uid, EFormat.Raw)
-
-    //     // TODO: UI animations 
-
-    //     await delay(1500)
-
-    //     if ([EUserType.Admin, EUserType.Shopper, EUserType.Multiple].includes(user.type)) location.href = '/admin/orders'
-    //     if (user.type === EUserType.Traveler) location.href = '/admin/flights'
-    // }    
+    CForm.init(loginForm.id, onSubmit)  
 }
 
 const configSignOut = async (wf) => {

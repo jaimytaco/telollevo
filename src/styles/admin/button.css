@@ -177,3 +177,31 @@ section.s-table header .s-t-h-actions .btn span{
 .btn.btn-check{
     cursor: pointer;
 }
+
+.btn-loading {
+    position: relative;
+    text-indent: -9999px;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2ch;
+    height: 2ch;
+    border-radius: 50%;
+    border: 4px solid rgb(255 255 255 / 25%);
+    border-top-color: #fff;
+    animation: btn-loading-anim 1.5s linear infinite;
+}
+  
+@keyframes btn-loading-anim {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+}

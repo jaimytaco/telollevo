@@ -47,6 +47,7 @@
     --font-color-primary: var(--black-color);
     --font-color-secondary: hsl(var(--hsl-3) / 60%);
     --font-color-tertiary: var(--color-5);
+    --font-color-invalid: red;
     --font-family-bold: GoogleSans-Bold, sans-serif;
     --font-family-semibold: GoogleSans-Medium, sans-serif;
     --font-family-regular: GoogleSans-Regular, sans-serif;

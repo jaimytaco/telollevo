@@ -140,15 +140,15 @@ fieldset input{
     inline-size: 100%;
 }
 
-fieldset.fs-invalid::after{
+:is(form > main,fieldset).is-invalid::after{
     content: attr(data-invalid);
     font: var(--font-size-label)/1.2 var(--font-family-semibold);
     inline-size: 100%;
-    color: red;
+    color: var(--font-color-invalid);
 }
 
-fieldset.fs-invalid input{
-    border-color: red;
+fieldset.is-invalid input{
+    border-color: var(--font-color-invalid);
 }
 
 label{
