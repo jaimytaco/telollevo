@@ -73,8 +73,9 @@ const handleInvalid = (mode, msg, fieldset) => {
     }
 }
 
-const init = (id) => {
+const init = (id, onSubmit) => {
     const form = getDOMElement(document, `#${id}`)
+    if (!form) return
     const inputs = getDOMElement(form, 'input', 'all')
 
     for (const input of inputs) {
@@ -83,6 +84,17 @@ const init = (id) => {
             handleInvalid('add', input.validationMessage, input.parentNode)
         }
     }
+
+    const btnSubmit = getDOMElement(form, '[type="submit"]')
+    if (!btnSubmit) return
+
+    btnSubmit.onclick = (e) => {
+        e.preventDefault()
+        validateBeforeSubmit(form)
+    }
+
+    if (!onSubmit) return
+    form.onsubmit = onSubmit
 }
 
 export default {

@@ -120,5 +120,6 @@ export const initApp = async () => {
         await actions[pathname](wf)
     }
 
+    // TODO: Refactor this logic in a module
     if (swState) document.body.classList.add('data-is-loaded')
 }
