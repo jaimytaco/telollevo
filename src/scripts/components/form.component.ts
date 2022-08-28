@@ -12,10 +12,10 @@ const showInvalid = (form, err, doc) => {
         if (!invalid) return
 
         handleInvalid('add', desc, invalid)
-        invalid.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        invalid.scrollIntoView({ behavior: 'smooth', block: 'end' })
     }
 
-    const msg = `Sanitize error: ${desc}${field ? ` in field ${field} ` : ''}for `
+    const msg = `Sanitize error: ${desc}${field ? ` in field ${field} ` : ' '}for `
     logger(msg, doc)
     return { err: `${msg}: ${doc}` }
 

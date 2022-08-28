@@ -1,5 +1,7 @@
 import { logger } from '@wf/helpers/browser.helper'
 
+export const MAX_FORM_FREEZING_TIME = 800
+
 export const formatPrice = (symbol, amount) => `${symbol}${amount.toFixed(2)}`
 
 const MAX_MERGE_LENGTH = 20

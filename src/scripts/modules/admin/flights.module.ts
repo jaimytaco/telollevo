@@ -41,6 +41,7 @@ import {
 import {
     getDOMElement,
     delay,
+    MAX_FORM_FREEZING_TIME,
 } from '@helpers/util.helper'
 
 
@@ -97,9 +98,6 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     // STEP-1
     const step1Form = getDOMElement(dialog, '#create-flight-step-1_form')
     if (!step1Form) return
-    const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
-    if (!btnSubmitStep1) return
-    CForm.init(step1Form.id)
 
     const createFlightBtns = getDOMElement(document, '[data-create-flight-dialog_btn]', 'all')
     const { default: CDialog } = await import('@components/dialog.component')
@@ -109,13 +107,9 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         step1Form.classList.add('active')
     })
 
-    // TODO: use flight local object
-    const flight = {}
+    CForm.init(step1Form.id)
 
-    btnSubmitStep1.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step1Form)
-    }
+    const flight = {}
 
     step1Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -137,7 +131,14 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.travelerId = travelerId
 
         const validateStatus = await CForm.validateOnSubmit(step1Form, MFlight.sanitize, flight)
-        if (validateStatus?.err) return
+        if (validateStatus?.err) {
+            CForm.showInvalid(step1Form, validateStatus.err, flight)
+            return
+        }
+
+        CForm.handleFreeze(step1Form)
+        await delay(MAX_FORM_FREEZING_TIME)
+        CForm.handleFreeze(step1Form, 'unfreeze')
 
         logger('create-flight-dialog step-1 with flight:', flight)
 
@@ -149,14 +150,8 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     // STEP-2
     const step2Form = getDOMElement(dialog, '#create-flight-step-2_form')
     if (!step2Form) return
-    const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
-    if (!btnSubmitStep2) return
+    
     CForm.init(step2Form.id)
-
-    btnSubmitStep2.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step2Form)
-    }
 
     step2Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -221,7 +216,14 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.areReceiveOrderDatesOk = areReceiveOrderDatesOk
 
         const validateStatus = await CForm.validateOnSubmit(step2Form, MFlight.sanitize, flight)
-        if (validateStatus?.err) return
+        if (validateStatus?.err) {
+            CForm.showInvalid(step2Form, validateStatus.err, flight)
+            return
+        }
+
+        CForm.handleFreeze(step2Form)
+        await delay(MAX_FORM_FREEZING_TIME)
+        CForm.handleFreeze(step2Form, 'unfreeze')
 
         logger('create-flight-dialog step-2 with flight:', flight)
 
@@ -233,14 +235,8 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     // STEP-3
     const step3Form = getDOMElement(dialog, '#create-flight-step-3_form')
     if (!step3Form) return
-    const btnSubmitStep3 = getDOMElement(step3Form, 'button[type="submit"]')
-    if (!btnSubmitStep3) return
+    
     CForm.init(step3Form.id)
-
-    btnSubmitStep3.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step3Form)
-    }
 
     step3Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -258,7 +254,14 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.receiver = receiver
 
         const validateStatus = await CForm.validateOnSubmit(step3Form, MFlight.sanitize, flight)
-        if (validateStatus?.err) return
+        if (validateStatus?.err) {
+            CForm.showInvalid(step3Form, validateStatus.err, flight)
+            return
+        }
+
+        CForm.handleFreeze(step3Form)
+        await delay(MAX_FORM_FREEZING_TIME)
+        CForm.handleFreeze(step3Form, 'unfreeze')
 
         logger('create-flight-dialog step-3 with flight:', flight)
 
@@ -270,14 +273,8 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     // STEP-4
     const step4Form = getDOMElement(dialog, '#create-flight-step-4_form')
     if (!step4Form) return
-    const btnSubmitStep4 = getDOMElement(step4Form, 'button[type="submit"]')
-    if (!btnSubmitStep4) return
+    
     CForm.init(step4Form.id)
-
-    btnSubmitStep4.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step4Form)
-    }
 
     step4Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -299,7 +296,14 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.confirmDeliverOrder48h = confirmDeliverOrder48h
 
         const validateStatus = await CForm.validateOnSubmit(step4Form, MFlight.sanitize, flight)
-        if (validateStatus?.err) return
+        if (validateStatus?.err) {
+            CForm.showInvalid(step4Form, validateStatus.err, flight)
+            return
+        }
+
+        CForm.handleFreeze(step4Form)
+        await delay(MAX_FORM_FREEZING_TIME)
+        CForm.handleFreeze(step4Form, 'unfreeze')
 
         logger('create-flight-dialog step-4 with flight:', flight)
 
@@ -311,14 +315,8 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     // STEP-5
     const step5Form = getDOMElement(dialog, '#create-flight-step-5_form')
     if (!step5Form) return
-    const btnSubmitStep5 = getDOMElement(step5Form, 'button[type="submit"]')
-    if (!btnSubmitStep5) return
+    
     CForm.init(step5Form.id)
-
-    btnSubmitStep5.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step5Form)
-    }
 
     step5Form.onsubmit = async (e) => {
         e.preventDefault()
@@ -345,23 +343,38 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         flight.to = to
 
         const validateStatus = await CForm.validateOnSubmit(step5Form, MFlight.sanitize, flight)
-        if (validateStatus?.err) return
+        if (validateStatus?.err) {
+            CForm.showInvalid(step5Form, validateStatus.err, flight)
+            return
+        }
 
         const now = new Date()
         flight.createdAt = now
         flight.updatedAt = now
 
-        logger('create-flight-dialog step-5 with flight:', flight)
+        CForm.handleFreeze(step5Form)
 
-        const responseFlight = await MFlight.add(wf, wf.mode.Network, flight)
-        if (responseFlight?.err) {
-            logger(responseFlight.err)
-            // TODO: show network error in UI
+        const networkResponse = await MFlight.add(wf, wf.mode.Network, flight)
+        if (networkResponse?.err) {
+            await delay(MAX_FORM_FREEZING_TIME)
+            CForm.showInvalid(step5Form, { inForm: true, desc: EConnectionStatus.NetworkError }, flight)
+            CForm.handleFreeze(step5Form, 'unfreeze')
             return
         }
-        await MFlight.add(wf, wf.mode.Offline, responseFlight.data)
 
-        // TODO: Turn loading animation on dialog
+        // TODO: Consider handling error for offline-db
+        const offlineResponse = await MFlight.add(wf, wf.mode.Offline, networkResponse.data)
+        // if (offlineResponse?.err){
+        //     await delay(MAX_FORM_FREEZING_TIME)
+        //     CForm.showInvalid(step5Form, { inForm: true, desc: offlineResponse.err }, networkResponse.data)
+        //     CForm.handleFreeze(step5Form, 'unfreeze')
+        //     return
+        // }
+
+        logger('create-flight-dialog step-5 with flight:', flight)
+
+        await delay(MAX_FORM_FREEZING_TIME)
+        CForm.handleFreeze(step5Form, 'unfreeze')
 
         step5Form.classList.remove('active')
         step6Form.classList.add('active')
@@ -373,10 +386,10 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     if (!step6Form) return
     step6Form.onsubmit = async (e) => {
         e.preventDefault()
-        // TODO: Improve animation after create-flight
-        step6Form.classList.remove('active')
-        CDialog.handle('create-flight_dialog', 'remove')
-        await delay(1500)
+        
+        CForm.handleFreeze(step6Form)
+        await delay(MAX_FORM_FREEZING_TIME)
+
         location.reload()
     }
 }
@@ -517,7 +530,7 @@ const action = async (wf) => {
     const { default: CDialog } = await import('@components/dialog.component')
     const { default: CTable } = await import('@components/table.component')
     const { default: CCard8 } = await import('@components/card8.component')
-    const { getDOMElement } = await import('@helpers/util.helper')
+    // const { getDOMElement } = await import('@helpers/util.helper')
 
 
     // TODO: make component of table-extra-row

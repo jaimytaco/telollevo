@@ -48,12 +48,11 @@ import {
     updateOfflineTimestamp
 } from '@wf/lib.worker'
 
-// import { createOrder_dialog } from '@data/admin/dialog.data'
-
 import { 
     capitalizeString,
     getDOMElement, 
     delay, 
+    MAX_FORM_FREEZING_TIME,
 } from '@helpers/util.helper'
 
 import CTable from '@components/table.component'
@@ -329,7 +328,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         }
 
         CForm.handleFreeze(step1Form)
-        await delay(1000)
+        await delay(MAX_FORM_FREEZING_TIME)
         CForm.handleFreeze(step1Form, 'unfreeze')
 
         logger('create-order-dialog step-1 with order:', order)
@@ -385,7 +384,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         }
 
         CForm.handleFreeze(step2Form)
-        await delay(1000)
+        await delay(MAX_FORM_FREEZING_TIME)
         CForm.handleFreeze(step2Form, 'unfreeze')
 
         logger('create-order-dialog step-2 with order:', order)
@@ -414,7 +413,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         }
 
         CForm.handleFreeze(step3Form)
-        await delay(1000)
+        await delay(MAX_FORM_FREEZING_TIME)
         CForm.handleFreeze(step3Form, 'unfreeze')
 
         logger('create-order-dialog step-3 with order:', order)
@@ -449,9 +448,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         CForm.handleFreeze(step4Form)
 
         const networkResponse = await MOrder.add(wf, wf.mode.Network, order)
-        console.log('--- step4Form: networkResponse =', networkResponse)
         if (networkResponse?.err){
-            await delay(1000)
+            await delay(MAX_FORM_FREEZING_TIME)
             CForm.showInvalid(step4Form, { inForm: true, desc: EConnectionStatus.NetworkError }, order)
             CForm.handleFreeze(step4Form, 'unfreeze')
             return
@@ -460,7 +458,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         // TODO: Consider handling error for offline-db
         const offlineResponse = await MOrder.add(wf, wf.mode.Offline, networkResponse.data)
         // if (offlineResponse?.err){
-        //     await delay(1000)
+        //     await delay(MAX_FORM_FREEZING_TIME)
         //     CForm.showInvalid(step4Form, { inForm: true, desc: offlineResponse.err }, networkResponse.data)
         //     CForm.handleFreeze(step4Form, 'unfreeze')
         //     return
@@ -468,7 +466,7 @@ const configCreateOrderDialog = async (wf, dialogId) => {
 
         logger('create-order-dialog step-4 with order:', order)
 
-        await delay(1000)
+        await delay(MAX_FORM_FREEZING_TIME)
         CForm.handleFreeze(step4Form, 'unfreeze')
 
         step4Form.classList.remove('active')
@@ -481,10 +479,8 @@ const configCreateOrderDialog = async (wf, dialogId) => {
         e.preventDefault()
 
         CForm.handleFreeze(step5Form)
-        await delay(1000)
-        // step5Form.classList.remove('active')
-        // CDialog.handle('create-order_dialog', 'remove')
-        // await delay(1500)
+        await delay(MAX_FORM_FREEZING_TIME)
+        
         location.reload()
     }
 }
