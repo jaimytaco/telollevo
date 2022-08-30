@@ -45,6 +45,7 @@ form main{
     overflow-y: auto !important;
     padding-block: 24px 0;
     padding-inline: 16px;
+    scroll-margin: 0 0 4ch 0;
     display: flex;
     flex-flow: row wrap;
     gap: 20px;
@@ -83,6 +84,7 @@ nav.n-top-1 form{
 
 fieldset{
     border: none;
+    scroll-margin: 0 0 4ch 0;
     display: flex;
     flex-flow: row wrap;
     gap: 8px;

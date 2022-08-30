@@ -46,12 +46,8 @@ const remove = (mode, collectionName, id) => {
     if (mode === EDatabaseMode.Offline) return OfflineDB.remove(collectionName, id);
 }
 
-const runWithTransaction = (mode, collectionName, docData, callback) => {
-    if (mode === EDatabaseMode.Network) return NetworkDB.runWithTransaction(collectionName, docData, formatFn(callback))
-}
-
-const customRunWithTransaction = (transactionData, onTransaction) => {
-    return NetworkDB.customRunWithTransaction(transactionData, onTransaction)
+const runWithTransaction = (transactionData, onTransaction) => {
+    return NetworkDB.runWithTransaction(transactionData, onTransaction)
 }
 
 const formatDocForDB = (docData: T) => NetworkDB.formatDocForDB(docData)
@@ -64,7 +60,6 @@ const ADatabaseMethods = {
     remove,
 
     runWithTransaction,
-    customRunWithTransaction,
 
     formatDocForDB,
 }

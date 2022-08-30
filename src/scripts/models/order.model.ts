@@ -278,7 +278,7 @@ const toRowActions_RegisteredOrder = (order: IOrder) => {
     return `
         <div class="t-r-actions t-r-actions-desktop">
             ${order.computed.isQuotableByTraveler ?
-                `<button class="btn btn-primary" data-quote-order_btn="${order.id}">
+                `<button class="btn btn-primary" data-quote-order_btn data-quote-order_id="${order.id}">
                     <span>Cotizar pedido</span>
                 </button>` : ''
             }
@@ -405,8 +405,7 @@ const toPaid = async (wf, payedQuotation: IQuotation) => {
 }
 
 const compute = async (wf, mode, user, order: IOrder) => {
-    const canOrderSelectFlight = await canSelectFlight(wf, mode, order)
-    const status = computeStatus(user, order, canOrderSelectFlight)
+    const status = await computeStatus(wf, mode, user, order)
     const quotations = await Promise.all(
         (order.quotations as IQuotation[]).map((quotation) => MQuotation.compute(wf, mode, quotation))
     )
@@ -417,6 +416,8 @@ const compute = async (wf, mode, user, order: IOrder) => {
     const pickedTraveler = status === EOrderStatus.Paid ? 
         await MUser.get(wf, mode, order.pickedTravelerId, EFormat.Pretty) : null
 
+    const isOrderQuotableByTraveler = await isQuotableByTraveler(wf, mode, user, order)
+
     return {
         ...order,
         quotations,
@@ -424,21 +425,38 @@ const compute = async (wf, mode, user, order: IOrder) => {
             status,
             pickedFlight,
             pickedTraveler,
+            isQuotableByTraveler: isOrderQuotableByTraveler,
         }
     }
 }
 
-const computeStatus = (user: IUser, order: IOrder, canSelectFlight) => {
+const computeStatus = async (wf, mode, user: IUser, order: IOrder) => {
     if (order.status !== EOrderStatus.Registered) return order.status
-    if (canSelectFlight) return EOrderStatus.Quoted
-    return EOrderStatus.Registered
+
+    if (user.type === EUserType.Shopper) {
+        const canShopperSelectFlightForOrder = await canShopperSelectFlight(wf, mode, order)
+        if (canShopperSelectFlightForOrder) return EOrderStatus.Quoted
+        return EOrderStatus.Registered
+    }
+
+    if (user.type === EUserType.Traveler) {
+        const isOrderQuotableByTraveler = await isQuotableByTraveler(wf, mode, user, order)
+        if (!isOrderQuotableByTraveler) return EOrderStatus.Quoted
+        return EOrderStatus.Registered
+    }
+
+    if (user.type === EUserType.Admin) {
+        const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id) as IQuotation[]
+        if (quotations.length) return EOrderStatus.Quoted
+        return EOrderStatus.Registered
+    }
 }
 
 const getAllTravelerIdsWhoQuoted = (order: IOrder) => order.quotations.map((quotation) => quotation.travelerId)
 
 const getMinSelectedFlightsToSelectFlight = () => 1
 
-const canSelectFlight = async (wf, mode, order: IOrder) => {
+const canShopperSelectFlight = async (wf, mode, order: IOrder) => {
     if (order.status === EOrderStatus.Paid) return false
 
     const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id)
@@ -451,7 +469,7 @@ const canSelectFlight = async (wf, mode, order: IOrder) => {
 
 const isQuotableByTraveler = async (wf, mode, user: IUser, order: IOrder) => {
     if (user.type !== EUserType.Traveler) return false
-    const quotations = await MQuotation.getAllByTravelerIdAndOrderId(wf, mode, EFormat.Raw, user.id, order.id)
+    const quotations = await MQuotation.getAllByTravelerIdAndOrderId(wf, mode, EFormat.Raw, user.id, order.id) as IQuotation[]
     return !quotations.length
 }
 
@@ -580,20 +598,6 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
 
     const orders = responseOrders.data as IOrder[]
     if (isFormatted === EFormat.Raw) return orders
-
-    // const quotations = await MQuotation.getAll(wf, mode, isFormatted)
-
-    // if (quotations?.err) {
-    //     const { err } = quotations
-    //     logger(err)
-    //     return { err }
-    // }
-
-    // const ordersWithQuotation = orders.map((order) => {
-    //     order.quotations = quotations
-    //         .filter((quotation) => quotation.orderId === order.id)
-    //     return order
-    // })
 
     const quotationsByOrders = await Promise.all(
         orders.map((order) => MQuotation.getAllByOrderId(wf, mode, isFormatted, order.id) as IQuotation[])

@@ -162,28 +162,29 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
     // STEP-1
     const step1Form = getDOMElement(dialog, '#quote-order-step-1_form')
     if (!step1Form) return
-    const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
-    if (!btnSubmitStep1) return
-    CForm.init(step1Form.id)
+    // const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
+    // if (!btnSubmitStep1) return
+
+    // CForm.init(step1Form.id)
 
     const quoteOrderBtns = getDOMElement(document, '[data-quote-order_btn]', 'all')
     quoteOrderBtns.forEach((quoteOrderBtn) => quoteOrderBtn.onclick = () => {
         CDialog.handle(dialogId, 'add')
         step1Form.classList.add('active')
         const orderId = quoteOrderBtn.getAttribute('data-quote-order_id')
-        const option = getDOMElement(step1Form, '[data-order_id]')
+        const option = getDOMElement(step1Form, `[data-order_id="${orderId}"]`)
         if (!option) return
         const input = getDOMElement(step1Form, '[list="quote-order"]')  
         if (!input) return
         input.value = option.value
     })
 
-    btnSubmitStep1.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step1Form)
-    }
+    // btnSubmitStep1.onclick = (e) => {
+    //     e.preventDefault()
+    //     CForm.validateBeforeSubmit(step1Form)
+    // }
 
-    step1Form.onsubmit = async (e) => {
+    const onSubmitStep1 = async (e) => {
         e.preventDefault()
         
         const orderInput = getDOMElement(step1Form, '[list="quote-order"]')
@@ -204,7 +205,6 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
 
         const now = new Date()
 
-        // TODO: use order local object?
         const quotation = {
             orderId,
             shopperId,
@@ -218,16 +218,29 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
         }
 
         const validateStatus = await CForm.validateOnSubmit(step1Form, MQuotation.sanitize, quotation)
-        if (validateStatus?.err) return
-
-        const response = await MQuotation.doQuote(wf, quotation)
-        if (response?.err){
-            CForm.showInvalid(step1Form, response.err, quotation)
+        if (validateStatus?.err){
+            CForm.showInvalid(step1Form, validateStatus.err, quotation)
             return
         }
 
-        await MQuotation.add(wf, wf.mode.Offline, response.data)
-        // await MOrder.toQuoted(wf, orderId)
+        CForm.handleFreeze(step1Form)
+
+        const networkResponse = await MQuotation.toQuoted(wf, quotation)
+        if (networkResponse?.err){
+            await delay(MAX_FORM_FREEZING_TIME)
+            CForm.showInvalid(step1Form, { inForm: true, desc: EConnectionStatus.NetworkError }, quotation)
+            CForm.handleFreeze(step1Form, 'unfreeze')
+            return
+        }
+
+        // TODO: Consider handling error for offline-db
+        const offlineResponse = await MQuotation.add(wf, wf.mode.Offline, networkResponse.data)
+        // if (offlineResponse?.err){
+        //     await delay(MAX_FORM_FREEZING_TIME)
+        //     CForm.showInvalid(step1Form, { inForm: true, desc: offlineResponse.err }, networkResponse.data)
+        //     CForm.handleFreeze(step1Form, 'unfreeze')
+        //     return
+        // }
 
         logger('quote-order-dialog step-1 with quotation:', quotation)
 
@@ -235,14 +248,17 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
         step2Form.classList.add('active')
     }
 
+    CForm.init(step1Form.id, onSubmitStep1)
+
     // STEP-2
     const step2Form = getDOMElement(dialog, '#quote-order-confirmation-step-2_form')
     if (!step2Form) return
-    const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
-    if (!btnSubmitStep2) return
-    CForm.init(step2Form.id)
+    // const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
+    // if (!btnSubmitStep2) return
 
-    step2Form.onsubmit = async (e) => {
+    // CForm.init(step2Form.id)
+
+    const onSubmitStep2 = async (e) => {
         e.preventDefault()
         // TODO: Improve animation after quote-order
         step2Form.classList.remove('active')
@@ -251,6 +267,7 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
         location.reload()
     }
 
+    CForm.init(step2Form.id, onSubmitStep2)
 }
 
 const configCreateOrderDialog = async (wf, dialogId) => {
@@ -974,6 +991,8 @@ const builder = async (wf) => {
     const computedOrders = await Promise.all(
         orders.map((order) => MOrder.compute(wf, wf.mode.Offline, user, order))
     )
+
+    console.log('--- computedOrders =', computedOrders)
 
     const rows = computedOrders.map((computedOrder) => MOrder.toRow(user, computedOrder))
 

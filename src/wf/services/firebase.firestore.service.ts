@@ -106,23 +106,12 @@ const add = async (collectionName, docData) => {
     }
 }
 
-const runWithTransaction = async (collectionName, docData, callback) => {
-    const { id, ...data } = docData
-    const docRef = id ? doc(firestore, collectionName, id) : doc(collection(firestore, collectionName))
-    try {
-        const transactionData = await runTransaction(firestore, (transaction) => callback(transaction, docRef, formatDocForFirebase(data)))
-        return { data: transactionData }
-    } catch (err) {
-        return { err }
-    }
-}
-
 const getDocRef = (docData, collectionName) => {
     const { id, ...data } = docData
     return id ? doc(firestore, collectionName, id) : doc(collection(firestore, collectionName))
 }
 
-const customRunWithTransaction = async (transactionData, onTransaction) => {
+const runWithTransaction = async (transactionData, onTransaction) => {
     for (const key of Object.keys(transactionData)){
         if (key === 'fns') continue
         transactionData[key].docRefs = transactionData[key].datas.map((data) => getDocRef(data, transactionData[key].collectionName))
@@ -166,7 +155,6 @@ export default {
     add,
 
     runWithTransaction,
-    customRunWithTransaction,
 
     formatDocForDB: formatDocForFirebase,
 }

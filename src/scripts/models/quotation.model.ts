@@ -49,13 +49,13 @@ const uninstall = async (wf) => {
 const getAllByShopperIdAndOrderId = (wf, mode, isFormatted: EFormat, shopperId, orderId) => {
     const byShopper = {
         field: 'shopperId',
-        operator: wf.operator.EQualTo,
+        operator: wf.operator.EqualTo,
         value: shopperId
     }
 
     const byOrder = {
         field: 'orderId',
-        operator: wf.operator.EQualTo,
+        operator: wf.operator.EqualTo,
         value: orderId
     }
 
@@ -65,13 +65,13 @@ const getAllByShopperIdAndOrderId = (wf, mode, isFormatted: EFormat, shopperId, 
 const getAllByTravelerIdAndOrderId = (wf, mode, isFormatted: EFormat, travelerId, orderId) => {
     const byTraveler = {
         field: 'travelerId',
-        operator: wf.operator.EQualTo,
+        operator: wf.operator.EqualTo,
         value: travelerId
     }
 
     const byOrder = {
         field: 'orderId',
-        operator: wf.operator.EQualTo,
+        operator: wf.operator.EqualTo,
         value: orderId
     }
 
@@ -305,7 +305,7 @@ const toPaid = async (wf, quotationId) => {
         }
     }
 
-    return wf.database.customRunWithTransaction(transactionData, onTransaction)
+    return wf.database.runWithTransaction(transactionData, onTransaction)
 }
 
 // TODO: Valid payed-status
@@ -332,26 +332,34 @@ const toQuoted = async (wf, quotation: IQuotation) => {
         ...quotation
     }
 
-    const onTransaction = async (transaction, docRef, data) => {
-        const doc = await transaction.get(docRef)
-        if (doc.exists())
+    const transactionData = {
+        quotation: {
+            collectionName: 'quotations',
+            datas: [data]
+        }
+    }
+
+    const onTransaction = async (transaction, transactionData) => {
+        const quotationRef = transactionData.quotation.docRefs[0]
+        const quotationDoc = await transaction.get(quotationRef)
+        const quotation = quotationDoc.data()
+
+        if (quotationDoc.exists())
             return Promise.reject({
                 field: 'quote-flight',
                 desc: 'Este pedido ya ha sido cotizado con este vuelo'
             })
 
-        transaction.set(docRef, data)
+        const data = transactionData.quotation.datas[0]
+        transaction.set(quotationRef, data)
 
         return {
-            data: {
-                id: docRef.id,
-                ...data
-            }
+            id: quotationRef.id,
+            ...data,
         }
     }
 
-    // TODO: update to new transaction fn
-    return wf.database.runWithTransaction(wf.mode.Network, 'quotations', data, onTransaction)
+    return wf.database.runWithTransaction(transactionData, onTransaction)
 }
 
 export default {

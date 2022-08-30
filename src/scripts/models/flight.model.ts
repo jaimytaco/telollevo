@@ -565,7 +565,7 @@ const toVisible = async (wf, id) => {
         }
     }
 
-    return wf.database.customRunWithTransaction(transactionData, onTransaction)
+    return wf.database.runWithTransaction(transactionData, onTransaction)
 }
 
 const toRegistered = async (wf, id) => {
@@ -629,7 +629,7 @@ const toRegistered = async (wf, id) => {
         }
     }
 
-    return wf.database.customRunWithTransaction(transactionData, onTransaction)
+    return wf.database.runWithTransaction(transactionData, onTransaction)
 }
 
 export default{

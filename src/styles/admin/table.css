@@ -72,6 +72,10 @@ body > main section.s-table .s-t-body{
     border-bottom: none;
 }
 
+.t-row .t-r-details{
+    flex: 1;
+}
+
 .t-r-actions{
     display: flex;
     flex-flow: row wrap;
