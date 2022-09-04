@@ -61,7 +61,7 @@ const get = async (collectionName, id) => {
     }
 }
 
-// TODO: Untested
+// TODO: Check if this is eccesary
 const getWithTransaction = async (docRef, callback) => {
     try {
         const doc = await runTransaction(firestore, (transaction) => callback(transaction, docRef))
@@ -75,6 +75,7 @@ const getWithTransaction = async (docRef, callback) => {
     }
 }
 
+// TODO: Remove id splitting
 const update = async (collectionName, docData) => {
     const { id, ...data } = docData
     const docRef = doc(firestore, collectionName, id)
@@ -91,6 +92,7 @@ const update = async (collectionName, docData) => {
     }
 }
 
+// TODO: Remove id splitting
 const add = async (collectionName, docData) => {
     const { id, ...data } = docData
     try {
@@ -138,7 +140,8 @@ const formatDoc = (data) => {
     return data
 }
 
-const formatDocForFirebase = (data) => {
+const formatDocForFirebase = (doc) => {
+    const { id, ...data } = doc
     for (const key of Object.keys(data))
         if (typeof data[key] instanceof Date)
             data[key] = dateToTimestamp(data[key])

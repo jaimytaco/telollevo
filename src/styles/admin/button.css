@@ -128,6 +128,10 @@ button:active{
     text-underline-offset: .5ch;
 }
 
+.btn.btn-primary-color{
+    color: var(--btn-color-primary);
+}
+
 .btn.btn-secondary-color{
     color: var(--btn-color-secondary);
 }
@@ -178,12 +182,12 @@ section.s-table header .s-t-h-actions .btn span{
     cursor: pointer;
 }
 
-.btn-loading {
+.btn.btn-loading {
     position: relative;
-    text-indent: -9999px;
+    color: transparent;
 }
 
-.btn-loading::after {
+.btn.btn-loading::after {
     content: '';
     position: absolute;
     top: 50%;

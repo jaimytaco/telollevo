@@ -112,8 +112,8 @@
     color: var(--font-color-secondary);
 }
 
-.card-7 p span.c-tertiary{
-    color: var(--font-color-tertiary);
+.c-tertiary{
+    color: var(--font-color-tertiary) !important;
 }
 
 .card-7-group{
@@ -293,6 +293,10 @@ nav.n-dialog.n-dialog-dark .card-13{
     gap: 24px;
 }
 
+.card-4 > .card-14-group{
+    padding-inline: 12px;
+}
+
 .card-14{
     display: flex;
     flex-flow: row wrap;
@@ -328,9 +332,9 @@ nav.n-dialog.n-dialog-dark .card-13{
 
 .card-15 p span{
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
     gap: 6px;
-    align-items: center;
+    /* align-items: center; */
 }
 
 .card-15 p span::before{
@@ -338,6 +342,7 @@ nav.n-dialog.n-dialog-dark .card-13{
     inline-size: 4px;
     block-size: 4px;
     border-radius: 50%;
+    margin-block: 0.5ch 0;
     background: #fff;
     border: 2px solid var(--btn-color-tertiary);
     z-index: 2;

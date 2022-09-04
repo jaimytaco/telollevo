@@ -16,6 +16,9 @@ import MFlight from '@models/flight.model'
 import MQuotation from '@models/quotation.model'
 import MUser from '@models/user.model'
 
+import { logger } from '@wf/helpers/browser.helper'
+
+
 export const app = {
     name: 'Te lo llevo',
     code: 'telollevo',
@@ -54,37 +57,45 @@ export const app = {
 export const initApp = async () => {
     const { SW_VERSION } = await import('@scripts/workers/sw.worker') // Hack to generate sw.worker.js file
     const { delay } = await import('@helpers/util.helper')
-    const { 
-        registerSW, 
-        subscribeToSWMessage, 
+    const {
+        registerSW,
+        subscribeToSWMessage,
         getSWState,
         supportsSW,
     } = await import('@wf/actors/pwa.actor')
 
-    if (!supportsSW()){
+    if (!supportsSW()) {
         // TODO: Show error message
         // TODO: Consider client-side rendering
+        logger('SW not supported')
         return
     }
 
-    const swState = getSWState()
+    const registration = await registerSW()
+    if (registration?.err){
+        logger('ServiceWorker registration failed: ', registration.err)
+        return
+    }
+
+    const forceReload = document.body.matches('.force-reload')
+    logger(`forceReload: ${forceReload}`)
+
+    const swState = registration?.active?.state
+    logger(`SW State: ${swState}`)
     
-    registerSW()
+    if (!swState){
+        logger('No SW installed')
+        return
+    }
 
-    subscribeToSWMessage(async (msg) => {
-        if (!swState && msg === ESWStatus.ContentReady){
-            // TODO: Consider animation pre-reload
-            location.reload()
-            return
-        }
+    if (forceReload){
+        // await delay(3000)
+        logger('Forcing reload')
+        location.reload()
+        return
+    }
 
-        if (swState && msg === ESWStatus.Claimed){
-            await delay(1500) // TODO: Check a way to detect claimed after user-installing
-            // TODO: Show pop-up for new version of SW
-        }
-    })
-
-    const { 
+    const {
         registerApp,
         registerNetworkDB,
         registerOfflineDB,
@@ -110,16 +121,17 @@ export const initApp = async () => {
     }
 
     const { pathname } = location
-    if (actions[pathname]){
-        if (app.routes[pathname]?.withAuth){
+    if (actions[pathname]) {
+        if (app.routes[pathname]?.withAuth) {
             // TODO: Enable logout
             const { default: ModAdminAuth } = await import('@modules/admin/auth.module')
             ModAdminAuth.configSignOut(wf)
         }
-        
+
         await actions[pathname](wf)
     }
 
     // TODO: Refactor this logic in a module
-    if (swState) document.body.classList.add('data-is-loaded')
+    await delay(1000)
+    document.body.classList.add('is-loaded')
 }

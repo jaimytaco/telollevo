@@ -142,3 +142,8 @@ body > main{
     display: flex;
     flex-flow: column nowrap;
 }
+
+body > main.m-public{
+    padding-block: 0;
+    padding-inline: 0;
+}

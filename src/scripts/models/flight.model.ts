@@ -48,9 +48,10 @@ import { logger } from '@wf/helpers/browser.helper'
 import { removeOfflineTimestamp } from '@wf/lib.worker'
 
 const getAlert = (user: IUser, flight: IFlight) => {
-    if (user.type === EUserType.Admin && flight.status === EFlightStatus.Registered)
-        return 'Este vuelo cuenta con al menos una cotización, valídalo para que sea visible para el comprador.'
-    return ''
+    // if (user.type === EUserType.Admin && flight.status === EFlightStatus.Registered)
+    //     return 'Este vuelo cuenta con al menos una cotización, valídalo para que sea visible para el comprador.'
+    // return ''
+    return 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
 }
 
 const toRowExtra = (user: IUser, flight: IFlight) => {
@@ -210,7 +211,7 @@ const toRow = (user: IUser, flight: IFlight) => {
         tags: toRowTags(flight),
         heading: `${flight.airline} - ${flight.code}`,
         details: [{
-            description: `${MUser.getFullName(user)}<br>DNI 88223302`
+            description: `${MUser.getFullName(user)}<br>${flight.from} <span class="c-tertiary">→</span> ${flight.to}`
         }],
         icon: 'flight.svg',
         actions: toRowActions(user, flight),
@@ -538,6 +539,12 @@ const toVisible = async (wf, id) => {
         flight: {
             collectionName: 'flights',
             datas: [flight]
+        },
+        fns: {
+            formatDocForDB: (visibleFlightToFormat) => {
+                const { id, ...data } = visibleFlightToFormat
+                return wf.database.formatDocForDB(data)
+            }
         }
     }
 
@@ -557,11 +564,12 @@ const toVisible = async (wf, id) => {
             })
         
         const data = transactionData.flight.datas[0]
-        transaction.update(flightRef, data)
+        const formattedData = transactionData.fns.formatDocForDB(data)
+        transaction.update(flightRef, formattedData)
 
         return {
             id: flightRef.id,
-            ...data
+            ...formattedData
         }
     }
 

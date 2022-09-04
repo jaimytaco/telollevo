@@ -73,7 +73,7 @@ const configPickAndPayQuotationDialog = async (wf, dialogId) => {
     if (!step1Form) return
     const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
     if (!btnSubmitStep1) return
-    CForm.init(step1Form.id)
+    // CForm.init(step1Form.id)
 
     const pickAndPayQuotationBtns = getDOMElement(document, '[data-pick-and-pay-quotation_btn]', 'all')
     pickAndPayQuotationBtns.forEach((pickAndPayQuotationBtn) => {
@@ -108,45 +108,53 @@ const configPickAndPayQuotationDialog = async (wf, dialogId) => {
         }
     })
 
-    btnSubmitStep1.onclick = (e) => {
-        e.preventDefault()
-        CForm.validateBeforeSubmit(step1Form)
-    }
+    // btnSubmitStep1.onclick = (e) => {
+    //     e.preventDefault()
+    //     CForm.validateBeforeSubmit(step1Form)
+    // }
 
-    step1Form.onsubmit = async (e) => {
+    const onSubmitStep1 = async (e) => {
         e.preventDefault()
+
+        CForm.handleFreeze(step1Form)
 
         const quotationId = btnSubmitStep1.getAttribute('data-quotation_id')
-        // TODO: Show loading in UI
-        const payedQuotationResponse = await MQuotation.toPaid(wf, quotationId)
-        if (payedQuotationResponse?.err){
-            logger(payedQuotationResponse.err.desc)
-            // TODO: Show error in UI
+        const paidQuotationResponse = await MQuotation.toPaid(wf, quotationId)
+        if (paidQuotationResponse?.err){
+            await delay(MAX_FORM_FREEZING_TIME)
+            CForm.showInvalid(step1Form, paidQuotationResponse.err, quotationId)
+            CForm.handleFreeze(step1Form, 'unfreeze')
             return
         }
 
-        const payedQuotation = MQuotation.uncompute(payedQuotationResponse.data)
-        await MQuotation.update(wf, wf.mode.Offline, payedQuotation)
+        const paidQuotation = MQuotation.uncompute(paidQuotationResponse.data.paidQuotation)
+        await MQuotation.update(wf, wf.mode.Offline, paidQuotation)
 
-        await MOrder.toPaid(wf, payedQuotation)
+        const paidOrder = paidQuotationResponse.data.paidOrder
+        await MOrder.update(wf, wf.mode.Offline, paidQuotationResponse.data.paidOrder)
+
+        await delay(MAX_FORM_FREEZING_TIME)
+        CForm.handleFreeze(step1Form, 'unfreeze')
 
         step1Form.classList.remove('active')
         step2Form.classList.add('active')
     }
 
+    CForm.init(step1Form.id, onSubmitStep1)
+
     // STEP-2
     const step2Form = getDOMElement(dialog, '#pick-and-pay-quotation-confirmation-step-2_form')
     if (!step2Form) return
-    const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
-    if (!btnSubmitStep2) return
-    CForm.init(step2Form.id)
+    // const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
+    // if (!btnSubmitStep2) return
+    // CForm.init(step2Form.id)
 
     step2Form.onsubmit = async (e) => {
         e.preventDefault()
-        // TODO: Improve animation after quote-order
-        step2Form.classList.remove('active')
-        CDialog.handle(dialogId, 'remove')
-        await delay(1500)
+        
+        CForm.handleFreeze(step2Form)
+        await delay(MAX_FORM_FREEZING_TIME)
+
         location.reload()
     }
 }
@@ -162,15 +170,12 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
     // STEP-1
     const step1Form = getDOMElement(dialog, '#quote-order-step-1_form')
     if (!step1Form) return
-    // const btnSubmitStep1 = getDOMElement(step1Form, 'button[type="submit"]')
-    // if (!btnSubmitStep1) return
-
-    // CForm.init(step1Form.id)
 
     const quoteOrderBtns = getDOMElement(document, '[data-quote-order_btn]', 'all')
     quoteOrderBtns.forEach((quoteOrderBtn) => quoteOrderBtn.onclick = () => {
         CDialog.handle(dialogId, 'add')
         step1Form.classList.add('active')
+        // TODO: Validate # of flights, if none, show alert
         const orderId = quoteOrderBtn.getAttribute('data-quote-order_id')
         const option = getDOMElement(step1Form, `[data-order_id="${orderId}"]`)
         if (!option) return
@@ -178,11 +183,6 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
         if (!input) return
         input.value = option.value
     })
-
-    // btnSubmitStep1.onclick = (e) => {
-    //     e.preventDefault()
-    //     CForm.validateBeforeSubmit(step1Form)
-    // }
 
     const onSubmitStep1 = async (e) => {
         e.preventDefault()
@@ -253,17 +253,13 @@ const configQuoteOrderDialog = async (wf, dialogId) => {
     // STEP-2
     const step2Form = getDOMElement(dialog, '#quote-order-confirmation-step-2_form')
     if (!step2Form) return
-    // const btnSubmitStep2 = getDOMElement(step2Form, 'button[type="submit"]')
-    // if (!btnSubmitStep2) return
-
-    // CForm.init(step2Form.id)
 
     const onSubmitStep2 = async (e) => {
         e.preventDefault()
-        // TODO: Improve animation after quote-order
-        step2Form.classList.remove('active')
-        CDialog.handle(dialogId, 'remove')
-        await delay(1500)
+        
+        CForm.handleFreeze(step2Form)
+        await delay(MAX_FORM_FREEZING_TIME)
+
         location.reload()
     }
 
@@ -527,7 +523,7 @@ const getCreateOrderDialog = () => `
                 </fieldset>
                 <fieldset>
                     <label for="${EOrderFields.ProductCategory}">Categoría</label>
-                    <input list="${EOrderFields.ProductCategory}" placeholder="Selecciona una categoría" required>
+                    <input list="${EOrderFields.ProductCategory}" placeholder="Selecciona una categoría" autocomplete="none" required>
                     <datalist id="${EOrderFields.ProductCategory}">
                         ${
                             Object.values(EProductCategory)
@@ -725,7 +721,7 @@ const getQuoteOrderDialog = async (wf, user: IUser, computedOrders: IOrder[]) =>
                 <main>
                     <fieldset>
                         <label for="quote-order">Pedido a cotizar</label>
-                        <input list="quote-order" placeholder="Selecciona un pedido" required>
+                        <input list="quote-order" placeholder="Selecciona un pedido" autocomplete="none" required>
                         <datalist id="quote-order">
                             ${
                                 quotableOrders
@@ -736,7 +732,7 @@ const getQuoteOrderDialog = async (wf, user: IUser, computedOrders: IOrder[]) =>
                     </fieldset>
                     <fieldset>
                         <label for="quote-flight">Vuelo a usar</label>
-                        <input list="quote-flight" placeholder="Selecciona un vuelo" required>
+                        <input list="quote-flight" placeholder="Selecciona un vuelo" autocomplete="none" required>
                         <datalist id="quote-flight">
                             ${
                                 flights
@@ -825,7 +821,7 @@ const getPickAndPayQuotationDialog = () => {
                         <input type="text" id="cc-exp" placeholder="P. ej. 02 / 21" autocomplete="cc-exp" required>
                     </fieldset>
                     <fieldset class="fs-sm">
-                        <label for="cc-csc">Código de seguridad <small>(CVV)</small></label>
+                        <label for="cc-csc">Código de seguridad</label>
                         <input type="text" id="cc-csc" placeholder="P. ej. 1234" autocomplete="cc-csc" required>
                     </fieldset>
                     <fieldset>
@@ -1027,7 +1023,6 @@ const builder = async (wf) => {
 const action = async (wf) => {
     const { default: CTable } = await import('@components/table.component')
     const { default: CCard8 } = await import('@components/card8.component')
-    const { getDOMElement } = await import('@helpers/util.helper')
 
     const {
         configSelectQuotationInQuotedOrder,

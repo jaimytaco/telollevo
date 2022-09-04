@@ -77,7 +77,7 @@ const installHdlr = (e) => {
                 const user = await MUser.install(wf, userId)
 
                 await prefetchRoutes(app.routes)
-            }else{
+            } else {
                 MUser.uninstall(wf)
                 MOrder.uninstall(wf)
                 MFlight.uninstall(wf)
@@ -86,11 +86,15 @@ const installHdlr = (e) => {
                 unprefetchRoutes(app.routes)
             }
 
+            // Skip waiting state when old SW only!
+            logger(`Skipwaiting SW (v.${SW_VERSION})`)
+            skipWaiting()
+            logger(`Skipwaited SW (v.${SW_VERSION})`)
+
             sendMessage({ msg: ESWStatus.ContentReady })
         })
 
         logger(`Installed SW (v.${SW_VERSION})`)
-        skipWaiting()
     }
 
     e.waitUntil(fn())
@@ -125,7 +129,7 @@ const prefetchRequest = async (request) => {
     const { routes } = app
 
     const route = routes[pathname]
-    if (!route){
+    if (!route) {
         logger(`Route ${url} not found in app to build`)
         return
     }
@@ -146,13 +150,13 @@ const prefetchRequest = async (request) => {
     ])
 
     if (loaderStatus?.err) {
-        const err = `Error in loader for ${url} ~` 
+        const err = `Error in loader for ${url} ~`
         logger(err, loaderStatus.err)
         // TODO: Indicate in someway that the document is rendered with data outdated
-        return { err: `${err} ${loaderStatus.err}`}
+        return { err: `${err} ${loaderStatus.err}` }
     }
 
-    if (!loaderStatus?.done){
+    if (!loaderStatus?.done) {
         logger(`Building dynamic response skipped for ${url}`)
         return
     }
@@ -175,27 +179,27 @@ const fetchHdlr = (e) => {
         if (destination === 'document') {
             const url = new URL(request.url)
             const { pathname } = url
-            if (pathname !== '/' && pathname.endsWith('/')){
+            if (pathname !== '/' && pathname.endsWith('/')) {
                 logger('Redirecting to same pathname without /')
                 return Response.redirect(pathname.slice(0, -1))
             }
 
             const currentUserCredential = await ModAuth.getUserAuthenticated(wf)
-            if (currentUserCredential?.err){
-                sendMessage({ msg: 'unregister-sw' })
+            if (currentUserCredential?.err) {
+                sendMessage({ msg: ESWStatus.Unregister })
                 return
             }
-            
+
             const redirectForAuth = !currentUserCredential && app.routes[pathname]?.withAuth
-            
-            if (redirectForAuth){
+
+            if (redirectForAuth) {
                 logger('Redirecting to login because user is not authenticated')
                 // TODO: Clear cached routes that need authentication
                 return Response.redirect('/login')
             }
 
             const prefetchRequestPromise = prefetchRequest(request)
-            
+
             const prefetchStatus = await Promise.any([
                 prefetchRequestPromise,
                 (async (ms, url) => {
@@ -210,7 +214,7 @@ const fetchHdlr = (e) => {
         return offlineFirst(request, CACHE_NAME)
     }
 
-    if (isRequestHandledBySW(e.request)){
+    if (isRequestHandledBySW(e.request)) {
         const url = new URL(e.request.url)
         const request = new Request(url.pathname)
         e.respondWith(fn(request, e.request.destination))
@@ -221,7 +225,7 @@ addEventListener('install', installHdlr)
 addEventListener('activate', activateHdlr)
 addEventListener('fetch', fetchHdlr)
 
-export const SW_VERSION = 819
+export const SW_VERSION = 960
 
 const CACHE_NAME = getCacheName(`sw-${app.code}`, SW_VERSION)
 const MAX_LOADER_MS = 3000

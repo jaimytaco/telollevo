@@ -38,7 +38,7 @@ export const createOrder_dialog = `
                 </fieldset>
                 <fieldset>
                     <label for="${EOrderFields.ProductCategory}">Categoría</label>
-                    <input list="${EOrderFields.ProductCategory}" placeholder="Selecciona una categoría" required>
+                    <input list="${EOrderFields.ProductCategory}" placeholder="Selecciona una categoría" autocomplete="none" required>
                     <datalist id="${EOrderFields.ProductCategory}">
                         ${
                             Object.values(EProductCategory)
@@ -291,7 +291,7 @@ export const createFlight_dialog = `
                 </fieldset>
                 <fieldset class="fs-sm">
                     <label for="${EPlaceFields.Country}">País</label>
-                    <input list="${EPlaceFields.Country}" placeholder="Selecciona un país" required>
+                    <input list="${EPlaceFields.Country}" placeholder="Selecciona un país" autocomplete="none" required>
                     <datalist id="${EPlaceFields.Country}">
                         ${
                             Object.values(ECountry)
@@ -380,7 +380,7 @@ export const createFlight_dialog = `
             <main>   
                 <fieldset>
                     <label for="${EFlightFields.ShippingDestination}">¿En cuál de nuestros locales entregarás los productos?</label>
-                    <input list="${EFlightFields.ShippingDestination}" placeholder="Selecciona un local" required>
+                    <input list="${EFlightFields.ShippingDestination}" placeholder="Selecciona un local" autocomplete="none" required>
                     <datalist id="${EFlightFields.ShippingDestination}">
                         <option value="${capitalizeString(EShippingDestination.Inplace_Miraflores)}"></option>
                     </datalist>
@@ -425,7 +425,7 @@ export const createFlight_dialog = `
                 </fieldset>
                 <fieldset>
                     <label for="${EFlightFields.From}">País origen</label>
-                    <input list="${EFlightFields.From}" placeholder="Selecciona un país" required>
+                    <input list="${EFlightFields.From}" placeholder="Selecciona un país" autocomplete="none" required>
                     <datalist id="${EFlightFields.From}">
                         ${
                             Object.values(ECountry)
@@ -437,7 +437,7 @@ export const createFlight_dialog = `
                 </fieldset>
                 <fieldset>
                     <label for="${EFlightFields.To}">País destino</label>
-                    <input list="${EFlightFields.To}" placeholder="Selecciona un país" required>
+                    <input list="${EFlightFields.To}" placeholder="Selecciona un país" autocomplete="none" required>
                     <datalist id="${EFlightFields.To}">
                         <option value="${ECountry.Peru}"></option>
                     </datalist>

@@ -1,0 +1,11 @@
+.card-17{
+    text-align: center;
+    padding-inline: 12px;
+    display: grid;
+    place-items: center;
+    gap: 12px;
+}
+
+.card-17 h1{
+    font-size: calc(var(--font-size-h1)*1.33);
+}

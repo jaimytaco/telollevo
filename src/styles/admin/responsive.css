@@ -197,11 +197,38 @@
     .card-14-group{
         padding-inline: 16px;
     }
+
+    .card-16 .c-16-thumbnail{
+        background: var(--btn-color-primary);
+        inline-size: 50%;
+        block-size: 100%;
+        padding-inline: 32px;
+        text-align: center;
+        color: var(--white-color);
+        display: flex;
+        flex-flow: column wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+    }
+
+    .card-16 .c-16-form{
+        inline-size: 50%;
+        padding-inline: 32px;
+    }
+
+    .card-17 > p{
+        display: none;
+    }
 }
 
 @media (min-width: 1024px){
     body{
         padding-block: 8px 0;
+    }
+
+    body.b-public{
+        padding-block: 0;
     }
 
     body.on-dialog::before{
@@ -255,6 +282,15 @@
 
     .card-14-group .card-14{
         max-inline-size: calc(50% - 32px/2);
+    }
+
+    .card-16 .c-16-thumbnail,
+    .card-16 .c-16-form{
+        padding-inline: 72px;
+    }
+
+    .card-16 .c-16-thumbnail img{
+        block-size: 320px;
     }
 }
 

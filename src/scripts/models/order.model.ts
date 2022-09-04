@@ -173,6 +173,9 @@ const toRowExtra_QuotedOrder = (order: IOrder) => {
                             <div class="card-7 c-7-p">
                                 <p>
                                     <strong>${MUser.getFullName(quotation.traveler)}</strong>
+                                    <!--
+                                    <strong>Detalle del Viajero</strong>
+                                    -->
                                     <br>
                                     <span>${quotation.flight.from} <span class="c-tertiary">→</span> ${quotation.flight.to}</span>
                                 </p>
@@ -206,7 +209,7 @@ const toRowExtra_QuotedOrder = (order: IOrder) => {
     `
 }
 
-const toRowExtra_PaidOrder = (order: IOrder) => {
+const toRowExtra_PaidOrder = (user: IUser, order: IOrder) => {
     return `
         <div id="te-${order.id}" class="t-r-extra">
             <div class="card-4">
@@ -221,7 +224,12 @@ const toRowExtra_PaidOrder = (order: IOrder) => {
                     <div class="card-7-group">
                         <div class="card-7">
                             <p>
-                                ${MUser.getFullName(order.computed.pickedTraveler)}  ·  <span>Esperando pedido</span>
+                                ${
+                                    user.type === EUserType.Admin ? 
+                                        `${MUser.getFullName(order.computed.shopper)}  ·  <span>Comprador</span>
+                                        <br>` : ''
+                                }
+                                ${MUser.getFullName(order.computed.pickedTraveler)}  ·  <span>Viajero asignado</span>
                             </p>
                         </div>
                         <div class="card-15">
@@ -268,7 +276,7 @@ const toRowExtra = (user: IUser, order: IOrder) => {
                 return toRowExtra_QuotedOrder(order)
             return toRowExtra_RegisteredOrder(order)
         case EOrderStatus.Paid:
-            return toRowExtra_PaidOrder(order)
+            return toRowExtra_PaidOrder(user, order)
         default:
             return ''
     }
@@ -390,19 +398,19 @@ const toRow = (user: IUser, order: IOrder) => {
     }
 }
 
-const toPaid = async (wf, payedQuotation: IQuotation) => {
-    const order = await get(wf, wf.mode.Network, payedQuotation.orderId, EFormat.Raw)
-    order.updatedAt = new Date()
-    order.status = EOrderStatus.Paid
-    order.pickedFlightId = payedQuotation.flightId
-    order.pickedTravelerId = payedQuotation.travelerId
-    order.pickedQuotationId = payedQuotation.id
+// const toPaid = async (wf, payedQuotation: IQuotation) => {
+//     const order = await get(wf, wf.mode.Network, payedQuotation.orderId, EFormat.Raw)
+//     order.updatedAt = new Date()
+//     order.status = EOrderStatus.Paid
+//     order.pickedFlightId = payedQuotation.flightId
+//     order.pickedTravelerId = payedQuotation.travelerId
+//     order.pickedQuotationId = payedQuotation.id
 
-    await Promise.all([
-        update(wf, wf.mode.Network, order),
-        update(wf, wf.mode.Offline, order)
-    ])
-}
+//     await Promise.all([
+//         update(wf, wf.mode.Network, order),
+//         update(wf, wf.mode.Offline, order)
+//     ])
+// }
 
 const compute = async (wf, mode, user, order: IOrder) => {
     const status = await computeStatus(wf, mode, user, order)
@@ -415,6 +423,9 @@ const compute = async (wf, mode, user, order: IOrder) => {
     
     const pickedTraveler = status === EOrderStatus.Paid ? 
         await MUser.get(wf, mode, order.pickedTravelerId, EFormat.Pretty) : null
+    
+    const shopper = status === EOrderStatus.Paid ? 
+        await MUser.get(wf, mode, order.shopperId, EFormat.Pretty) : null
 
     const isOrderQuotableByTraveler = await isQuotableByTraveler(wf, mode, user, order)
 
@@ -425,6 +436,7 @@ const compute = async (wf, mode, user, order: IOrder) => {
             status,
             pickedFlight,
             pickedTraveler,
+            shopper,
             isQuotableByTraveler: isOrderQuotableByTraveler,
         }
     }
@@ -458,10 +470,9 @@ const getMinSelectedFlightsToSelectFlight = () => 1
 
 const canShopperSelectFlight = async (wf, mode, order: IOrder) => {
     if (order.status === EOrderStatus.Paid) return false
-
-    const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id)
+    const quotations = await MQuotation.getAllByOrderId(wf, mode, EFormat.Raw, order.id) as IQuotation[]
     const flightIds = quotations.map((quotation) => quotation.flightId)
-    const flights = await Promise.all(flightIds.map((flightId) => MFlight.get(wf, mode, flightId, EFormat.Raw)))
+    const flights = await Promise.all(flightIds.map((flightId) => MFlight.get(wf, mode, flightId, EFormat.Raw))) as IFlight[]
     const selectedFlights = flights.filter((flight) => flight.status === EFlightStatus.Visible)
 
     return getMinSelectedFlightsToSelectFlight() <= selectedFlights.length
@@ -813,5 +824,5 @@ export default {
     uninstall,
     compute,
     toQuoted,
-    toPaid,
+    // toPaid,
 }

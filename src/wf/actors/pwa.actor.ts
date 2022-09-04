@@ -4,7 +4,12 @@ import {
     subscribeToServiceWorkerMessage,
     getServiceWorkerState,
     supportsServiceWorker,
+    delay,
 } from '@wf/helpers/browser.helper'
+
+import {
+    ESWStatus,
+} from '@helpers/sw.helper'
 
 
 export const supportsSW = supportsServiceWorker
@@ -32,13 +37,13 @@ export const registerSW = async () => {
         )
 
         subscribeToSWMessage(async (msg) => {
-            if (msg === 'unregister-sw'){
+            if (msg === ESWStatus.Unregister) {
                 if (!registration) return
                 logger('Unregistering ServiceWorker')
                 await registration.unregister()
                 logger('ServiceWorker unregistered successfully')
                 location.reload()
-            }
+            } 
         })
 
         if (registration.waiting && registration.active) {
@@ -46,6 +51,14 @@ export const registerSW = async () => {
             // This would happen if skipWaiting() isn't being called, and there are
             // still old tabs open.
             // console.info('Please close all tabs to get updates.')
+            logger('Please close all tabs to get updates. [1]')
+
+            subscribeToSWMessage(async (msg) => {
+                if (msg === ESWStatus.Claimed) {
+                    logger('SW claimed tabs [1]')
+                    document.body.classList.add('data-pwa-update')
+                }
+            })
         } else {
             // updatefound is also fired for the very first install. ¯\_(ツ)_/¯
             registration.addEventListener('updatefound', () => {
@@ -56,26 +69,36 @@ export const registerSW = async () => {
                             // called in the SW, then the user needs to close all their
                             // tabs before they'll get updates.
                             // console.info('Please close all tabs to get updates.')
+                            logger('Please close all tabs to get updates. [2]')
+
+                            subscribeToSWMessage(async (msg) => {
+                                if (msg === ESWStatus.Claimed) {
+                                    logger('SW claimed tabs [2]')
+                                    document.body.classList.add('data-pwa-update')
+                                }
+                            })
                         } else {
                             // Otherwise, this newly installed SW will soon become the
                             // active SW. Rather than explicitly wait for that to happen,
                             // just show the initial "content is cached" message.
                             // console.info('Content is cached for the first time!')
+                            logger('Content is cached for the first time! [3]')
 
-                            // // Force control of SW in initial state
-                            // location.reload()
+                            subscribeToSWMessage(async (msg) => {
+                                if (msg === ESWStatus.ContentReady) {
+                                    logger('SW content ready [3]')
+                                    location.reload()
+                                }
+                            })
                         }
                     }
                 })
             })
         }
+
+        return registration
     } catch (err) {
         // registration failed :(
-        console.error('ServiceWorker registration failed: ', err)
+        return { err }
     }
 }
-
-// export const APWA = {
-//     registerSW,
-//     subscribeToSWMessage,
-// }

@@ -23,6 +23,7 @@ import MFlight from '@models/flight.model'
 import { 
     IOrder, 
     EOrderShoppers,
+    EOrderStatus,
 } from '@types/order.type'
 import MOrder from '@models/order.model'
 
@@ -238,10 +239,24 @@ const toPaid = async (wf, quotationId) => {
     const quotations = await getAllByOrderId(wf, wf.mode.Offline, EFormat.Raw, computedQuotationToPay.orderId)
     const otherQuotations = quotations.filter((quotation) => quotation.id !== computedQuotationToPay.id)
 
+    const order = await MOrder.get(wf, wf.mode.Offline, computedQuotationToPay.orderId, EFormat.Raw)
+    const orderToPay = {
+        ...order,
+        status: EOrderStatus.Paid,
+        updatedAt: new Date(),
+        pickedFlightId: computedQuotationToPay.flightId,
+        pickedTravelerId: computedQuotationToPay.travelerId,
+        pickedQuotationId: computedQuotationToPay.id,
+    }
+
     const transactionData = {
         quotation: {
             collectionName: 'quotations',
             datas: [computedQuotationToPay, ...otherQuotations],
+        },
+        order: {
+            collectionName: 'orders',
+            datas: [orderToPay],
         },
         fns: {
             formatDocForDB: (computedQuotationToFormat) => {
@@ -253,6 +268,22 @@ const toPaid = async (wf, quotationId) => {
     }
 
     const onTransaction = async (transaction, transactionData) => {
+        const orderRef = transactionData.order.docRefs[0]
+        const orderDoc = await transaction.get(orderRef)
+        const order = orderDoc.data()
+
+        if (!orderDoc.exists())
+            return Promise.reject({
+                inForm: true,
+                desc: `El pedido ${orderRef.id} no existen`
+            })
+
+        if (order.status === EOrderStatus.Paid)
+            return Promise.reject({
+                inForm: true,
+                desc: `El pedido ya tiene el estado ${EOrderStatus.Paid}`
+            })
+
         const quotationRefs = transactionData.quotation.docRefs
         const quotationDocs = await Promise.all(
             quotationRefs.map((quotationRef) => transaction.get(quotationRef))
@@ -262,14 +293,16 @@ const toPaid = async (wf, quotationId) => {
 
         if (quotationDocsThatNotExist.length)
             return Promise.reject({
+                inForm: true,
                 desc: 'Algunas de las cotizaciones de la orden no existen'
             })
 
         const quotations = quotationDocs.map((quotationDoc) => quotationDoc.data())
-        const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Paid)
+        const paidQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Paid)
         
-        if (payedQuotations.length)
+        if (paidQuotations.length)
             return Promise.reject({
+                inForm: true,
                 desc: 'No se puede pagar esta cotización porque la orden ya ha sido pagada'
             })
         
@@ -277,31 +310,52 @@ const toPaid = async (wf, quotationId) => {
 
         if (quotationToPay.status === EQuotationStatus.Paid)
             return Promise.reject({
+                inForm: true,
                 desc: `La cotización ya tiene el estado ${EQuotationStatus.Paid}`
             })
         
-        const data = transactionData.quotation.datas[0]
-        const paymentResponse = await transactionData.fns.makePayment(data)
+        const quotationData = transactionData.quotation.datas[0]
+        const paymentResponse = await transactionData.fns.makePayment(quotationData)
         
         if (paymentResponse?.err)
             return Promise.reject({
+                inForm: true,
                 desc: `Error en pasarela de pago: ${paymentResponse.err}`
             })
 
-        const payedQuotation = {
-            ...data,
+        const paidQuotation = {
+            ...quotationToPay,
             updatedAt: new Date(),
             status: EQuotationStatus.Paid,
             payment: paymentResponse
         }
 
-        const formattedQuotation = transactionData.fns.formatDocForDB(payedQuotation)
+        const formattedQuotation = transactionData.fns.formatDocForDB(paidQuotation)
 
+        const orderData = transactionData.order.datas[0]
+        const paidOrder = {
+            ...order,
+            status: orderData.status,
+            updatedAt: orderData.updatedAt,
+            pickedFlightId: orderData.pickedFlightId,
+            pickedTravelerId: orderData.pickedTravelerId,
+            pickedQuotationId: orderData.pickedQuotationId,
+        }
+
+        const formattedOrder = transactionData.fns.formatDocForDB(paidOrder)
+        
         transaction.update(quotationRefs[0], formattedQuotation)
+        transaction.update(orderRef, formattedOrder)
 
         return {
-            id: quotationRefs[0].id,
-            ...payedQuotation,
+            paidQuotation: {
+                id: quotationRefs[0].id,
+                ...paidQuotation,
+            },
+            paidOrder: {
+                id: orderRef.id,
+                ...paidOrder,
+            }
         }
     }
 
@@ -336,6 +390,12 @@ const toQuoted = async (wf, quotation: IQuotation) => {
         quotation: {
             collectionName: 'quotations',
             datas: [data]
+        },
+        fns: {
+            formatDocForDB: (quotationToFormat) => {
+                const { id, ...data } = quotationToFormat
+                return wf.database.formatDocForDB(data)
+            }
         }
     }
 
@@ -351,7 +411,8 @@ const toQuoted = async (wf, quotation: IQuotation) => {
             })
 
         const data = transactionData.quotation.datas[0]
-        transaction.set(quotationRef, data)
+        const formattedData = transactionData.fns.formatDocForDB(data)
+        transaction.set(quotationRef, formattedData)
 
         return {
             id: quotationRef.id,

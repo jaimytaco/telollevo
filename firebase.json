@@ -55,6 +55,17 @@
           "source": "/admin/flights",
           "destination": "/admin/flights.html"
         }
+      ],
+      "headers": [
+        {
+          "source": "**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=0"
+            }
+          ]
+        }
       ]
     }
   ]

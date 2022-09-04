@@ -1,5 +1,7 @@
 ---
 import '@styles/admin.css'
+import PwaUpdateComponent from '@astrocomponents/pwa-update.component.astro'
+import LoaderComponent from '@astrocomponents/LoaderComponent.astro';
 
 interface IProps {
 	title: string,
@@ -7,9 +9,11 @@ interface IProps {
     body: string,
     page: string,
     loader: string,
+    reload: string,
 }
 
-const { title, meta, body, page, loader } = Astro.props as IProps
+const { title, meta, body, page, loader, reload } = Astro.props as IProps
+const bodyClass = [loader, reload].join(' ').trim()
 ---
 
 <html lang="es">
@@ -22,13 +26,12 @@ const { title, meta, body, page, loader } = Astro.props as IProps
     <title>{title}</title>
     <Fragment set:html={meta}>
 </head>
-<body class={loader} data-page={page}>
-    <div class="loader">
-        <p>Loading...</p>
-    </div>
-
-    <Fragment set:html={body}>
+<body class={bodyClass} data-page={page}>
+    <PwaUpdateComponent/>
+    <LoaderComponent/>
     
+    <Fragment set:html={body}>
+
     <script>
         import { initApp } from '@helpers/app.helper'
         initApp()

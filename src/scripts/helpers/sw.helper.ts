@@ -37,6 +37,7 @@ export const images = [
     '/img/icon/package.svg',
     '/img/icon/close.svg',
     'favicon.ico',
+    '/img/illustrations/login-puzzle.svg',
 ]
 
 export const scripts = [
@@ -81,4 +82,5 @@ export enum ESWStatus{
     Claimed = 'claimed',
     ContentReady = 'content-ready',
     Unregister = 'unregister',
+    Fetched = 'document-fetched'
 }

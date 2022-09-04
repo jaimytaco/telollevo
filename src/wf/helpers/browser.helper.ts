@@ -57,13 +57,15 @@ export const getWorkerPath = (fn: string) => {
     return fn.split(WORKER_PREFIX)[1]?.split('",')?.[0]
 }
 
+export const getScope = () => {
+    if (isNode()) return '[Node]'
+    if (isBrowser()) return '[Window]'
+    if (isServiceWorker()) return '[ServiceWorker]'
+    if (isWorker()) return '[Worker]'
+    return '[]'
+}
+
 export const logger = async (msg, args) => {
-    let scope = '[]'
-    if (isNode()) scope = '[Node]'
-    if (isBrowser()) scope = '[Window]'
-    if (isWorker()) scope = '[Worker]'
-    if (isServiceWorker()) scope = '[ServiceWorker]'
-    
-    if (args) console.info(`${scope} ${msg}`, args)
-    else console.info(`${scope} ${msg}`)
+    if (args) console.info(`${getScope()} ${msg}`, args)
+    else console.info(`${getScope()} ${msg}`)
 }

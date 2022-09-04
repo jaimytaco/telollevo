@@ -1,0 +1,14 @@
+.card-16{
+    block-size: 100vh;
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.card-16 .c-16-thumbnail{
+    display: none;
+}
+
+.card-16 .c-16-form{
+    padding-block: 48px;
+    padding-inline: 12px;
+}

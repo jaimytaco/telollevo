@@ -12,6 +12,7 @@ import {
     isServiceWorker,
     supportsWorkerType,
     supportsIndexedDB,
+    getScope,
 } from '@wf/helpers/browser.helper'
 
 import {
@@ -122,7 +123,7 @@ export const buildRouteResponse = async ({ routes, url, cacheName }) => {
     if (err) return { err }
 
     return {
-        response: new Response(html, {
+        response: new Response(`${html}<!-- Rendered by ${getScope()} -->`, {
             headers: { 'Content-Type': 'text/html; charset=utf-8' }
         })
     }
@@ -130,7 +131,7 @@ export const buildRouteResponse = async ({ routes, url, cacheName }) => {
 
 const getLayoutPathname = () => '/admin/layout'
 
-export const getLoaderTag = () => 'data-is-loaded'
+export const getLoaderTag = () => 'is-loaded'
 export const getTitleTag = () => '[TITLE]'
 export const getMetaTag = () => '<!-- [META] -->'
 export const getBodyTag = () => '<!-- [BODY] -->'

@@ -1,4 +1,4 @@
-body > .loader{
+body > .n-loader{
     position: fixed;
     top: 0;
     left: 0;
@@ -10,14 +10,32 @@ body > .loader{
     visibility: visible;
     z-index: 999;
     display: flex;
+    flex-flow: column wrap;
     align-items: center;
     justify-content: center;
+    gap: 12px;
 }
 
-body[data-is-loaded] > .loader,
-body.data-is-loaded > .loader{
+body[is-loaded] > .n-loader,
+body.is-loaded > .n-loader{
     opacity: 0;
     visibility: hidden;
     z-index: -1;
     transition: all .3s ease;
+}
+
+body:not(.is-loaded) > .n-loader img{
+    animation: bounce-anim 1.5s infinite ease;
+}
+
+@keyframes bounce-anim {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-40px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }

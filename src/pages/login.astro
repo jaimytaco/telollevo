@@ -3,10 +3,15 @@ import '@styles/admin/root.css'
 import '@styles/admin/font.css'
 import '@styles/admin/global.css'
 import '@styles/admin/button.css'
+import '@styles/loader.css'
 import '@styles/admin/form.css'
 import '@styles/admin/card-16.css'
 import '@styles/admin/card-17.css'
 import '@styles/admin/responsive.css'
+import '@styles/pwa-update.css';
+
+import LoaderComponent from '@astrocomponents/LoaderComponent.astro';
+import PwaUpdateComponent from '@astrocomponents/pwa-update.component.astro'
 
 import { app } from '@helpers/app.helper'
 ---
@@ -21,10 +26,17 @@ import { app } from '@helpers/app.helper'
     <title>{app.name} | Login</title>
     
 </head>
-<body data-page="public-login">
-    <main>
+<body class="b-public" data-page="public-login">
+    <PwaUpdateComponent/>
+    <LoaderComponent/>
+
+    <main class="m-public">
         <div class="card-16">
             <div class="c-16-thumbnail">
+                <picture>
+                    <img src="/img/illustrations/login-puzzle.svg" height="240">
+                </picture>
+                <h1>¡Bienvenido nuevamente a tu cuenta de {app.name}, te hemos extrañado!</h1>
             </div>
             <div class="c-16-form">
                 <form id="login-form">
@@ -35,7 +47,7 @@ import { app } from '@helpers/app.helper'
                                     <img src="/img/icon/logotype.svg" height="40">
                                 </picture>
                                 <h1>Iniciar sesión</h1>
-                                <p>¡Hola! Bienvenido nuevamente a tu cuenta de {app.name}, te hemos extrañado</p>
+                                <p>¡Bienvenido nuevamente a tu cuenta de {app.name}, te hemos extrañado!</p>
                                 <!-- 
                                 <button class="btn">
                                     <span>Iniciar sesión con Facebook</span>
@@ -52,15 +64,13 @@ import { app } from '@helpers/app.helper'
                         </fieldset>
                         <fieldset>
                             <label for="login-password">Contraseña</label>
-                            <input type="password" id="login-password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>                                                        
-                        </fieldset>
-                        <!-- 
-                        <fieldset>
-                            <button class="btn btn-underline">
+                            <input type="password" id="login-password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
+                            <!-- 
+                            <a href="/login" class="btn btn-primary-color btn-underline btn-xs-inline">
                                 <span>Olvidé mi contraseña</span>
-                            </button>
+                            </a>
+                            -->
                         </fieldset>
-                        -->
                     </main>
                     <footer>
                         <button class="btn btn-primary btn-submit" type="submit">Iniciar sesión</button>

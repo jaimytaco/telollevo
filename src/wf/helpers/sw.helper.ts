@@ -3,17 +3,34 @@ import {
 } from '@wf/helpers/browser.helper'
 
 export const cacheStatic = async (e, cacheName, staticPaths) => {
+    // try {
+    //     const cache = await caches.open(cacheName)
+    //     for(const path of staticPaths){
+    //         try{
+    //             await cache.addAll([path])
+    //         }catch(err){
+    //             logger(`Request failed while caching statically for ${path}`)
+    //         } 
+    //     }
+    // } catch (err) {
+    //     console.error(err)
+    // }
+
     try {
         const cache = await caches.open(cacheName)
-        for(const path of staticPaths){
-            try{
-                await cache.addAll([path])
-            }catch(err){
-                logger(`Request failed while caching statically for ${path}`)
-            } 
-        }
+        await Promise.all(
+            staticPaths.map((path) => {
+                try {
+                    return cache.add(path)
+                } catch (err) {
+                    console.log(err)
+                    logger(`Request failed while caching statically for ${path}`)
+                }
+            })
+        )
     } catch (err) {
-        console.error(err)
+        console.log(err)
+        logger(`Something went wrong caching static assets:`, err)
     }
 }
 
@@ -25,11 +42,6 @@ export const serveFromCache = async (request, cacheName) => {
     try {
         const cache = await caches.open(cacheName)
         const response = await cache.match(request, { ignoreSearch: true })
-
-        // if (response) {
-        //     sendMessage({msg: `from cache: ${getPathnameFromRequest(request)}`})
-        // }
-
         return { response }
     } catch (err) {
        return { err }
