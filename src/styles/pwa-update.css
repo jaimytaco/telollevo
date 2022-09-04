@@ -1,0 +1,31 @@
+.n-pwa-update{
+    inline-size: 100%;
+    background: var(--black-color);
+    color: var(--white-color);
+    opacity: 0;
+    visibility: hidden;
+    max-block-size: 0;
+    padding-inline: 0;
+    padding-block: 0;
+    z-index: -9999;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.n-pwa-update > p{
+    max-inline-size: 60%;
+}
+
+body.data-pwa-update > .n-pwa-update{
+    opacity: 1;
+    visibility: visible;
+    max-block-size: 999px;
+    padding-inline: 16px;
+    padding-block: 12px;
+    z-index: 9999;
+    transition: opacity .3s ease,
+                visibility .3s ease;
+}
