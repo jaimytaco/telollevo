@@ -16,6 +16,47 @@
         "firebase.json",
         "**/.*",
         "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/traveler",
+          "destination": "/traveler.html"
+        },
+        {
+          "source": "/shopper",
+          "destination": "/shopper.html"
+        },
+        {
+          "source": "/login",
+          "destination": "/login.html"
+        },
+        {
+          "source": "/404",
+          "destination": "/404.html"
+        },
+        {
+          "source": "/admin/layout",
+          "destination": "/admin/layout.html"
+        },
+        {
+          "source": "/admin/orders",
+          "destination": "/admin/orders.html"
+        },
+        {
+          "source": "/admin/flights",
+          "destination": "/admin/flights.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=0"
+            }
+          ]
+        }
       ]
     },
     {

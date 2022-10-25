@@ -75,6 +75,7 @@ const configFlightToRegistered = async (wf) => {
 
         const flightId = registeredFlightBtn.getAttribute('data-flight_id')
         const response = await MFlight.toRegistered(wf, flightId)
+        console.log('--- response =', response)
         if (response?.err){
             logger(response.err.desc)
             // TODO: Shoy error in UI
@@ -114,6 +115,14 @@ const configCreateFlightDialog = async (wf, dialogId) => {
     step1Form.onsubmit = async (e) => {
         e.preventDefault()
 
+        const fligthSinceInput = getDOMElement(step1Form, `#${EFlightFields.Since}`)
+        if (!fligthSinceInput) return
+        const flightSince = fligthSinceInput.value
+
+        const fligthUntilInput = getDOMElement(step1Form, `#${EFlightFields.Until}`)
+        if (!fligthUntilInput) return
+        const fligthUntil = fligthUntilInput.value
+
         const receiveOrdersSinceInput = getDOMElement(step1Form, `#${EFlightFields.ReceiveOrdersSince}`)
         if (!receiveOrdersSinceInput) return
         const receiveOrdersSince = receiveOrdersSinceInput.value
@@ -121,6 +130,9 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         const receiveOrdersUntilInput = getDOMElement(step1Form, `#${EFlightFields.ReceiveOrdersUntil}`)
         if (!receiveOrdersUntilInput) return
         const receiveOrdersUntil = receiveOrdersUntilInput.value
+
+        flight.since = new Date(`${flightSince} 00:00:00`)
+        flight.until = new Date(`${fligthUntil} 00:00:00`)
 
         flight.receiveOrdersSince = new Date(`${receiveOrdersSince} 00:00:00`)
         flight.receiveOrdersUntil = new Date(`${receiveOrdersUntil} 00:00:00`)
@@ -143,6 +155,47 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         logger('create-flight-dialog step-1 with flight:', flight)
 
         step1Form.classList.remove('active')
+        // step2Form.classList.add('active')
+        step2_1Form.classList.add('active')
+    }
+
+    // STEP-2_1
+    const step2_1Form = getDOMElement(dialog, '#create-flight-step-2_1_form')
+    if (!step2_1Form) return
+    CForm.init(step2_1Form.id)
+
+    step2_1Form.onsubmit = async (e) => {
+        e.preventDefault()
+
+        const shippingDestinationInput = getDOMElement(step2_1Form, `[list="${EFlightFields.ShippingDestination}"]`)
+        if (!shippingDestinationInput) return
+        const shippingDestination = shippingDestinationInput.value
+
+        const deliverOrderAtInput = getDOMElement(step2_1Form, `#${EFlightFields.DeliverOrderAt}`)
+        if (!deliverOrderAtInput) return
+        const deliverOrderAt = deliverOrderAtInput.value
+
+        const confirmDeliverOrder48hInput = getDOMElement(step2_1Form, `#${EFlightFields.ConfirmDeliverOrder48h}`)
+        if (!confirmDeliverOrder48hInput) return
+        const confirmDeliverOrder48h = confirmDeliverOrder48hInput.checked
+
+        flight.shippingDestination = shippingDestination
+        flight.deliverOrderAt = new Date(`${deliverOrderAt} 00:00:00`)
+        flight.confirmDeliverOrder48h = confirmDeliverOrder48h
+
+        const validateStatus = await CForm.validateOnSubmit(step2_1Form, MFlight.sanitize, flight)
+        if (validateStatus?.err) {
+            CForm.showInvalid(step2_1Form, validateStatus.err, flight)
+            return
+        }
+
+        CForm.handleFreeze(step2_1Form)
+        await delay(MAX_FORM_FREEZING_TIME)
+        CForm.handleFreeze(step2_1Form, 'unfreeze')
+
+        logger('create-flight-dialog step-2_1 with flight:', flight)
+
+        step2_1Form.classList.remove('active')
         step2Form.classList.add('active')
     }
 
@@ -211,6 +264,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
             place
         }
 
+        flight.from = country
         flight.housing = housing
         flight.isResponsibleFor = isResponsibleFor
         flight.areReceiveOrderDatesOk = areReceiveOrderDatesOk
@@ -266,50 +320,51 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         logger('create-flight-dialog step-3 with flight:', flight)
 
         step3Form.classList.remove('active')
-        step4Form.classList.add('active')
-    }
-
-
-    // STEP-4
-    const step4Form = getDOMElement(dialog, '#create-flight-step-4_form')
-    if (!step4Form) return
-    
-    CForm.init(step4Form.id)
-
-    step4Form.onsubmit = async (e) => {
-        e.preventDefault()
-
-        const shippingDestinationInput = getDOMElement(step4Form, `[list="${EFlightFields.ShippingDestination}"]`)
-        if (!shippingDestinationInput) return
-        const shippingDestination = shippingDestinationInput.value
-
-        const deliverOrderAtInput = getDOMElement(step4Form, `#${EFlightFields.DeliverOrderAt}`)
-        if (!deliverOrderAtInput) return
-        const deliverOrderAt = deliverOrderAtInput.value
-
-        const confirmDeliverOrder48hInput = getDOMElement(step4Form, `#${EFlightFields.ConfirmDeliverOrder48h}`)
-        if (!confirmDeliverOrder48hInput) return
-        const confirmDeliverOrder48h = confirmDeliverOrder48hInput.checked
-
-        flight.shippingDestination = shippingDestination
-        flight.deliverOrderAt = new Date(`${deliverOrderAt} 00:00:00`)
-        flight.confirmDeliverOrder48h = confirmDeliverOrder48h
-
-        const validateStatus = await CForm.validateOnSubmit(step4Form, MFlight.sanitize, flight)
-        if (validateStatus?.err) {
-            CForm.showInvalid(step4Form, validateStatus.err, flight)
-            return
-        }
-
-        CForm.handleFreeze(step4Form)
-        await delay(MAX_FORM_FREEZING_TIME)
-        CForm.handleFreeze(step4Form, 'unfreeze')
-
-        logger('create-flight-dialog step-4 with flight:', flight)
-
-        step4Form.classList.remove('active')
+        // step4Form.classList.add('active')
         step5Form.classList.add('active')
     }
+
+
+    // // STEP-4
+    // const step4Form = getDOMElement(dialog, '#create-flight-step-4_form')
+    // if (!step4Form) return
+    
+    // CForm.init(step4Form.id)
+
+    // step4Form.onsubmit = async (e) => {
+    //     e.preventDefault()
+
+    //     const shippingDestinationInput = getDOMElement(step4Form, `[list="${EFlightFields.ShippingDestination}"]`)
+    //     if (!shippingDestinationInput) return
+    //     const shippingDestination = shippingDestinationInput.value
+
+    //     const deliverOrderAtInput = getDOMElement(step4Form, `#${EFlightFields.DeliverOrderAt}`)
+    //     if (!deliverOrderAtInput) return
+    //     const deliverOrderAt = deliverOrderAtInput.value
+
+    //     const confirmDeliverOrder48hInput = getDOMElement(step4Form, `#${EFlightFields.ConfirmDeliverOrder48h}`)
+    //     if (!confirmDeliverOrder48hInput) return
+    //     const confirmDeliverOrder48h = confirmDeliverOrder48hInput.checked
+
+    //     flight.shippingDestination = shippingDestination
+    //     flight.deliverOrderAt = new Date(`${deliverOrderAt} 00:00:00`)
+    //     flight.confirmDeliverOrder48h = confirmDeliverOrder48h
+
+    //     const validateStatus = await CForm.validateOnSubmit(step4Form, MFlight.sanitize, flight)
+    //     if (validateStatus?.err) {
+    //         CForm.showInvalid(step4Form, validateStatus.err, flight)
+    //         return
+    //     }
+
+    //     CForm.handleFreeze(step4Form)
+    //     await delay(MAX_FORM_FREEZING_TIME)
+    //     CForm.handleFreeze(step4Form, 'unfreeze')
+
+    //     logger('create-flight-dialog step-4 with flight:', flight)
+
+    //     step4Form.classList.remove('active')
+    //     step5Form.classList.add('active')
+    // }
 
 
     // STEP-5
@@ -329,9 +384,9 @@ const configCreateFlightDialog = async (wf, dialogId) => {
         if (!airlineInput) return
         const airline = airlineInput.value
 
-        const fromInput = getDOMElement(step5Form, `[list="${EFlightFields.From}"]`)
-        if (!fromInput) return
-        const from = fromInput.value
+        // const fromInput = getDOMElement(step5Form, `[list="${EFlightFields.From}"]`)
+        // if (!fromInput) return
+        // const from = fromInput.value
 
         const toInput = getDOMElement(step5Form, `[list="${EFlightFields.To}"]`)
         if (!toInput) return
@@ -339,7 +394,7 @@ const configCreateFlightDialog = async (wf, dialogId) => {
 
         flight.code = code
         flight.airline = airline
-        flight.from = from
+        // flight.from = from
         flight.to = to
 
         const validateStatus = await CForm.validateOnSubmit(step5Form, MFlight.sanitize, flight)

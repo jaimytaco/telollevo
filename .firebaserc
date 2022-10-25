@@ -7,6 +7,9 @@
       "hosting": {
         "qa": [
           "qa-telollevo-e311e"
+        ],
+        "dev": [
+          "dev-telollevo-e311e"
         ]
       }
     }

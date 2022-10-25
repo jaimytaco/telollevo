@@ -68,6 +68,8 @@ export interface IReceiver{
 }
 
 export enum EFlightFields{
+    Since = 'since',
+    Until = 'until',
     ReceiveOrdersSince = 'receive-orders-since',
     ReceiveOrdersUntil = 'receive-orders-until',
     IsResponsibleFor = 'is-responsible-for',
@@ -81,20 +83,37 @@ export enum EFlightFields{
     To = 'to',
 }
 
+export const MAX_DELIVERY_HOURS_AFTER_FLIGHT = 48
+
 export enum ESanitizeFlightErrors{
     TravelerId = 'Usuario no autenticado',
+
+    Since = 'Debe indicar una fecha válida',
+    Until = 'Debe indicar una fecha válida',
+    UntilLower = 'La fecha debe ser posterior a la fecha de salida de tu vuelo',
+
     ReceiveOrdersSince = 'Debe indicar una fecha válida',
+    ReceiveOrdersSinceLower = 'La fecha debe ser posterior a la fecha de salida de tu vuelo',
+    ReceiveOrdersSinceHigher = 'La fecha debe ser anterior a la fecha de llegada de tu vuelo',
+
     ReceiveOrdersUntil = 'Debe indicar una fecha válida',
-    ReceiveOrdersUntilLower = 'La fecha debe ser mayor a la anterior',
+    ReceiveOrdersUntilLower = 'La fecha debe ser posterior a la fecha de recepción',
+    ReceiveOrdersUntilHigher = 'La fecha debe ser anterior a la fecha de llegada de tu vuelo',
+
     IsResponsibleFor = 'Debe indicar que el viajero se hace responsable de los productos',
     AreReceiveOrderDatesOk = 'Debe indicar que el viajero se compromete a revisar bien las fechas registradas',
     ShippingDestination = 'Debe indicar un punto de entrega válido',
+
     DeliverOrderAt = 'Debe indicar una fecha válida',
+    DeliverOrderAtHigher = `La fecha debe ser posterior en ${MAX_DELIVERY_HOURS_AFTER_FLIGHT}hrs. como máximo a la fecha de salida de tu vuelo`,
+
     ConfirmDeliverOrder48h = 'Debe confirmar si el pedido será entregado, como máximo, 48 horas después de llegar al destino',
     Code = 'Debe indicar el código de vuelo',
     Airline = 'Debe indicar la aerolínea de vuelo',
     From = 'Debe indicar un país origen válido',
+    
     To = 'Debe indicar un país destino válido',
+    ToEqualsFrom = 'Debe indicar un país diferente al de origen',
 }
 
 export enum EFlightStatus{

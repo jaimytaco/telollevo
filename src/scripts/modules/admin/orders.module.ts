@@ -638,8 +638,8 @@ const getCreateOrderDialog = () => `
             </header>
             <main>
                 <fieldset>
-                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Inplace_Miraflores}" id="${EOrderFields.ShippingDestination}_inplace-miraflores" checked required>
-                    <label for="${EOrderFields.ShippingDestination}_inplace-miraflores" class="btn btn-f-width">${capitalizeString(EShippingDestination.Inplace_Miraflores)}</label>
+                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Inplace_Surco}" id="${EOrderFields.ShippingDestination}_inplace-surco" checked required>
+                    <label for="${EOrderFields.ShippingDestination}_inplace-surco" class="btn btn-f-width">${capitalizeString(EShippingDestination.Inplace_Surco)}</label>
 
                     <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Town}" id="${EOrderFields.ShippingDestination}_town" required>
                     <label for="${EOrderFields.ShippingDestination}_town" class="btn btn-f-width">Envio ${EShippingDestination.Town}</label>
@@ -743,7 +743,7 @@ const getQuoteOrderDialog = async (wf, user: IUser, computedOrders: IOrder[]) =>
                     </fieldset>
                     <fieldset>
                         <label for="quote-price">
-                            Precio<small>(en ${ECoin.USD.code})</small>
+                            Precio<small> (en ${ECoin.USD.code})</small>
                         </label>
                         <input type="number" placeholder="0.00" step="0.01" id="quote-price" required>
                     </fieldset>

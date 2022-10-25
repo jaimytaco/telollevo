@@ -14,6 +14,8 @@ import {
 
     EReceiverFields,
     ESanitizeReceiverErrors,
+
+    MAX_DELIVERY_HOURS_AFTER_FLIGHT,
 } from '@types/flight.type'
 
 import { 
@@ -67,6 +69,14 @@ const toRowExtra = (user: IUser, flight: IFlight) => {
                 <div class="card-6">
                     <h6>Detalles del vuelo</h6>
                     <div class="card-7-group">
+                        ${
+                            1 || user.type === EUserType.Admin ? 
+                                `<div class="card-7">
+                                    <p>Trayecto:<br>
+                                        <span>El vuelo sale el ${flight.since} y llega el ${flight.until}</span>
+                                    </p>
+                                </div>` : ''
+                        }
                         <div class="card-7">
                             <p>Recepción:<br>
                                 <span>El pedido será recepcionado del ${flight.receiveOrdersSince} al ${flight.receiveOrdersUntil}.</span>
@@ -97,7 +107,7 @@ const toRowExtra = (user: IUser, flight: IFlight) => {
                             <img src="/img/icon/package.svg" width="18" height="18">
                         </picture>
                         <p>La entrega será en ${flight.shippingDestination}</p>
-                        </div>
+                    </div>
                     <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-open" data-c-8_btn="">Ver más detalles</button>
                     <button class="btn btn-underline btn-xs-inline btn-xs-block c-8-close" data-c-8_btn="">Ocultar más detalles</button>
                 </div>
@@ -335,51 +345,186 @@ const getAll = async (wf, mode, isFormatted: EFormat, filters?) => {
 }
 
 const prettify = (flight: IFlight) => {
+    flight.since = formatLocaleDate(flight.since)
+    flight.until = formatLocaleDate(flight.until)
     flight.receiveOrdersSince = formatLocaleDate(flight.receiveOrdersSince)
     flight.receiveOrdersUntil = formatLocaleDate(flight.receiveOrdersUntil)
     flight.deliverOrderAt = formatLocaleDate(flight.deliverOrderAt)
     return flight
 }
 
+const sanitize_travelerId = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'travelerId') && !isValidString(flight.travelerId)
+    if (hasError) return { 
+        err: {
+            desc: ESanitizeFlightErrors.TravelerId
+        } 
+    }
+}
+
+const sanitize_status = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'status') && !Object.values(EFlightStatus).includes(flight.status)
+    if (hasError) return {
+        err: {
+            desc: ESanitizeFlightErrors.Status
+        }
+    } 
+}
+
+const sanitize_since = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'since') && !isValidDate(flight.since)
+    if (hasError) return {
+        err: {
+            field: EFlightFields.Since,
+            desc: ESanitizeFlightErrors.Since
+        }
+    }
+}
+
+const sanitize_until = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'until') && !isValidDate(flight.until)
+    if (hasError) return {
+        err: {
+            field: EFlightFields.Until,
+            desc: ESanitizeFlightErrors.Until
+        }
+    }
+
+    const untilLower_error = flight.since >= flight.until
+    if (untilLower_error) return {
+        err: {
+            field: EFlightFields.Until,
+            desc: `${ESanitizeFlightErrors.UntilLower}: ${formatLocaleDate(flight.since)}`
+        }
+    }
+}
+
+const sanitize_receiveOrdersSince = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'receiveOrdersSince') && !isValidDate(flight.receiveOrdersSince)
+    if (hasError) return {
+        err: {
+            field: EFlightFields.ReceiveOrdersSince,
+            desc: ESanitizeFlightErrors.ReceiveOrdersSince
+        }
+    }
+
+    const receiveOrdersSinceLower_error = flight.since >= flight.receiveOrdersSince
+    if (receiveOrdersSinceLower_error) return {
+        err: {
+            field: EFlightFields.ReceiveOrdersSince,
+            desc: `${ESanitizeFlightErrors.ReceiveOrdersSinceLower}: ${formatLocaleDate(flight.since)}`
+        }
+    }
+
+    const receiveOrdersSinceHigher_error = flight.until <= flight.receiveOrdersSince
+    if (receiveOrdersSinceHigher_error) return {
+        err: {
+            field: EFlightFields.ReceiveOrdersSince,
+            desc: `${ESanitizeFlightErrors.ReceiveOrdersSinceHigher}: ${formatLocaleDate(flight.until)}`
+        }
+    }
+}
+
+const sanitize_receiveOrdersUntil = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'receiveOrdersUntil') && !isValidDate(flight.receiveOrdersUntil)
+    if (hasError) return {
+        err: {
+            field: EFlightFields.ReceiveOrdersUntil,
+            desc: ESanitizeFlightErrors.ReceiveOrdersUntil
+        }
+    }
+
+    const receiveOrderUntilLower_error = flight.receiveOrdersSince >= flight.receiveOrdersUntil
+    if (receiveOrderUntilLower_error) return {
+        err: {
+            field: EFlightFields.ReceiveOrdersUntil,
+            desc: `${ESanitizeFlightErrors.ReceiveOrdersUntilLower}: ${formatLocaleDate(flight.receiveOrdersSince)}`
+        }
+    }
+
+    const receiveOrdersUntilHigher_error = flight.receiveOrdersUntil >= flight.until
+    if (receiveOrdersUntilHigher_error) return {
+        err: {
+            field: EFlightFields.ReceiveOrdersUntil,
+            desc: `${ESanitizeFlightErrors.ReceiveOrdersUntilHigher}: ${formatLocaleDate(flight.until)}`
+        }
+    }
+}
+
+const sanitize_shippingDestination = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'shippingDestination') && !Object.values(EShippingDestination).map((sd) => capitalizeString(sd)).includes(flight.shippingDestination)
+    if (hasError) return {
+        err: {
+            field: EFlightFields.ShippingDestination,
+            desc: ESanitizeFlightErrors.ShippingDestination
+        }
+    }
+}
+
+const sanitize_deliverOrderAt = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'deliverOrderAt') && !isValidDate(flight.deliverOrderAt)
+    if (hasError) return {
+        err: {
+            field: EFlightFields.DeliverOrderAt,
+            desc: ESanitizeFlightErrors.DeliverOrderAt
+        }
+    }
+
+    const diff = flight.deliverOrderAt - flight.until
+    const hours = diff / (1000 * 60 * 60)
+    console.log('--- hours =', hours)
+
+    const deliverOrderAtHigher_error = !(hours > 0 && hours <= MAX_DELIVERY_HOURS_AFTER_FLIGHT)
+    if (deliverOrderAtHigher_error) return {
+        err: {
+            field: EFlightFields.DeliverOrderAt,
+            desc: `${ESanitizeFlightErrors.DeliverOrderAtHigher}: ${formatLocaleDate(flight.until)}`
+        }
+    }
+}
+
+const sanitize_confirmDeliverOrder48h = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'confirmDeliverOrder48h') && !isBoolean(flight.confirmDeliverOrder48h)
+    if (hasError) return {
+        err: {
+            field: EFlightFields.ConfirmDeliverOrder48h,
+            desc: ESanitizeFlightErrors.ConfirmDeliverOrder48h
+        }
+    }
+}
+
+
 const sanitize = (flight: IFlight) => {
     // Sanitize for step-1
-    if (hasParameter(flight, 'travelerId') && !isValidString(flight.travelerId))
-        return {
-            err: {
-                desc: ESanitizeFlightErrors.TravelerId
-            }
-        }
+    const travelerId_error = sanitize_travelerId(flight)
+    if (travelerId_error) return travelerId_error
 
-    if (hasParameter(flight, 'status') && !Object.values(EFlightStatus).includes(flight.status))
-        return {
-            err: {
-                desc: ESanitizeFlightErrors.Status
-            }
-        }
-    
-    if (hasParameter(flight, 'receiveOrdersSince') && !isValidDate(flight.receiveOrdersSince))
-        return {
-            err: {
-                field: EFlightFields.ReceiveOrdersSince,
-                desc: ESanitizeFlightErrors.ReceiveOrdersSince
-            }
-        }
+    const status_error = sanitize_status(flight)
+    if (status_error) return status_error
 
-    if (hasParameter(flight, 'receiveOrdersUntil') && !isValidDate(flight.receiveOrdersUntil))
-        return {
-            err: {
-                field: EFlightFields.ReceiveOrdersUntil,
-                desc: ESanitizeFlightErrors.ReceiveOrdersUntil
-            }
-        }
+    const since_error = sanitize_since(flight)
+    if (since_error) return since_error
 
-    if (hasParameter(flight, 'receiveOrdersSince') && hasParameter(flight, 'receiveOrdersUntil') && flight.receiveOrdersSince >= flight.receiveOrdersUntil)
-        return {
-            err: {
-                field: EFlightFields.ReceiveOrdersUntil,
-                desc: ESanitizeFlightErrors.ReceiveOrdersUntilLower
-            }
-        }
+    const until_error = sanitize_until(flight)
+    if (!since_error && until_error) return until_error
+
+    const receiveOrdersSince_error = sanitize_receiveOrdersSince(flight)
+    if (!since_error && receiveOrdersSince_error) return receiveOrdersSince_error
+
+    const receiveOrdersUntil_error = sanitize_receiveOrdersUntil(flight)
+    if (!receiveOrdersSince_error && receiveOrdersUntil_error) return receiveOrdersUntil_error
+
+
+    // Sanitize for step-2_1
+    const shippingDestination_error = sanitize_shippingDestination(flight)
+    if (shippingDestination_error) return shippingDestination_error
+
+    const deliverOrderAt_error = sanitize_deliverOrderAt(flight)
+    if (deliverOrderAt_error) return deliverOrderAt_error
+
+    const confirmDeliverOrder48h_error = sanitize_confirmDeliverOrder48h(flight)
+    if (confirmDeliverOrder48h_error) return confirmDeliverOrder48h_error
+
     
     // Sanitize for step-2
     if (hasParameter(flight?.housing?.place, 'district') && !isValidString(flight.housing.place.district))
@@ -471,31 +616,6 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    // Sanitize for step-4
-    if (hasParameter(flight, 'shippingDestination') && !Object.values(EShippingDestination).map((sd) => capitalizeString(sd)).includes(flight.shippingDestination))
-        return {
-            err: {
-                field: EFlightFields.ShippingDestination,
-                desc: ESanitizeFlightErrors.ShippingDestination
-            }
-        }
-
-    if (hasParameter(flight, 'deliverOrderAt') && !isValidDate(flight.deliverOrderAt))
-        return {
-            err: {
-                field: EFlightFields.DeliverOrderAt,
-                desc: ESanitizeFlightErrors.DeliverOrderAt
-            }
-        }
-
-    if (hasParameter(flight, 'confirmDeliverOrder48h') && !isBoolean(flight.confirmDeliverOrder48h))
-        return {
-            err: {
-                field: EFlightFields.ConfirmDeliverOrder48h,
-                desc: ESanitizeFlightErrors.ConfirmDeliverOrder48h
-            }
-        }
-
     // Sanitize for step-5
     if (hasParameter(flight, 'code') && !isValidString(flight.code))
         return {
@@ -513,21 +633,55 @@ const sanitize = (flight: IFlight) => {
             }
         }
 
-    if (hasParameter(flight, 'from') && !Object.values(ECountry).filter((value) => value !== ECountry.Peru).includes(flight.from))
-        return {
-            err: {
-                field: EFlightFields.From,
-                desc: ESanitizeFlightErrors.From
-            }
-        }
+    // if (hasParameter(flight, 'from') && !Object.values(ECountry).includes(flight.from))
+    //     return {
+    //         err: {
+    //             field: EFlightFields.From,
+    //             desc: ESanitizeFlightErrors.From
+    //         }
+    //     }
 
-    if (hasParameter(flight, 'to') && ECountry.Peru !== flight.to)
-        return {
-            err: {
-                field: EFlightFields.To,
-                desc: ESanitizeFlightErrors.To
-            }
+    // if (hasParameter(flight, 'to') && flight.from !== flight.to)
+    //     return {
+    //         err: {
+    //             field: EFlightFields.To,
+    //             desc: ESanitizeFlightErrors.To
+    //         }
+    //     }
+
+    const from_error = sanitize_from(flight)
+    if (from_error) return from_error
+
+    const to_error = sanitize_to(flight)
+    if (!from_error && to_error) return to_error
+}
+
+const sanitize_from = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'from') && !Object.values(ECountry).includes(flight.from)
+    if (hasError) return {
+        err: {
+            field: EPlaceFields.Country,
+            desc: ESanitizeFlightErrors.From
         }
+    }
+}
+
+const sanitize_to = (flight: IFlight) => {
+    const hasError = hasParameter(flight, 'to') && !Object.values(ECountry).includes(flight.to)
+    if (hasError) return {
+        err: {
+            field: EFlightFields.To,
+            desc: ESanitizeFlightErrors.To
+        }
+    }
+
+    const toEqualsFrom_error = flight.from === flight.to
+    if (toEqualsFrom_error) return {
+        err: {
+            field: EFlightFields.To,
+            desc: ESanitizeFlightErrors.ToEqualsFrom
+        }
+    }
 }
 
 const toVisible = async (wf, id) => {
@@ -607,11 +761,17 @@ const toRegistered = async (wf, id) => {
             })
 
         const quotations = quotationDocs.map((quotationDoc) => quotationDoc.data())
-        const selectedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Selected)
         
+        const selectedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Selected)
         if (selectedQuotations.length)
             return Promise.reject({
                 desc: 'Este vuelo ya ha sido elegido por un comprador, no se puede reestablecer'
+            })
+
+        const payedQuotations = quotations.filter((quotation) => quotation.status === EQuotationStatus.Paid)
+        if (payedQuotations.length)
+            return Promise.reject({
+                desc: 'Este vuelo ya ha sido pagado por un comprador, no se puede reestablecer'
             })
 
         const flightRef = transactionData.flight.docRefs[0]

@@ -153,8 +153,8 @@ export const createOrder_dialog = `
             </header>
             <main>
                 <fieldset>
-                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Inplace_Miraflores}" id="${EOrderFields.ShippingDestination}_inplace-miraflores" checked required>
-                    <label for="${EOrderFields.ShippingDestination}_inplace-miraflores" class="btn btn-f-width">${capitalizeString(EShippingDestination.Inplace_Miraflores)}</label>
+                    <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Inplace_Surco}" id="${EOrderFields.ShippingDestination}_inplace-surco" checked required>
+                    <label for="${EOrderFields.ShippingDestination}_inplace-surco" class="btn btn-f-width">${capitalizeString(EShippingDestination.Inplace_Surco)}</label>
 
                     <input type="radio" name="${EOrderFields.ShippingDestination}" value="${EShippingDestination.Town}" id="${EOrderFields.ShippingDestination}_town" required>
                     <label for="${EOrderFields.ShippingDestination}_town" class="btn btn-f-width">Envio ${EShippingDestination.Town}</label>
@@ -230,6 +230,15 @@ export const createFlight_dialog = `
             </header>
             <main>
                 <fieldset>
+                    <label for="${EFlightFields.Since}">¿Cuando sale tu vuelo?</label>
+                    <input type="date" placeholder="DD/MM/AAAA" id="${EFlightFields.Since}" required>
+                </fieldset>
+                <fieldset>
+                    <label for="${EFlightFields.Until}">¿Cuando llega tu vuelo?</label>
+                    <input type="date" placeholder="DD/MM/AAAA" id="${EFlightFields.Until}" required>
+                </fieldset>
+
+                <fieldset>
                     <label for="${EFlightFields.ReceiveOrdersSince}">¿Desde cuando puedes recibir productos?</label>
                     <input type="date" placeholder="DD/MM/AAAA" id="${EFlightFields.ReceiveOrdersSince}" required>
                 </fieldset>
@@ -243,9 +252,46 @@ export const createFlight_dialog = `
             </footer>
         </form>
 
+        <form id="create-flight-step-2_1_form">
+            <header>
+                <button class="btn btn-xs-inline btn-xs-block" type="button" data-current-step="create-flight-step-2_1_form" data-previous-step_btn="create-flight-step-1_form">
+                    <picture>
+                        <img src="/img/icon/arrow-left.svg" width="20" height="20">
+                    </picture>
+                </button>
+                <div class="h-heading">
+                    <h3>¿Cómo será la entrega?</h3>
+                    <p>Una vez que llegues con los productos al país destino.</p>
+                </div>
+            </header>  
+            <main>  
+                <fieldset>
+                    <label for="${EFlightFields.ShippingDestination}">¿En cuál de nuestros locales entregarás los productos?</label>
+                    <input list="${EFlightFields.ShippingDestination}" placeholder="Selecciona un local" autocomplete="none" required>
+                    <datalist id="${EFlightFields.ShippingDestination}">
+                        <option value="${capitalizeString(EShippingDestination.Inplace_Surco)}"></option>
+                    </datalist>
+                </fieldset> 
+                <fieldset>
+                    <label for="${EFlightFields.DeliverOrderAt}">¿Qué día entregarás los productos al equipo de Te lo Llevo?</label>
+                    <input type="date" placeholder="DD/MM/AAAA" id="${EFlightFields.DeliverOrderAt}" required>
+                </fieldset>
+                <fieldset>
+                    <input type="checkbox" id="${EFlightFields.ConfirmDeliverOrder48h}" required>
+                    <label for="${EFlightFields.ConfirmDeliverOrder48h}">
+                        Me comprometo a entregar el pedido, como máximo, 
+                        después de 48 horas de haber llegado a mi destino.
+                    </label>
+                </fieldset>
+            </main>
+            <footer>
+                <button class="btn btn-primary btn-submit" type="submit">Continuar</button>
+            </footer>
+        </form>
+
         <form id="create-flight-step-2_form">
             <header>
-                <button class="btn btn-xs-inline btn-xs-block" type="button" data-current-step="create-flight-step-2_form" data-previous-step_btn="create-flight-step-1_form">
+                <button class="btn btn-xs-inline btn-xs-block" type="button" data-current-step="create-flight-step-2_form" data-previous-step_btn="create-flight-step-2_1_form">
                     <picture>
                         <img src="/img/icon/arrow-left.svg" width="20" height="20">
                     </picture>
@@ -382,19 +428,8 @@ export const createFlight_dialog = `
                     <label for="${EFlightFields.ShippingDestination}">¿En cuál de nuestros locales entregarás los productos?</label>
                     <input list="${EFlightFields.ShippingDestination}" placeholder="Selecciona un local" autocomplete="none" required>
                     <datalist id="${EFlightFields.ShippingDestination}">
-                        <option value="${capitalizeString(EShippingDestination.Inplace_Miraflores)}"></option>
+                        <option value="${capitalizeString(EShippingDestination.Inplace_Surco)}"></option>
                     </datalist>
-                </fieldset>
-                <fieldset>
-                    <label for="${EFlightFields.DeliverOrderAt}">¿Qué día entregarás los productos al equipo de Te lo Llevo?</label>
-                    <input type="date" placeholder="DD/MM/AAAA" id="${EFlightFields.DeliverOrderAt}" required>
-                </fieldset>
-                <fieldset>
-                    <input type="checkbox" id="${EFlightFields.ConfirmDeliverOrder48h}" required>
-                    <label for="${EFlightFields.ConfirmDeliverOrder48h}">
-                        Me comprometo a entregar el pedido, como máximo, 
-                        después de 48 horas de haber llegado a mi destino.
-                    </label>
                 </fieldset>
             </main>
             <footer>
@@ -404,7 +439,7 @@ export const createFlight_dialog = `
 
         <form id="create-flight-step-5_form">
             <header>
-                <button class="btn btn-xs-inline btn-xs-block" type="button" data-current-step="create-flight-step-5_form" data-previous-step_btn="create-flight-step-4_form">
+                <button class="btn btn-xs-inline btn-xs-block" type="button" data-current-step="create-flight-step-5_form" data-previous-step_btn="create-flight-step-3_form">
                     <picture>
                         <img src="/img/icon/arrow-left.svg" width="20" height="20">
                     </picture>
@@ -424,22 +459,12 @@ export const createFlight_dialog = `
                     <input type="text" id="${EFlightFields.Airline}" placeholder="Ingresa la aerolínea encargada de su vuelo" required>
                 </fieldset>
                 <fieldset>
-                    <label for="${EFlightFields.From}">País origen</label>
-                    <input list="${EFlightFields.From}" placeholder="Selecciona un país" autocomplete="none" required>
-                    <datalist id="${EFlightFields.From}">
-                        ${
-                            Object.values(ECountry)
-                                .filter((value) => value !== ECountry.Peru)
-                                .map((value) => `<option value="${value}"></option>`)
-                                .join('')
-                        }
-                    </datalist>
-                </fieldset>
-                <fieldset>
                     <label for="${EFlightFields.To}">País destino</label>
                     <input list="${EFlightFields.To}" placeholder="Selecciona un país" autocomplete="none" required>
                     <datalist id="${EFlightFields.To}">
-                        <option value="${ECountry.Peru}"></option>
+                        <option value="${ECountry.Perú}"></option>
+                        <option value="${ECountry.Colombia}"></option>
+                        <option value="${ECountry.Ecuador}"></option>
                     </datalist>
                 </fieldset>
             </main>
